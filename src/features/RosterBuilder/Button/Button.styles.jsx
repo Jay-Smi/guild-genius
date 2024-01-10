@@ -8,7 +8,7 @@ export const StyledButton = styled.button`
     justify-content: center;
     flex: 0 0 auto;
     touch-action: none;
-    cursor: var(--cursor, pointer);
+
     border-radius: 5px;
     border: none;
     outline: none;
@@ -34,11 +34,19 @@ export const StyledButton = styled.button`
 
     &:focus-visible {
         outline: none;
-        box-shadow: 0 0 0 2px rgba(255, 255, 255, 0),
+        box-shadow:
+            0 0 0 2px rgba(255, 255, 255, 0),
             0 0px 0px 2px var(--focused-outline-color);
     }
 
     &:active svg {
         background-color: var(--background, rgba(0, 0, 0, 0.05));
+    }
+
+    &.handle {
+        cursor: grab;
+    }
+    &.handle:active {
+        cursor: grabbing;
     }
 `;

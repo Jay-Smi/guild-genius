@@ -117,16 +117,16 @@ export function RosterBuilderActual({
                             return container.id === activeContainer.id
                                 ? false
                                 : activeContainer.type === "raid"
-                                ? findContainer(container.id).type === "raid"
-                                : findContainer(container.id).type ===
-                                  "category";
+                                  ? findContainer(container.id).type === "raid"
+                                  : findContainer(container.id).type ===
+                                    "category";
                         }
                     ),
                 });
             }
 
             if (activeContainer.type === "group") {
-                return closestCenter({
+                return closestCorners({
                     ...args,
                     droppableContainers: args.droppableContainers.filter(
                         (container) => {
@@ -219,15 +219,18 @@ export function RosterBuilderActual({
         >
             <div
                 style={{
-                    display: "flex",
+                    display: "grid",
+                    gridTemplateColumns: "auto 1fr",
                 }}
             >
                 <div
                     style={{
                         display: "flex",
-                        boxSizing: "border-box",
+
                         padding: 20,
                         flexDirection: "column",
+                        height: "100%",
+                        overflow: "scroll",
                     }}
                     ref={animatedParent}
                 >
@@ -301,8 +304,11 @@ export function RosterBuilderActual({
                     style={{
                         display: "flex",
                         boxSizing: "border-box",
+
                         padding: 20,
                         flexDirection: "column",
+
+                        gap: "20px",
                     }}
                 >
                     {/* //Sortable Raids */}
@@ -629,6 +635,7 @@ export function RosterBuilderActual({
                 shadow
                 onRemove={() => {}}
                 type={currentContainer.type}
+                overlay={"overlay"}
             >
                 {currentContainer.type === "category"
                     ? currentContainer.data.map((item, index) => {
@@ -656,66 +663,68 @@ export function RosterBuilderActual({
                           );
                       })
                     : currentContainer.type === "raid"
-                    ? currentContainer.data.map((group) => {
-                          const currentGroup = findContainer(group);
-                          return (
-                              <Container
-                                  label={currentGroup.name}
-                                  shadow
-                                  key={group}
-                                  onRemove={() => {}}
-                                  type={currentGroup.type}
-                              >
-                                  {currentGroup.data.map((item) => {
-                                      const currentItem = findContainer(item);
-                                      return (
-                                          <Item
-                                              key={currentItem.id}
-                                              value={currentItem.id}
-                                              style={getItemStyles({
-                                                  containerId,
-                                                  overIndex: -1,
+                      ? currentContainer.data.map((group) => {
+                            const currentGroup = findContainer(group);
+                            return (
+                                <Container
+                                    label={currentGroup.name}
+                                    shadow
+                                    key={group}
+                                    onRemove={() => {}}
+                                    type={currentGroup.type}
+                                >
+                                    {currentGroup.data.map((item) => {
+                                        const currentItem = findContainer(item);
+                                        return (
+                                            <Item
+                                                key={currentItem.id}
+                                                value={currentItem.id}
+                                                style={getItemStyles({
+                                                    containerId,
+                                                    overIndex: -1,
 
-                                                  value: currentItem.id,
-                                                  isDragging: false,
-                                                  isSorting: false,
-                                                  isDragOverlay: false,
-                                              })}
-                                              renderItem={renderItem}
-                                              character={currentItem}
-                                              activeCharacter={activeCharacter}
-                                              activePlayer={activePlayer}
-                                          />
-                                      );
-                                  })}
-                              </Container>
-                          );
-                      })
-                    : currentContainer.type === "group"
-                    ? currentContainer.data.map((item, index) => {
-                          const currentItem = findContainer(item);
-                          return (
-                              <Item
-                                  key={currentItem.id}
-                                  value={currentItem.id}
-                                  style={getItemStyles({
-                                      containerId,
-                                      overIndex: -1,
+                                                    value: currentItem.id,
+                                                    isDragging: false,
+                                                    isSorting: false,
+                                                    isDragOverlay: false,
+                                                })}
+                                                renderItem={renderItem}
+                                                character={currentItem}
+                                                activeCharacter={
+                                                    activeCharacter
+                                                }
+                                                activePlayer={activePlayer}
+                                            />
+                                        );
+                                    })}
+                                </Container>
+                            );
+                        })
+                      : currentContainer.type === "group"
+                        ? currentContainer.data.map((item, index) => {
+                              const currentItem = findContainer(item);
+                              return (
+                                  <Item
+                                      key={currentItem.id}
+                                      value={currentItem.id}
+                                      style={getItemStyles({
+                                          containerId,
+                                          overIndex: -1,
 
-                                      value: currentItem.id,
-                                      isDragging: false,
-                                      isSorting: false,
-                                      isDragOverlay: false,
-                                  })}
-                                  wrapperStyle={wrapperStyle({ index })}
-                                  renderItem={renderItem}
-                                  character={currentItem}
-                                  activeCharacter={activeCharacter}
-                                  activePlayer={activePlayer}
-                              />
-                          );
-                      })
-                    : null}
+                                          value: currentItem.id,
+                                          isDragging: false,
+                                          isSorting: false,
+                                          isDragOverlay: false,
+                                      })}
+                                      wrapperStyle={wrapperStyle({ index })}
+                                      renderItem={renderItem}
+                                      character={currentItem}
+                                      activeCharacter={activeCharacter}
+                                      activePlayer={activePlayer}
+                                  />
+                              );
+                          })
+                        : null}
             </Container>
         );
     }

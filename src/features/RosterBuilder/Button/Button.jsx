@@ -8,7 +8,11 @@ export const Button = forwardRef(
             <StyledButton
                 ref={ref}
                 {...props}
-                className={classNames(className)}
+                className={classNames(
+                    className,
+                    props.overlay === "overlay" ? "overlay" : "",
+                    props.type === "handle" ? "handle" : ""
+                )}
                 tabIndex={0}
                 style={{ ...style }}
             />

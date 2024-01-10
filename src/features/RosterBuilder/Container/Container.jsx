@@ -25,6 +25,7 @@ const Container = forwardRef(
             style,
             shadow,
             type,
+            overlay,
             ...props
         },
         ref
@@ -35,9 +36,9 @@ const Container = forwardRef(
             type === "raid"
                 ? StyledRaid
                 : type === "group"
-                ? StyledGroup
-                : StyledCategory;
-        console.log(type);
+                  ? StyledGroup
+                  : StyledCategory;
+
         function toggleOpen() {
             setIsOpen((isOpen) => !isOpen);
         }
@@ -54,17 +55,19 @@ const Container = forwardRef(
                 type={type}
             >
                 {label ? (
-                    <StyledContainerHeader>
-                        <StyledDragHandle>
-                            <Handle {...handleProps} />
+                    <div className="containerHeader">
+                        <StyledDragHandle
+                            className={`handle ${overlay ? "" : "overlay"}`}
+                        >
+                            <Handle {...handleProps} overlay={overlay} />
                         </StyledDragHandle>
                         <StyledLabel>{label}</StyledLabel>
-                        <StyledActions>
+                        <StyledActions className="buttons">
                             {onRemove ? (
                                 <Remove onClick={toggleOpen} />
                             ) : undefined}
                         </StyledActions>
-                    </StyledContainerHeader>
+                    </div>
                 ) : null}
                 {isOpen && <ul>{children}</ul>}
             </Component>
