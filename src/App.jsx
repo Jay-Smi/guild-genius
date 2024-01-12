@@ -1,32 +1,16 @@
-import {
-    Outlet,
-    RouterProvider,
-    lazyRouteComponent,
-    Link,
-    useNavigate,
-    useSearch,
-    Router,
-    Route,
-    redirect,
-    ErrorComponent,
-    rootRouteWithContext,
-    useRouter,
-    MatchRoute,
-    useRouterState,
-} from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/router-devtools";
-import {
-    QueryClient,
-    QueryClientProvider,
-    queryOptions,
-    useMutation,
-    useSuspenseQuery,
-} from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { RosterBuilder } from "./pages/RosterBuilder";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ThemeProvider } from "@mui/material/styles";
+import { CssBaseline, StyledEngineProvider } from "@mui/material";
 
-import AppLayout from "./layouts/AppLayout/AppLayout";
-import GlobalStyles from "./styles/GlobalStyles";
+// routing
+import Routes from "./routes";
+
+// defaultTheme
+import themes from "./themes";
+
+// project imports
+import NavigationScroll from "./layouts/NavigationScroll";
+import { useStore } from "./store";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -37,46 +21,38 @@ const queryClient = new QueryClient({
     },
 });
 
-const rootRoute = rootRouteWithContext()({ component: AppLayout });
+// ==============================|| APP ||============================== //
 
-const indexRoute = new Route({
-    getParentRoute: () => rootRoute,
-    path: "/",
-    component: RosterBuilder,
-});
-
-const routeTree = rootRoute.addChildren([indexRoute]);
-const router = new Router({
-    routeTree,
-    context: {
-        queryClient,
-    },
-    defaultPreload: "intent",
-    defaultPreloadStaleTime: 0,
-});
-
-export default function App() {
-    return (
-        <QueryClientProvider client={queryClient}>
-            <GlobalStyles />
-
-            <RouterProvider router={router} />
-            {/* <BrowserRouter>
-                <Routes>
-                    <Route element={<AppLayout />}>
-                        <Route
-                            index
-                            element={<Navigate replace to="roster-builder" />}
-                        />
-                        <Route
-                            path="roster-builder"
-                            element={<RosterBuilder />}
-                        />
-                    </Route>
-
-                   
-                </Routes>
-            </BrowserRouter> */}
-        </QueryClientProvider>
+const App = () => {
+    const { isOpen, defaultId, fontFamily, borderRadius, opened } = useStore(
+        (state) => ({
+            isOpen: state.isOpen,
+            defaultId: state.defaultId,
+            fontFamily: state.fontFamily,
+            borderRadius: state.borderRadius,
+            opened: state.opened,
+        })
     );
-}
+    const customization = {
+        isOpen,
+        defaultId,
+        fontFamily,
+        borderRadius,
+        opened,
+    };
+
+    return (
+        <StyledEngineProvider injectFirst>
+            <QueryClientProvider client={queryClient}>
+                <ThemeProvider theme={themes(customization)}>
+                    <CssBaseline />
+                    <NavigationScroll>
+                        <Routes />
+                    </NavigationScroll>
+                </ThemeProvider>
+            </QueryClientProvider>
+        </StyledEngineProvider>
+    );
+};
+
+export default App;
