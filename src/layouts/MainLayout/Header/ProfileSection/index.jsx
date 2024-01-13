@@ -43,6 +43,7 @@ import {
     IconSettings,
     IconUser,
 } from "@tabler/icons-react";
+import { signOut } from "../../../../services/auth/apiDiscord";
 
 // ==============================|| PROFILE MENU ||============================== //
 
@@ -61,7 +62,7 @@ const ProfileSection = () => {
      * */
     const anchorRef = useRef(null);
     const handleLogout = async () => {
-        console.log("Logout");
+        signOut();
     };
 
     const handleClose = (event) => {

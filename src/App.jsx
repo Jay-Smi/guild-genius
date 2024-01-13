@@ -3,6 +3,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import { CssBaseline, StyledEngineProvider } from "@mui/material";
 
 // routing
+import { BrowserRouter } from "react-router-dom";
 import Routes from "./routes";
 
 // defaultTheme
@@ -42,16 +43,18 @@ const App = () => {
     };
 
     return (
-        <StyledEngineProvider injectFirst>
-            <QueryClientProvider client={queryClient}>
-                <ThemeProvider theme={themes(customization)}>
-                    <CssBaseline />
-                    <NavigationScroll>
-                        <Routes />
-                    </NavigationScroll>
-                </ThemeProvider>
-            </QueryClientProvider>
-        </StyledEngineProvider>
+        <BrowserRouter>
+            <StyledEngineProvider injectFirst>
+                <QueryClientProvider client={queryClient}>
+                    <ThemeProvider theme={themes(customization)}>
+                        <CssBaseline />
+                        <NavigationScroll>
+                            <Routes />
+                        </NavigationScroll>
+                    </ThemeProvider>
+                </QueryClientProvider>
+            </StyledEngineProvider>
+        </BrowserRouter>
     );
 };
 

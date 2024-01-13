@@ -3,6 +3,7 @@ import { lazy } from "react";
 // project imports
 import MainLayout from "../layouts/MainLayout";
 import Loadable from "../components/Loadable";
+import AuthGuard from "./AuthGuard";
 
 // dashboard routing
 const DashboardDefault = Loadable(
@@ -32,7 +33,11 @@ const SamplePage = Loadable(lazy(() => import("../views/sample-page")));
 
 const MainRoutes = {
     path: "/",
-    element: <MainLayout />,
+    element: (
+        <AuthGuard>
+            <MainLayout />
+        </AuthGuard>
+    ),
     children: [
         {
             path: "/",
@@ -103,6 +108,10 @@ const MainRoutes = {
         },
         {
             path: "sample-page",
+            element: <SamplePage />,
+        },
+        {
+            path: "*",
             element: <SamplePage />,
         },
     ],

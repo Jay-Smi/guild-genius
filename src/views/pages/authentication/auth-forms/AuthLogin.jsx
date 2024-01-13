@@ -28,6 +28,7 @@ import { Formik } from "formik";
 import useScriptRef from "../../../../hooks/useScriptRef";
 import AnimateButton from "../../../../components/extended/AnimateButton";
 import { useStore } from "../../../../store";
+import { signInWithDiscord } from "../../../../services/auth/apiDiscord";
 
 // assets
 import Visibility from "@mui/icons-material/Visibility";
@@ -45,7 +46,7 @@ const FirebaseLogin = ({ ...others }) => {
     const [checked, setChecked] = useState(true);
 
     const googleHandler = async () => {
-        console.error("Login");
+        signInWithDiscord();
     };
 
     const [showPassword, setShowPassword] = useState(false);

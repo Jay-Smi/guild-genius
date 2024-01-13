@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getRaids, getRaidsGroups } from "../services/apiRaids";
+import { getRaids, getRaidsGroups } from "../services/crud/apiRaids";
 
 export default function useRaids() {
     const {

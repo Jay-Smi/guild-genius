@@ -20,6 +20,7 @@ import { drawerWidth } from "../../../store/constant";
 const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
     const theme = useTheme();
     const matchUpMd = useMediaQuery(theme.breakpoints.up("md"));
+    const appVersion = import.meta.env.VITE_APP_VERSION;
 
     const drawer = (
         <>
@@ -47,7 +48,7 @@ const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
                         sx={{ mb: 2 }}
                     >
                         <Chip
-                            label={import.meta.env.VITE_REACT_APP_VERSION}
+                            label={appVersion}
                             disabled
                             chipcolor="secondary"
                             size="small"
@@ -66,7 +67,7 @@ const Sidebar = ({ drawerOpen, drawerToggle, window }) => {
                         sx={{ mb: 2 }}
                     >
                         <Chip
-                            label={import.meta.env.VITE_REACT_APP_VERSION}
+                            label={appVersion}
                             disabled
                             chipcolor="secondary"
                             size="small"

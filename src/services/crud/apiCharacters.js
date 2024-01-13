@@ -1,4 +1,4 @@
-import supabase from "./supabase";
+import supabase from "../supabase";
 
 export async function getCharacters() {
     const { data: characters, error } = await supabase

@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getGroups, getGroupsCharacters } from "../services/apiGroups";
+import { getGroups, getGroupsCharacters } from "../services/crud/apiGroups";
 
 export default function useGroups() {
     const {

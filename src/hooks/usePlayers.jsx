@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getPlayers, getPlayersCharacters } from "../services/apiPlayers";
+import { getPlayers, getPlayersCharacters } from "../services/crud/apiPlayers";
 
 export default function usePlayers() {
     const {

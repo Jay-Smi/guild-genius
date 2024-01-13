@@ -23,7 +23,7 @@ const LogoSection = () => {
         >
             <Logo />
             <Typography variant="h3" color="inherit">
-                Cute Boys
+                Guild Genius
             </Typography>
         </ButtonBase>
     );

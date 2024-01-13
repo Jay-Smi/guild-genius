@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
     getCategories,
     getCategoriesCharacters,
-} from "../services/apiCategories";
+} from "../services/crud/apiCategories";
 
 export default function useCategories() {
     const {
