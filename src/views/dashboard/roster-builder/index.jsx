@@ -9,13 +9,13 @@ export default function RosterBuilder() {
         return <div>Loading...</div>;
     }
 
-    return (
-        <RosterBuilderActual
-            categories={categories}
-            characters={characters}
-            raids={raids}
-            groups={groups}
-            players={players}
-        />
-    );
+    // return (
+    //     <RosterBuilderActual
+    //         categories={categories}
+    //         characters={characters}
+    //         raids={raids}
+    //         groups={groups}
+    //         players={players}
+    //     />
+    // );
 }

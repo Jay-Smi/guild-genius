@@ -69,5 +69,16 @@ export default function themePalette(theme) {
             paper: theme.paper,
             default: theme.backgroundDefault,
         },
+        wow: {
+            druid: theme.colors?.wowDruid,
+            hunter: theme.colors?.wowHunter,
+            mage: theme.colors?.wowMage,
+            paladin: theme.colors?.wowPaladin,
+            priest: theme.colors?.wowPriest,
+            rogue: theme.colors?.wowRogue,
+            shaman: theme.colors?.wowShaman,
+            warlock: theme.colors?.wowWarlock,
+            warrior: theme.colors?.wowWarrior,
+        },
     };
 }

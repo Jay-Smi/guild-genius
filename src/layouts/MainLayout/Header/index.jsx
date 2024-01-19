@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 
 // material-ui
 import { useTheme } from "@mui/material/styles";
-import { Avatar, Box, ButtonBase } from "@mui/material";
+import { Avatar, Box, ButtonBase, Typography } from "@mui/material";
 
 // project imports
 import LogoSection from "../LogoSection";
@@ -12,12 +12,34 @@ import NotificationSection from "./NotificationSection";
 
 // assets
 import { IconMenu2 } from "@tabler/icons-react";
+import { useGuildInstanceLockout } from "../../../hooks/useGuildInstanceLockout";
+import { getLockoutStartAndEndDates } from "../../../utils/wowHelpers";
+import useUserInfo from "../../../hooks/useUserInfo";
+import useGuild from "../../../hooks/useGuild";
+import { useStore } from "../../../store";
+import { format, parseISO } from "date-fns";
 
 // ==============================|| MAIN NAVBAR / HEADER ||============================== //
 
 const Header = ({ handleLeftDrawerToggle }) => {
     const theme = useTheme();
+    // const user = useStore((state) => state.session.user);
+    // const discordName = user.user_metadata.name;
+    // const userId = user.id;
+    // const { profile, characters, players } = useUserInfo(userId, discordName);
+    // const somePlayerisInGuild =
+    //     players?.some((player) => player.guild_id !== null) || false;
 
+    // const { guild } = useGuild(players[0].guild_id, somePlayerisInGuild);
+    // const guildId = guild[0].id;
+    const today = new Date();
+    const { startDate, endDate } = getLockoutStartAndEndDates(today);
+    // const { lockout, lockoutError, isLoadingLockout } = useGuildInstanceLockout(
+    //     startDate,
+    //     guildId
+    // );
+    const start = format(parseISO(startDate), "MMMM dd");
+    const end = format(parseISO(endDate), "MMMM dd");
     return (
         <>
             {/* logo & toggler button */}
@@ -60,6 +82,12 @@ const Header = ({ handleLeftDrawerToggle }) => {
 
             {/* header search */}
             <SearchSection />
+            <Typography
+                variant="h4"
+                sx={{ ml: 3, color: theme.palette.secondary.dark }}
+            >
+                {`Current Lockout: ${start} - ${end}`}
+            </Typography>
             <Box sx={{ flexGrow: 1 }} />
             <Box sx={{ flexGrow: 1 }} />
 

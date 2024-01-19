@@ -1,5 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { getPlayers, getPlayersCharacters } from "../services/crud/apiPlayers";
+import supabase from "../services/supabase";
+import { queryClient } from "../config";
 
 export default function usePlayers() {
     const {
@@ -51,4 +53,53 @@ export default function usePlayers() {
         isLoading: isLoadingPlayers || isLoadingPlayersCharacters,
         error: playerError || playersCharactersError,
     };
+}
+
+async function getPlayersByDiscordName(discordName) {
+    const { data, error } = await supabase
+        .from("players")
+        .select("*")
+        .eq("discord_name", discordName);
+    if (error) throw error;
+    return data;
+}
+
+export function usePlayersByDiscordName(discordName) {
+    const {
+        data: players,
+        isLoading: isLoadingPlayers,
+        error: playerError,
+    } = useQuery({
+        queryKey: ["players", discordName],
+        queryFn: () => getPlayersByDiscordName(discordName),
+    });
+
+    return {
+        players,
+        isLoading: isLoadingPlayers,
+        error: playerError,
+    };
+}
+
+async function insertPlayer(displayName, discordName, profileId) {
+    const { data, error } = await supabase
+        .from("players")
+        .insert([
+            {
+                player_name: displayName,
+                discord_name: discordName,
+                profile_id: profileId,
+            },
+        ])
+        .select();
+    if (error) throw error;
+    return data;
+}
+
+export function useInsertPlayer(displayName, discordName, profileId) {
+    const mutation = useMutation({
+        mutationFn: () => insertPlayer(displayName, discordName, profileId),
+    });
+
+    return mutation;
 }

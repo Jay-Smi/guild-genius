@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import { forwardRef, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 
 // material-ui
 import { useTheme } from "@mui/material/styles";
@@ -53,7 +53,7 @@ const NavItem = ({ item, level }) => {
 
     let listItemProps = {
         component: forwardRef((props, ref) => (
-            <Link ref={ref} {...props} to={item.url} target={itemTarget} />
+            <NavLink ref={ref} {...props} to={item.url} target={itemTarget} />
         )),
     };
     if (item?.external) {

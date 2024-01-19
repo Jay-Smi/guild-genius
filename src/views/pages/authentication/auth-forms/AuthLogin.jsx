@@ -91,7 +91,7 @@ const FirebaseLogin = ({ ...others }) => {
                                     }}
                                 />
                             </Box>
-                            Sign in with Google
+                            Sign in with Discord
                         </Button>
                     </AnimateButton>
                 </Grid>

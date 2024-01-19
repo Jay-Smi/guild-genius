@@ -1,9 +1,10 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "@mui/material/styles";
 import { CssBaseline, StyledEngineProvider } from "@mui/material";
+import { SnackbarProvider } from "notistack";
 
 // routing
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, RouterProvider } from "react-router-dom";
 import Routes from "./routes";
 
 // defaultTheme
@@ -12,15 +13,10 @@ import themes from "./themes";
 // project imports
 import NavigationScroll from "./layouts/NavigationScroll";
 import { useStore } from "./store";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { queryClient } from "./config";
 
-const queryClient = new QueryClient({
-    defaultOptions: {
-        queries: {
-            refetchOnWindowFocus: false,
-            staleTime: Infinity,
-        },
-    },
-});
+const router = Routes();
 
 // ==============================|| APP ||============================== //
 
@@ -43,18 +39,24 @@ const App = () => {
     };
 
     return (
-        <BrowserRouter>
-            <StyledEngineProvider injectFirst>
-                <QueryClientProvider client={queryClient}>
-                    <ThemeProvider theme={themes(customization)}>
+        <StyledEngineProvider injectFirst>
+            <QueryClientProvider client={queryClient}>
+                <ThemeProvider theme={themes(customization)}>
+                    <SnackbarProvider
+                        maxSnack={3}
+                        autoHideDuration={3000}
+                        anchorOrigin={{
+                            vertical: "bottom",
+                            horizontal: "right",
+                        }}
+                    >
                         <CssBaseline />
-                        <NavigationScroll>
-                            <Routes />
-                        </NavigationScroll>
-                    </ThemeProvider>
-                </QueryClientProvider>
-            </StyledEngineProvider>
-        </BrowserRouter>
+                        <RouterProvider router={router} />
+                    </SnackbarProvider>
+                </ThemeProvider>
+                <ReactQueryDevtools initialIsOpen={false} />
+            </QueryClientProvider>
+        </StyledEngineProvider>
     );
 };
 

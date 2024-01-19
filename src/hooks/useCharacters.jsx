@@ -3,6 +3,7 @@ import {
     getCharacters,
     getCharactersTags,
 } from "../services/crud/apiCharacters";
+import supabase from "../services/supabase";
 
 export default function useCharacters() {
     const {
@@ -51,5 +52,32 @@ export default function useCharacters() {
         characters,
         isLoading: isLoadingCharacters || isLoadingCharactersTags,
         error: CharactersError || isErrorCharactersTags,
+    };
+}
+
+async function getCharactersByDiscordName(discordName) {
+    const { data, error } = await supabase
+        .from("characters")
+        .select("*")
+        .eq("discord_name", discordName);
+
+    if (error) throw error;
+    return data;
+}
+
+export function useCharactersByDiscordName(discordName) {
+    const {
+        data: characters,
+        isLoadingCharacters,
+        errorCharacters,
+    } = useQuery({
+        queryKey: ["characters", discordName],
+        queryFn: () => getCharactersByDiscordName(discordName),
+    });
+
+    return {
+        characters,
+        isLoadingCharacters,
+        errorCharacters,
     };
 }

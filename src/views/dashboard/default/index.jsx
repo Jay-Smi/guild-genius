@@ -11,11 +11,14 @@ import TotalIncomeDarkCard from "./TotalIncomeDarkCard";
 import TotalIncomeLightCard from "./TotalIncomeLightCard";
 import TotalGrowthBarChart from "./TotalGrowthBarChart";
 import { gridSpacing } from "../../../store/constant";
+import useProfile from "../../../hooks/auth/useProfile";
+import { useSession } from "../../../hooks/auth/useSession";
 
 // ==============================|| DEFAULT DASHBOARD ||============================== //
 
 const Dashboard = () => {
     const [isLoading, setLoading] = useState(true);
+
     useEffect(() => {
         setLoading(false);
     }, []);

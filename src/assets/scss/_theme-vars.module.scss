@@ -75,6 +75,17 @@ $darkTextTitle: #d7dcec;
 $darkTextPrimary: #bdc8f0;
 $darkTextSecondary: #8492c4;
 
+//wow class colors
+$wowDruid: #ff7c0a;
+$wowHunter: #aad372;
+$wowMage: #3fc7eb;
+$wowPaladin: #f48cba;
+$wowPriest: #ffffff;
+$wowRogue: #fff468;
+$wowShaman: #0070dd;
+$wowWarlock: #8788ee;
+$wowWarrior: #c69b6d;
+
 // ==============================|| JAVASCRIPT ||============================== //
 
 :export {
@@ -125,6 +136,17 @@ $darkTextSecondary: #8492c4;
     grey600: $grey600;
     grey700: $grey700;
     grey900: $grey900;
+
+    //wow class colors
+    wowDruid: $wowDruid;
+    wowHunter: $wowHunter;
+    wowMage: $wowMage;
+    wowPaladin: $wowPaladin;
+    wowPriest: $wowPriest;
+    wowRogue: $wowRogue;
+    wowShaman: $wowShaman;
+    wowWarlock: $wowWarlock;
+    wowWarrior: $wowWarrior;
 
     // ==============================|| DARK THEME VARIANTS ||============================== //
 

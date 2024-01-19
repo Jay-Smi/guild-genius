@@ -44,10 +44,30 @@ import {
     IconUser,
 } from "@tabler/icons-react";
 import { signOut } from "../../../../services/auth/apiDiscord";
+import useUserInfo from "../../../../hooks/useUserInfo";
+import useGuild from "../../../../hooks/useGuild";
 
 // ==============================|| PROFILE MENU ||============================== //
 
 const ProfileSection = () => {
+    const user = useStore((state) => state.session.user);
+
+    const userId = user.id;
+    const discordName = user.user_metadata.name;
+    const { profile, characters, players } = useUserInfo(userId, discordName);
+    const somePlayerisInGuild =
+        players?.some((player) => player.guild_id !== null) || false;
+
+    const { guild } = useGuild(players[0].guild_id, somePlayerisInGuild);
+    const avatarURL = user.user_metadata.avatar_url;
+    const mainPlayer =
+        players.find((player) => player.id === profile[0].main_player) ||
+        players[0];
+    const mainCharacter = characters.find(
+        (character) => character.id === mainPlayer.main_character
+    );
+    const guildRank = mainCharacter?.guild_rank || characters[0]?.guild_rank;
+
     const theme = useTheme();
     const borderRadius = useStore((state) => state.borderRadius);
     const navigate = useNavigate();
@@ -117,7 +137,7 @@ const ProfileSection = () => {
                 }}
                 icon={
                     <Avatar
-                        src={User1}
+                        src={avatarURL}
                         sx={{
                             ...theme.typography.mediumAvatar,
                             margin: "8px 0 8px 8px !important",
@@ -180,18 +200,22 @@ const ProfileSection = () => {
                                                 alignItems="center"
                                             >
                                                 <Typography variant="h4">
-                                                    Good Morning,
+                                                    Hello,
                                                 </Typography>
                                                 <Typography
                                                     component="span"
                                                     variant="h4"
                                                     sx={{ fontWeight: 400 }}
                                                 >
-                                                    Johne Doe
+                                                    {profile[0].display_name}
                                                 </Typography>
                                             </Stack>
                                             <Typography variant="subtitle2">
-                                                Project Admin
+                                                {guildRank
+                                                    .charAt(0)
+                                                    .toUpperCase() +
+                                                    guildRank?.slice(1)}{" "}
+                                                of {guild[0]?.guild_name}
                                             </Typography>
                                         </Stack>
                                         <OutlinedInput
@@ -234,7 +258,7 @@ const ProfileSection = () => {
                                         }}
                                     >
                                         <Box sx={{ p: 2 }}>
-                                            <UpgradePlanCard />
+                                            {/* <UpgradePlanCard /> */}
                                             <Divider />
                                             <Card
                                                 sx={{
@@ -401,7 +425,6 @@ const ProfileSection = () => {
                                                             >
                                                                 <Grid item>
                                                                     <Typography variant="body2">
-                                                                        Social
                                                                         Profile
                                                                     </Typography>
                                                                 </Grid>

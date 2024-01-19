@@ -6,16 +6,16 @@ const icons = { IconDashboard };
 
 // ==============================|| DASHBOARD MENU ITEMS ||============================== //
 
-const dashboard = {
-    id: "dashboard",
-    title: "Dashboard",
+const guild = {
+    id: "guild",
+    title: "Guild",
     type: "group",
     children: [
         {
             id: "default",
             title: "Dashboard",
             type: "item",
-            url: "/dashboard/default",
+            url: "/guild/dashboard",
             icon: icons.IconDashboard,
             breadcrumbs: false,
         },
@@ -23,7 +23,7 @@ const dashboard = {
             id: "raids",
             title: "Raids",
             type: "item",
-            url: "/dashboard/raids",
+            url: "/guild/raids",
             icon: icons.IconDashboard,
             breadcrumbs: false,
         },
@@ -31,7 +31,15 @@ const dashboard = {
             id: "calendar",
             title: "Calendar",
             type: "item",
-            url: "/dashboard/calendar",
+            url: "/guild/calendar",
+            icon: icons.IconDashboard,
+            breadcrumbs: false,
+        },
+        {
+            id: "characters",
+            title: "Characters",
+            type: "item",
+            url: "/guild/characters",
             icon: icons.IconDashboard,
             breadcrumbs: false,
         },
@@ -39,11 +47,19 @@ const dashboard = {
             id: "roster-builder",
             title: "Roster Builder",
             type: "item",
-            url: "/dashboard/roster-builder",
+            url: "/guild/roster-builder",
+            icon: icons.IconDashboard,
+            breadcrumbs: false,
+        },
+        {
+            id: "guild-settings",
+            title: "Guild Settings",
+            type: "item",
+            url: "/guild/guild-settings",
             icon: icons.IconDashboard,
             breadcrumbs: false,
         },
     ],
 };
 
-export default dashboard;
+export default guild;

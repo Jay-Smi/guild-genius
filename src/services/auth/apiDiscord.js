@@ -11,3 +11,15 @@ export async function signInWithDiscord() {
 export async function signOut() {
     const { error } = await supabase.auth.signOut();
 }
+
+export async function getUser() {
+    const {
+        data: { user },
+    } = supabase.auth.getUser();
+    return user;
+}
+
+export async function getSession() {
+    const session = supabase.auth.getSession();
+    return session;
+}

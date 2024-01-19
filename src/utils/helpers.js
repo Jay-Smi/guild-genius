@@ -150,3 +150,46 @@ export function classNames(...args) {
     // Join the individual class names with a space and return the result
     return result.join(" ");
 }
+
+import { formatDistance, parseISO, differenceInDays } from "date-fns";
+
+export const subtractDates = (dateStr1, dateStr2) =>
+    differenceInDays(parseISO(String(dateStr1)), parseISO(String(dateStr2)));
+
+export const formatDistanceFromNow = (dateStr) =>
+    formatDistance(parseISO(dateStr), new Date(), {
+        addSuffix: true,
+    })
+        .replace("about ", "")
+        .replace("in", "In");
+
+export const getToday = function (options = {}) {
+    const today = new Date();
+
+    if (options?.end) today.setUTCHours(23, 59, 59, 999);
+    else today.setUTCHours(0, 0, 0, 0);
+    return today.toISOString();
+};
+
+export const formatDate = function (date) {
+    new Intl.DateTimeFormat("en", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        weekday: "long",
+    }).format(new Date(date));
+};
+
+export function formatTime(timeString) {
+    const [hours, minutes] = timeString.split(":");
+    const date = new Date();
+    date.setHours(hours, minutes);
+
+    const formattedTime = date.toLocaleString("en-US", {
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+    });
+
+    return formattedTime;
+}
