@@ -1,4 +1,4 @@
-import{al as L,av as h,aw as _,ax as $,ay as C,az as p,r as b,j as i}from"./index-8peLLp4J.js";async function q(){const{data:r,error:e}=await L.from("categories").select("*");if(e)throw console.error(e),new Error("Categories could not be loaded.");return r}async function A(){const{data:r,error:e}=await L.from("categories").select(`
+import{al as L,av as h,aw as _,ax as $,ay as C,az as p,r as b,j as i}from"./index-pLlpl9gL.js";async function q(){const{data:r,error:e}=await L.from("categories").select("*");if(e)throw console.error(e),new Error("Categories could not be loaded.");return r}async function A(){const{data:r,error:e}=await L.from("categories").select(`
     id,
     categories_characters (
       character_id
