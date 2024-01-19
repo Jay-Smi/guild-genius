@@ -1,0 +1,1 @@
+import{al as a}from"./index-8peLLp4J.js";async function n(){const{data:s,error:t}=await a.auth.signInWithOAuth({provider:"discord"});console.log(s,t)}async function o(){await a.auth.signOut()}export{n as a,o as s};
