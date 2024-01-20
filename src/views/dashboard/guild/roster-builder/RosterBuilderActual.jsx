@@ -26,7 +26,7 @@ import Container from "./components/Container/Container";
 import DroppableContainer from "./components/DroppableContainer";
 import { Item } from "./components/Item/Item";
 import SortableItem from "./components/SortableItem";
-import { coordinateGetter as multipleContainersCoordinateGetter } from "../../../utils/helpers";
+import { coordinateGetter as multipleContainersCoordinateGetter } from "../../../../utils/helpers";
 
 // roster lockout-1 default tanks/healers/melee/ranged, characters filtered in by associated tag,
 // create custom lockout-1 with any tag, ex. kicks, dispells, etc.

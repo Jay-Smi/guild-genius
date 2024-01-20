@@ -2,7 +2,13 @@ import PropTypes from "prop-types";
 
 // material-ui
 import { useTheme } from "@mui/material/styles";
-import { Avatar, Box, ButtonBase, Typography } from "@mui/material";
+import {
+    Avatar,
+    Box,
+    ButtonBase,
+    Typography,
+    useMediaQuery,
+} from "@mui/material";
 
 // project imports
 import LogoSection from "../LogoSection";
@@ -23,23 +29,13 @@ import { format, parseISO } from "date-fns";
 
 const Header = ({ handleLeftDrawerToggle }) => {
     const theme = useTheme();
-    // const user = useStore((state) => state.session.user);
-    // const discordName = user.user_metadata.name;
-    // const userId = user.id;
-    // const { profile, characters, players } = useUserInfo(userId, discordName);
-    // const somePlayerisInGuild =
-    //     players?.some((player) => player.guild_id !== null) || false;
+    const small = useMediaQuery(theme.breakpoints.up("sm"));
 
-    // const { guild } = useGuild(players[0].guild_id, somePlayerisInGuild);
-    // const guildId = guild[0].id;
     const today = new Date();
     const { startDate, endDate } = getLockoutStartAndEndDates(today);
-    // const { lockout, lockoutError, isLoadingLockout } = useGuildInstanceLockout(
-    //     startDate,
-    //     guildId
-    // );
-    const start = format(parseISO(startDate), "MMMM dd");
-    const end = format(parseISO(endDate), "MMMM dd");
+
+    const start = format(parseISO(startDate), "MMM dd");
+    const end = format(parseISO(endDate), "MMM dd");
     return (
         <>
             {/* logo & toggler button */}
@@ -86,7 +82,9 @@ const Header = ({ handleLeftDrawerToggle }) => {
                 variant="h4"
                 sx={{ ml: 3, color: theme.palette.secondary.dark }}
             >
-                {`Current Lockout: ${start} - ${end}`}
+                {small
+                    ? `Current Lockout: ${start} - ${end}`
+                    : ` ${start} - ${end}`}
             </Typography>
             <Box sx={{ flexGrow: 1 }} />
             <Box sx={{ flexGrow: 1 }} />

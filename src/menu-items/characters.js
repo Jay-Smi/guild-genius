@@ -12,7 +12,7 @@ const characters = {
             id: "my-characters",
             title: "My Characters",
             type: "collapse",
-            icon: icons.IconKey,
+            icon: icons.IconDashboard,
 
             children: [
                 {

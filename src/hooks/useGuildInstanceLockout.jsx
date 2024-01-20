@@ -27,3 +27,29 @@ async function getLockoutByStartDate(startDate, guildId) {
     if (error) throw error;
     return data;
 }
+
+export function useAllGuildInstanceLockouts(guildId) {
+    const {
+        data: lockouts,
+        error: lockoutsError,
+        isLoading: isLoadingLockouts,
+    } = useQuery({
+        queryKey: ["guild-instance-lockouts", guildId],
+        queryFn: () => getAllLockouts(guildId),
+    });
+
+    return {
+        lockouts,
+        lockoutsError,
+        isLoadingLockouts,
+    };
+}
+
+async function getAllLockouts(guildId) {
+    const { data, error } = await supabase
+        .from("guild_instance_lockouts")
+        .select()
+        .eq("guild_id", guildId);
+    if (error) throw error;
+    return data;
+}

@@ -6,11 +6,11 @@ export function getLockoutStartAndEndDates(date) {
 
     let currentLockoutStartDate = lockoutWindowStartReference;
 
-    while (isBefore(add(currentLockoutStartDate, { days: 3 }), date)) {
+    while (isBefore(add(currentLockoutStartDate, { days: 2 }), date)) {
         currentLockoutStartDate = add(currentLockoutStartDate, { days: 3 });
     }
 
-    const currentLockoutEndDate = add(currentLockoutStartDate, { hours: 72 });
+    const currentLockoutEndDate = add(currentLockoutStartDate, { days: 2 });
 
     return {
         startDate: format(currentLockoutStartDate, "yyyy-MM-dd"),

@@ -1,5 +1,5 @@
 import { forwardRef } from "react";
-import { classNames } from "../../../../../utils/helpers.js";
+import { classNames } from "../../../../../../utils/helpers.js";
 import { StyledButton } from "./Button.styles.jsx";
 
 export const Button = forwardRef(

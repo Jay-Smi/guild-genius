@@ -1,5 +1,5 @@
 import React, { forwardRef, useState } from "react";
-import { classNames } from "../../../../../utils/helpers.js";
+import { classNames } from "../../../../../../utils/helpers.js";
 
 import { Handle } from "../Handle.jsx";
 import { Remove } from "../Remove.jsx";

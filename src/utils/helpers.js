@@ -1,4 +1,5 @@
 import { closestCorners, getFirstCollision, KeyboardCode } from "@dnd-kit/core";
+import { formatDistance, parseISO, differenceInDays } from "date-fns";
 const defaultInitializer = (index) => index;
 
 export function createRange(length, initializer = defaultInitializer) {
@@ -150,8 +151,6 @@ export function classNames(...args) {
     // Join the individual class names with a space and return the result
     return result.join(" ");
 }
-
-import { formatDistance, parseISO, differenceInDays } from "date-fns";
 
 export const subtractDates = (dateStr1, dateStr2) =>
     differenceInDays(parseISO(String(dateStr1)), parseISO(String(dateStr2)));

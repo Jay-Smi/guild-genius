@@ -1,17 +1,16 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "@mui/material/styles";
 import { CssBaseline, StyledEngineProvider } from "@mui/material";
 import { SnackbarProvider } from "notistack";
 
 // routing
-import { BrowserRouter, RouterProvider } from "react-router-dom";
+import { RouterProvider } from "react-router-dom";
 import Routes from "./routes";
 
 // defaultTheme
 import themes from "./themes";
 
 // project imports
-import NavigationScroll from "./layouts/NavigationScroll";
 import { useStore } from "./store";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { queryClient } from "./config";

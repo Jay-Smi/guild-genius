@@ -98,15 +98,7 @@ function GatherGuildCurrentLockout({ children, guildId }) {
     if (isLoadingLockout) return <div>Loading Lockout</div>;
     if (lockoutError) console.error(lockoutError);
 
-    return (
-        <GatherAllLockoutRelatedData lockout={lockout[0]}>
-            {children}
-        </GatherAllLockoutRelatedData>
-    );
-}
-
-function GatherAllLockoutRelatedData({ children, lockoutId, guildId }) {
-    return <>{children}</>;
+    return children;
 }
 
 function MakeProfile({ userId, displayName, discordName }) {

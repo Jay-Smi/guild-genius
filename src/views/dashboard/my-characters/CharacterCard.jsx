@@ -15,6 +15,7 @@ import {
     Menu,
     MenuItem,
     Modal,
+    Tooltip,
     Typography,
 } from "@mui/material";
 
@@ -156,38 +157,47 @@ export default function CharacterCard({ isLoading, character }) {
                                     >
                                         <Grid item>
                                             <AnimateButton>
-                                                <ButtonBase
-                                                    onClick={handleModalOpen}
-                                                >
-                                                    <Avatar
-                                                        variant="rounded"
-                                                        sx={{
-                                                            ...theme.typography
-                                                                .commonAvatar,
-                                                            ...theme.typography
-                                                                .largeAvatar,
-                                                            backgroundColor:
-                                                                theme.palette
-                                                                    .primary[800],
-                                                            mt: 1,
-                                                            "&:hover": {
+                                                <Tooltip title="Character Armory">
+                                                    <ButtonBase
+                                                        onClick={
+                                                            handleModalOpen
+                                                        }
+                                                    >
+                                                        <Avatar
+                                                            variant="rounded"
+                                                            sx={{
+                                                                ...theme
+                                                                    .typography
+                                                                    .commonAvatar,
+                                                                ...theme
+                                                                    .typography
+                                                                    .largeAvatar,
                                                                 backgroundColor:
                                                                     theme
                                                                         .palette
-                                                                        .primary
-                                                                        .main,
-                                                                color: theme
-                                                                    .palette
-                                                                    .primary[100],
-                                                            },
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={EarningIcon}
-                                                            alt="Notification"
-                                                        />
-                                                    </Avatar>
-                                                </ButtonBase>
+                                                                        .primary[800],
+                                                                mt: 1,
+                                                                "&:hover": {
+                                                                    backgroundColor:
+                                                                        theme
+                                                                            .palette
+                                                                            .primary
+                                                                            .main,
+                                                                    color: theme
+                                                                        .palette
+                                                                        .primary[100],
+                                                                },
+                                                            }}
+                                                        >
+                                                            <img
+                                                                src={
+                                                                    EarningIcon
+                                                                }
+                                                                alt="Notification"
+                                                            />
+                                                        </Avatar>
+                                                    </ButtonBase>
+                                                </Tooltip>
                                             </AnimateButton>
                                         </Grid>
                                         <Grid item>
@@ -265,7 +275,7 @@ export default function CharacterCard({ isLoading, character }) {
                                             <Typography
                                                 sx={{
                                                     fontSize: "2.125rem",
-                                                    fontWeight: 500,
+                                                    fontWeight: 600,
                                                     color: characterColor,
                                                     mr: 1,
                                                     mt: 1.75,
@@ -277,31 +287,37 @@ export default function CharacterCard({ isLoading, character }) {
                                         </Grid>
                                         <Grid item>
                                             <AnimateButton>
-                                                <Link
-                                                    href={`https://vanilla.warcraftlogs.com/character/us/living-flame/${character.character_name}`}
-                                                    target="_blank"
-                                                >
-                                                    <Avatar
-                                                        sx={{
-                                                            cursor: "pointer",
-                                                            ...theme.typography
-                                                                .smallAvatar,
-                                                            backgroundColor:
-                                                                theme.palette
-                                                                    .secondary[200],
-                                                            color: theme.palette
-                                                                .secondary.dark,
-                                                        }}
+                                                <Tooltip title="Warcraft Logs">
+                                                    <Link
+                                                        href={`https://vanilla.warcraftlogs.com/character/us/living-flame/${character.character_name}`}
+                                                        target="_blank"
                                                     >
-                                                        <ArrowUpwardIcon
-                                                            fontSize="inherit"
+                                                        <Avatar
                                                             sx={{
-                                                                transform:
-                                                                    "rotate3d(1, 1, 1, 45deg)",
+                                                                cursor: "pointer",
+                                                                ...theme
+                                                                    .typography
+                                                                    .smallAvatar,
+                                                                backgroundColor:
+                                                                    theme
+                                                                        .palette
+                                                                        .secondary[200],
+                                                                color: theme
+                                                                    .palette
+                                                                    .secondary
+                                                                    .dark,
                                                             }}
-                                                        />
-                                                    </Avatar>
-                                                </Link>
+                                                        >
+                                                            <ArrowUpwardIcon
+                                                                fontSize="inherit"
+                                                                sx={{
+                                                                    transform:
+                                                                        "rotate3d(1, 1, 1, 45deg)",
+                                                                }}
+                                                            />
+                                                        </Avatar>
+                                                    </Link>
+                                                </Tooltip>
                                             </AnimateButton>
                                         </Grid>
                                     </Grid>

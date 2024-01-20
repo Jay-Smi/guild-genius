@@ -18,11 +18,17 @@ const { queryClient } = lazy(() => import("../config"));
 const DashboardDefault = Loadable(
     lazy(() => import("../views/dashboard/default"))
 );
+const GuildDashboard = Loadable(
+    lazy(() => import("../views/dashboard/guild/dashboard"))
+);
 const DashboardRosterBuilder = Loadable(
-    lazy(() => import("../views/dashboard/roster-builder"))
+    lazy(() => import("../views/dashboard/guild/roster-builder"))
 );
 const MyCharactersOverview = Loadable(
     lazy(() => import("../views/dashboard/my-characters/MyCharactersOverview"))
+);
+const DashboardRaids = Loadable(
+    lazy(() => import("../views/dashboard/guild/raids"))
 );
 
 // utilities routing
@@ -71,11 +77,11 @@ const MainRoutes = {
             children: [
                 {
                     path: "dashboard",
-                    element: <DashboardDefault />,
+                    element: <GuildDashboard />,
                 },
                 {
                     path: "raids",
-                    element: <DashboardDefault />,
+                    element: <DashboardRaids />,
                 },
                 {
                     path: "calendar",
