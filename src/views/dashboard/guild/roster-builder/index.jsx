@@ -38,6 +38,7 @@ const CustomPickersDay = styled(PickersDay, {
 }));
 
 export default function RosterBuilder() {
+    console.log("test");
     return <WeekPicker />;
     // if (isLoading) {
     //     return <div>Loading...</div>;
