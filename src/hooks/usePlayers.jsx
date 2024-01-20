@@ -99,6 +99,9 @@ async function insertPlayer(displayName, discordName, profileId) {
 export function useInsertPlayer(displayName, discordName, profileId) {
     const mutation = useMutation({
         mutationFn: () => insertPlayer(displayName, discordName, profileId),
+        onSuccess: (data) => {
+            queryClient.invalidateQueries("players");
+        },
     });
 
     return mutation;

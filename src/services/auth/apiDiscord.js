@@ -2,9 +2,12 @@ import { getURL } from "../getURL";
 import supabase from "../supabase";
 
 export async function signInWithDiscord() {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "discord",
-    });
+    const { data, error } = await supabase.auth.signInWithOAuth(
+        {
+            provider: "discord",
+        },
+        { redirectTo: window.location.origin }
+    );
     console.log(data, error);
 }
 

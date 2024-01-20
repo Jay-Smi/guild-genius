@@ -124,7 +124,6 @@ function MakePlayer({ displayName, discordName, profileId, hasMutatedPlayer }) {
     useEffect(() => {
         if (!hasMutatedPlayer.current) {
             hasMutatedPlayer.current = true;
-            queryClient.invalidateQueries("players");
 
             playersMutation.mutate();
         }

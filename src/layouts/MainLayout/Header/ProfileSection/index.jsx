@@ -212,7 +212,7 @@ const ProfileSection = () => {
                                             </Stack>
                                             <Typography variant="subtitle2">
                                                 {guildRank
-                                                    .charAt(0)
+                                                    ?.charAt(0)
                                                     .toUpperCase() +
                                                     guildRank?.slice(1)}{" "}
                                                 of {guild[0]?.guild_name}
