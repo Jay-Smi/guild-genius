@@ -7,7 +7,7 @@ import characters from "./characters";
 // ==============================|| MENU ITEMS ||============================== //
 //, pages, utilities, other
 const menuItems = {
-    items: [guild, characters, pages, utilities, other],
+    items: [guild, characters],
 };
 
 export default menuItems;

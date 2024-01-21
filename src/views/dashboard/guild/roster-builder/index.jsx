@@ -17,6 +17,11 @@ dayjs.extend(isSameOrAfter);
 const CustomPickersDay = styled(PickersDay, {
     shouldForwardProp: (prop) => prop !== "isSelected" && prop !== "isHovered",
 })(({ theme, isSelected, isHovered, day }) => {
+    const dayDay = dayjs(day);
+    const { startDate, endDate } = getLockoutStartAndEndDates(day);
+    const isStartDate = dayDay.isSame(dayjs(startDate), "day");
+    const isEndDate = dayDay.isSame(dayjs(endDate), "day");
+
     return {
         borderRadius: 0,
         ...(isSelected && {
@@ -33,6 +38,15 @@ const CustomPickersDay = styled(PickersDay, {
             },
         }),
 
+        ...(isStartDate && {
+            borderTopLeftRadius: "50%",
+            borderBottomLeftRadius: "50%",
+        }),
+        ...(isEndDate && {
+            borderTopRightRadius: "50%",
+            borderBottomRightRadius: "50%",
+        }),
+
         // ...(day.day() === 0 && {
         //     borderTopLeftRadius: "50%",
         //     borderBottomLeftRadius: "50%",
@@ -44,30 +58,18 @@ const CustomPickersDay = styled(PickersDay, {
     };
 });
 
-function isInSameLockout(day, selectedDay) {
-    if (selectedDay === null) {
-        return false;
-    }
-    const dayDay = dayjs(day);
-    const daySelectedDay = dayjs(selectedDay);
-
-    const { startDate, endDate } = getLockoutStartAndEndDates(selectedDay);
-
-    const start = dayjs(startDate);
-    const end = dayjs(endDate);
-
-    return (
-        dayDay.isSameOrBefore(end, "day") && dayDay.isSameOrAfter(start, "day")
-    );
-}
-
 export default function RosterBuilder() {
-    const test = dayjs();
-    console.log(test);
-    // console.log(
-    //     isInSameLockout(new Date("2024-01-19"), new Date("2024-01-16"))
-    // );
-    return <WeekPicker />;
+    const [hoveredDay, setHoveredDay] = useState(null);
+    const [value, setValue] = useState(null);
+    const { startDate, endDate } = getLockoutStartAndEndDates(value);
+    return (
+        <WeekPicker
+            hoveredDay={hoveredDay}
+            setHoveredDay={setHoveredDay}
+            value={value}
+            setValue={setValue}
+        />
+    );
     // if (isLoading) {
     //     return <div>Loading...</div>;
     // }
@@ -103,10 +105,7 @@ function Day(props) {
     );
 }
 
-function WeekPicker() {
-    const [hoveredDay, setHoveredDay] = useState(null);
-    const [value, setValue] = useState(null);
-
+function WeekPicker({ value, setValue, hoveredDay, setHoveredDay }) {
     return (
         <LocalizationProvider dateAdapter={AdapterDateFns}>
             <DateCalendar
@@ -126,5 +125,22 @@ function WeekPicker() {
                 }}
             />
         </LocalizationProvider>
+    );
+}
+
+function isInSameLockout(day, selectedDay) {
+    if (selectedDay === null) {
+        return false;
+    }
+    const dayDay = dayjs(day);
+    const daySelectedDay = dayjs(selectedDay);
+
+    const { startDate, endDate } = getLockoutStartAndEndDates(selectedDay);
+
+    const start = dayjs(startDate);
+    const end = dayjs(endDate);
+
+    return (
+        dayDay.isSameOrBefore(end, "day") && dayDay.isSameOrAfter(start, "day")
     );
 }
