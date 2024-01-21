@@ -2,11 +2,15 @@ import { add, format, isBefore } from "date-fns";
 import { threeDayLockoutRef } from "../config";
 
 export function getLockoutStartAndEndDates(date) {
+    let dateObj = date;
+    if (typeof date === "string") {
+        dateObj = new Date(date);
+    }
     const lockoutWindowStartReference = threeDayLockoutRef;
 
     let currentLockoutStartDate = lockoutWindowStartReference;
 
-    while (isBefore(add(currentLockoutStartDate, { days: 2 }), date)) {
+    while (isBefore(add(currentLockoutStartDate, { days: 2 }), dateObj)) {
         currentLockoutStartDate = add(currentLockoutStartDate, { days: 3 });
     }
 

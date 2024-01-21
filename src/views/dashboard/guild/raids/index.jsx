@@ -199,7 +199,7 @@ function GuildRaids() {
                                                                             }
                                                                         >
                                                                             {guildCharacters
-                                                                                .filter(
+                                                                                ?.filter(
                                                                                     (
                                                                                         guildCharacter
                                                                                     ) =>
