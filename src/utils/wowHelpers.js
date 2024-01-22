@@ -1,5 +1,23 @@
 import { add, format, isBefore } from "date-fns";
 import { threeDayLockoutRef } from "../config";
+import dayjs from "dayjs";
+
+export function isInSameLockout(day, selectedDay) {
+    if (selectedDay === null) {
+        return false;
+    }
+    const dayDay = dayjs(day);
+    const daySelectedDay = dayjs(selectedDay);
+
+    const { startDate, endDate } = getLockoutStartAndEndDates(selectedDay);
+
+    const start = dayjs(startDate);
+    const end = dayjs(endDate);
+
+    return (
+        dayDay.isSameOrBefore(end, "day") && dayDay.isSameOrAfter(start, "day")
+    );
+}
 
 export function getLockoutStartAndEndDates(date) {
     let dateObj = date;

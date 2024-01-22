@@ -1,74 +1,52 @@
 import { useGuildInstanceLockout } from "../../../../hooks/useGuildInstanceLockout";
-import { RosterBuilderActual } from "./RosterBuilderActual";
-import { styled } from "@mui/material/styles";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
-import { PickersDay } from "@mui/x-date-pickers/PickersDay";
 import { useState } from "react";
 import { getLockoutStartAndEndDates } from "../../../../utils/wowHelpers";
-import { isAfter, isBefore, isEqual, parseISO } from "date-fns";
+import { isEqual, parseISO } from "date-fns";
 import dayjs from "dayjs";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
+import { Box, Paper, useMediaQuery, useTheme } from "@mui/material";
+import RosterBuilderSidebar from "./roster-builder-sidebar";
+import LockoutTabs from "./lockout-tabs/LockoutTabs";
+import SidebarItems from "./roster-builder-sidebar/sidebar-items";
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
 
-const CustomPickersDay = styled(PickersDay, {
-    shouldForwardProp: (prop) => prop !== "isSelected" && prop !== "isHovered",
-})(({ theme, isSelected, isHovered, day }) => {
-    const dayDay = dayjs(day);
-    const { startDate, endDate } = getLockoutStartAndEndDates(day);
-    const isStartDate = dayDay.isSame(dayjs(startDate), "day");
-    const isEndDate = dayDay.isSame(dayjs(endDate), "day");
-
-    return {
-        borderRadius: 0,
-        ...(isSelected && {
-            backgroundColor: theme.palette.primary.main,
-            color: theme.palette.primary.contrastText,
-            "&:hover, &:focus": {
-                backgroundColor: theme.palette.primary.main,
-            },
-        }),
-        ...(isHovered && {
-            backgroundColor: theme.palette.secondary.main,
-            "&:hover, &:focus": {
-                backgroundColor: theme.palette.secondary.main,
-            },
-        }),
-
-        ...(isStartDate && {
-            borderTopLeftRadius: "50%",
-            borderBottomLeftRadius: "50%",
-        }),
-        ...(isEndDate && {
-            borderTopRightRadius: "50%",
-            borderBottomRightRadius: "50%",
-        }),
-
-        // ...(day.day() === 0 && {
-        //     borderTopLeftRadius: "50%",
-        //     borderBottomLeftRadius: "50%",
-        // }),
-        // ...(day.day() === 6 && {
-        //     borderTopRightRadius: "50%",
-        //     borderBottomRightRadius: "50%",
-        // }),
-    };
-});
-
 export default function RosterBuilder() {
+    const theme = useTheme();
+    const [selectedTab, setSelectedTab] = useState(0);
     const [hoveredDay, setHoveredDay] = useState(null);
-    const [value, setValue] = useState(null);
-    const { startDate, endDate } = getLockoutStartAndEndDates(value);
+    const [selectedLockout, setSelectedLockout] = useState(null);
+    const [instanceSelectValue, setInstanceSelectValue] = useState("");
+    const [chosenLockouts, setChosenLockouts] = useState([{ type: "all" }]);
+    const matchUpLg = useMediaQuery(theme.breakpoints.up("lg"));
+
+    const sideBarItems = SidebarItems({
+        instanceSelectValue,
+        handleInstanceSelectChange,
+        hoveredDay,
+        setHoveredDay,
+        selectedLockout,
+        setSelectedLockout,
+        chosenLockouts,
+        handleAddLockout,
+        handleDeleteLockout,
+    });
+
     return (
-        <WeekPicker
-            hoveredDay={hoveredDay}
-            setHoveredDay={setHoveredDay}
-            value={value}
-            setValue={setValue}
-        />
+        <Box sx={{ height: "100%" }}>
+            <Paper
+                elevation={1}
+                sx={{ height: "100%", mr: matchUpLg ? "334px" : "40px" }}
+            >
+                <LockoutTabs
+                    chosenLockouts={chosenLockouts}
+                    selectedTab={selectedTab}
+                    handleChangeTab={handleChangeTab}
+                />
+            </Paper>
+            <RosterBuilderSidebar listItems={sideBarItems} />
+        </Box>
     );
     // if (isLoading) {
     //     return <div>Loading...</div>;
@@ -82,65 +60,47 @@ export default function RosterBuilder() {
     //         players={players}
     //     />
     // );
-}
 
-function RosterLoader({ children, guildId, startDate }) {
-    const { lockout, lockoutError, isLoadingLockout } =
-        useGuildInstanceLockout();
-}
-
-function Day(props) {
-    const { day, selectedDay, hoveredDay, ...other } = props;
-
-    return (
-        <CustomPickersDay
-            {...other}
-            day={day}
-            sx={{ px: 2.5 }}
-            disableMargin
-            selected={false}
-            isSelected={isInSameLockout(day, selectedDay)}
-            isHovered={isInSameLockout(day, hoveredDay)}
-        />
-    );
-}
-
-function WeekPicker({ value, setValue, hoveredDay, setHoveredDay }) {
-    return (
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
-            <DateCalendar
-                value={value}
-                onChange={(newValue) => setValue(newValue)}
-                showDaysOutsideCurrentMonth
-                slots={{ day: Day }}
-                slotProps={{
-                    day: (ownerState) => ({
-                        selectedDay: value,
-                        hoveredDay,
-                        onPointerEnter: () => {
-                            setHoveredDay(new Date(ownerState.day));
-                        },
-                        onPointerLeave: () => setHoveredDay(null),
-                    }),
-                }}
-            />
-        </LocalizationProvider>
-    );
-}
-
-function isInSameLockout(day, selectedDay) {
-    if (selectedDay === null) {
-        return false;
+    function handleDeleteLockout(lockout) {
+        setChosenLockouts((prev) => {
+            return prev.filter((prevLockout) => {
+                return !isEqual(
+                    parseISO(prevLockout.startDate),
+                    parseISO(lockout.startDate)
+                );
+            });
+        });
     }
-    const dayDay = dayjs(day);
-    const daySelectedDay = dayjs(selectedDay);
 
-    const { startDate, endDate } = getLockoutStartAndEndDates(selectedDay);
+    function handleAddLockout() {
+        if (selectedLockout === null) {
+            return;
+        }
 
-    const start = dayjs(startDate);
-    const end = dayjs(endDate);
+        const { startDate, endDate } =
+            getLockoutStartAndEndDates(selectedLockout);
 
-    return (
-        dayDay.isSameOrBefore(end, "day") && dayDay.isSameOrAfter(start, "day")
-    );
+        const alreadyAdded = chosenLockouts.some((lockout) => {
+            return dayjs(lockout.startDate).isSame(dayjs(startDate));
+        });
+        if (alreadyAdded) {
+            return;
+        }
+
+        setChosenLockouts((prev) => [
+            ...prev,
+            {
+                startDate,
+                endDate,
+            },
+        ]);
+    }
+
+    function handleInstanceSelectChange(event) {
+        setInstanceSelectValue(event.target.value);
+    }
+
+    function handleChangeTab(event, newValue) {
+        setSelectedTab(newValue);
+    }
 }

@@ -78,12 +78,13 @@ const MainLayout = () => {
                 enableColorOnDark
                 position="fixed"
                 color="inherit"
-                elevation={0}
+                elevation={1}
                 sx={{
                     bgcolor: theme.palette.background.default,
                     transition: leftDrawerOpened
                         ? theme.transitions.create("width")
                         : "none",
+                    boxShadow: "none",
                 }}
             >
                 <Toolbar>
@@ -107,7 +108,9 @@ const MainLayout = () => {
                     title
                     rightAlign
                 />
-                <Outlet />
+                <Box id="main-content-container">
+                    <Outlet />
+                </Box>
             </Main>
             <Customization />
         </Box>

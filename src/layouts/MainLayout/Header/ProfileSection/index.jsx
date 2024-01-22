@@ -180,6 +180,7 @@ const ProfileSection = () => {
                         },
                     ],
                 }}
+                style={{ zIndex: 9999 }}
             >
                 {({ TransitionProps }) => (
                     <Transitions in={open} {...TransitionProps}>
