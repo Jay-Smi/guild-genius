@@ -22,16 +22,16 @@ import {
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-import Container from "./components/Container/Container";
-import DroppableContainer from "./components/DroppableContainer";
-import { Item } from "./components/Item/Item";
-import SortableItem from "./components/SortableItem";
-import { coordinateGetter as multipleContainersCoordinateGetter } from "../../../../utils/helpers";
+import Container from "../components/Container/Container";
+import DroppableContainer from "../components/DroppableContainer";
+import { Item } from "../components/Item/Item";
+import SortableItem from "../components/SortableItem";
+import { coordinateGetter as multipleContainersCoordinateGetter } from "../../../../../utils/helpers";
 
 // roster lockout-1 default tanks/healers/melee/ranged, characters filtered in by associated tag,
 // create custom lockout-1 with any tag, ex. kicks, dispells, etc.
 
-export function RosterBuilderActual({
+export default function RosterBuilderActual({
     adjustScale = false,
     cancelDrop,
     coordinateGetter = multipleContainersCoordinateGetter,
@@ -49,15 +49,29 @@ export function RosterBuilderActual({
     const updatedCharacters = initialCharacters.map((character) => {
         return {
             ...character,
-            player: players.find((player) => player.data.includes(character.id))
+            player: players.find((player) => character.player_id === player.id)
                 .name,
         };
     });
     const [containers, setContainers] = useState([
         ...initialCategories,
-        ...initialRaids,
-        ...initialGroups,
         ...updatedCharacters,
+        {
+            id: "initialRaid1",
+            type: "raid",
+            data: ["initialGroup1", "initialGroup2"],
+            name: "Raid 1",
+        },
+        { id: "initialGroup1", type: "group", data: [], name: "Group 1" },
+        { id: "initialGroup2", type: "group", data: [], name: "Group 2" },
+        {
+            id: "initialRaid2",
+            type: "raid",
+            data: ["initialGroup3", "initialGroup4"],
+            name: "Raid 2",
+        },
+        { id: "initialGroup3", type: "group", data: [], name: "Group 3" },
+        { id: "initialGroup4", type: "group", data: [], name: "Group 4" },
         {
             id: "categoriesContainer",
             type: "container",
@@ -66,7 +80,7 @@ export function RosterBuilderActual({
         {
             id: "raidsContainer",
             type: "container",
-            data: initialRaids.map((raid) => raid.id),
+            data: ["initialRaid1", "initialRaid2"],
         },
     ]);
     const [activePlayer, setActivePlayer] = useState(null);
@@ -416,7 +430,7 @@ export function RosterBuilderActual({
     );
 
     function findPlayer(id) {
-        return players.find((player) => player.data.includes(id));
+        return players.find((player) => player.id === id);
     }
 
     function isACharacter(id) {
@@ -424,7 +438,7 @@ export function RosterBuilderActual({
     }
 
     function findParent(id) {
-        return containers.find((container) => container.data.includes(id));
+        return containers.find((container) => container.data?.includes(id));
     }
 
     function getIndex(id) {

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import useProfile from "./auth/useProfile";
-import { useCharactersByDiscordName } from "./useCharacters";
+import { useCharactersByDiscordName } from "./character/useCharacters";
 import { usePlayersByDiscordName } from "./usePlayers";
 import supabase from "../services/supabase";
 import { useStore } from "../store";

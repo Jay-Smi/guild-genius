@@ -69,7 +69,7 @@ export function allSpecs() {
 }
 
 export function isTank(character) {
-    if (character.Spec === "Protection" || character.Spec === "Guardian") {
+    if (character.spec === "Protection" || character.spec === "Guardian") {
         return true;
     } else {
         return false;
@@ -78,9 +78,9 @@ export function isTank(character) {
 
 export function isHealer(character) {
     if (
-        character.Spec === "Holy" ||
-        character.Spec === "Discipline" ||
-        character.Spec === "Restoration"
+        character.spec === "Holy" ||
+        character.spec === "Discipline" ||
+        character.spec === "Restoration"
     ) {
         return true;
     } else {
@@ -90,15 +90,15 @@ export function isHealer(character) {
 
 export function isMelee(character) {
     if (
-        character.Spec === "Fury" ||
-        character.Spec === "Arms" ||
-        character.Spec === "Combat" ||
-        character.Spec === "Assassination" ||
-        character.Spec === "Sublety" ||
-        character.Spec === "Feral" ||
-        character.Spec === "Cat" ||
-        character.Spec === "Retribution" ||
-        character.Spec === "Enhancement"
+        character.spec === "Fury" ||
+        character.spec === "Arms" ||
+        character.spec === "Combat" ||
+        character.spec === "Assassination" ||
+        character.spec === "Sublety" ||
+        character.spec === "Feral" ||
+        character.spec === "Cat" ||
+        character.spec === "Retribution" ||
+        character.spec === "Enhancement"
     ) {
         return true;
     } else {
@@ -108,17 +108,17 @@ export function isMelee(character) {
 
 export function isRanged(character) {
     if (
-        character.Spec === "Affliction" ||
-        character.Spec === "Destruction" ||
-        character.Spec === "Demonology" ||
-        character.Spec === "Frost" ||
-        character.Spec === "Fire" ||
-        character.Spec === "Arcane" ||
-        character.Spec === "Boomkin" ||
-        character.Spec === "Balance" ||
-        character.Spec === "Marksman" ||
-        character.Spec === "Beastmaster" ||
-        character.Spec === "Survival"
+        character.spec === "Affliction" ||
+        character.spec === "Destruction" ||
+        character.spec === "Demonology" ||
+        character.spec === "Frost" ||
+        character.spec === "Fire" ||
+        character.spec === "Arcane" ||
+        character.spec === "Boomkin" ||
+        character.spec === "Balance" ||
+        character.spec === "Marksman" ||
+        character.spec === "Beastmaster" ||
+        character.spec === "Survival"
     ) {
         return true;
     } else {

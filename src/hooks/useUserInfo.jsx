@@ -1,5 +1,5 @@
 import useProfile from "./auth/useProfile";
-import { useCharactersByDiscordName } from "./useCharacters";
+import { useCharactersByDiscordName } from "./character/useCharacters";
 import { usePlayersByDiscordName } from "./usePlayers";
 
 export default function useUserInfo(userId, discordName) {

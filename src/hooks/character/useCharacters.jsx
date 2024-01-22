@@ -2,8 +2,8 @@ import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
     getCharacters,
     getCharactersTags,
-} from "../services/crud/apiCharacters";
-import supabase from "../services/supabase";
+} from "../../services/crud/apiCharacters";
+import supabase from "../../services/supabase";
 
 async function getCharactersByDiscordName(discordName) {
     const { data, error } = await supabase
@@ -18,8 +18,8 @@ async function getCharactersByDiscordName(discordName) {
 export function useCharactersByDiscordName(discordName) {
     const {
         data: characters,
-        isLoadingCharacters,
-        errorCharacters,
+        isLoading: isLoadingCharacters,
+        error: errorCharacters,
     } = useQuery({
         queryKey: ["characters", discordName],
         queryFn: () => getCharactersByDiscordName(discordName),
