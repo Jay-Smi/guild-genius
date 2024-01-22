@@ -17,7 +17,7 @@ import {
     useAllGuildsGroupCharacters,
     useAllGuildsGroups,
 } from "../../../../hooks/useGroups";
-import { useAllGuildsCharacters } from "../../../../hooks/useCharacters";
+import { useAllGuildsCharacters } from "../../../../hooks/character/useCharacters";
 import {
     Accordion,
     AccordionDetails,
