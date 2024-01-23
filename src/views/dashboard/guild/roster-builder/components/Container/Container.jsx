@@ -6,12 +6,9 @@ import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrow
 import { Handle } from "../Handle.jsx";
 import { Remove } from "../Remove.jsx";
 import {
-    StyledContainer,
     StyledRaid,
     StyledGroup,
     StyledCategory,
-    StyledActions,
-    StyledContainerHeader,
     StyledDragHandle,
     StyledLabel,
 } from "./Container.styles.jsx";
@@ -19,6 +16,7 @@ import {
     Badge,
     Box,
     Button,
+    ButtonGroup,
     Chip,
     Dialog,
     DialogActions,
@@ -34,13 +32,16 @@ import {
     Stack,
     Switch,
     TextField,
+    Tooltip,
     Typography,
+    useTheme,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SettingsSuggestIcon from "@mui/icons-material/SettingsSuggest";
 import EditAttributesIcon from "@mui/icons-material/EditAttributes";
 import { RosterContext } from "../../store/RosterContextProvider.jsx";
 import { useStore } from "zustand";
+import { ThemeContext } from "@emotion/react";
 
 const Container = forwardRef(
     (
@@ -59,8 +60,9 @@ const Container = forwardRef(
         },
         ref
     ) => {
+        const theme = useTheme();
         const as = onClick ? "button" : "div";
-        const [isOpen, setIsOpen] = useState(true);
+        const [isOpen, setContainerIsOpen] = useState(true);
         const Component =
             type === "raid"
                 ? StyledRaid
@@ -136,8 +138,8 @@ const Container = forwardRef(
             setContainers(newContainers);
         }
 
-        function toggleOpen() {
-            setIsOpen((isOpen) => !isOpen);
+        function toggleOpenContainer() {
+            setContainerIsOpen((isOpen) => !isOpen);
         }
 
         function handleClickOpenDialog() {
@@ -168,206 +170,243 @@ const Container = forwardRef(
                         </StyledDragHandle>
                         <StyledLabel>{label}</StyledLabel>
 
-                        {type === "raid" && (
-                            <>
-                                <Stack
-                                    direction="row"
-                                    spacing={1}
-                                    divider={
-                                        <Divider
-                                            orientation="vertical"
-                                            flexItem
-                                        />
-                                    }
-                                >
-                                    {container.tags &&
-                                        container.tags.length > 0 &&
-                                        container.tags.map((tag) => {
-                                            return (
-                                                <Badge
-                                                    key={tag.tag}
-                                                    badgeContent={Number(
-                                                        tag.amount
-                                                    )}
-                                                    color="secondary"
-                                                >
-                                                    <Chip
-                                                        label={tag.tag}
-                                                        size="small"
-                                                        onDelete={() =>
-                                                            handleRemoveTag(
-                                                                tag.tag
-                                                            )
-                                                        }
-                                                    />
-                                                </Badge>
-                                            );
-                                        })}
-                                </Stack>
-                                <Dialog
-                                    open={tagDialogOpen}
-                                    onClose={handleCloseDialog}
-                                >
-                                    <DialogTitle
-                                        sx={{
-                                            display: "flex",
-                                            justifyContent: "center",
-                                            alignItems: "center",
-                                            fontSize: "1.5em",
-                                        }}
-                                    >
-                                        {container.name}
-                                    </DialogTitle>
-                                    <Divider sx={{ mb: 2 }} />
-                                    <DialogContent>
-                                        <DialogContentText>
-                                            Set the number of tags (0 for
-                                            exclusive) to control raid
-                                            composition.
-                                        </DialogContentText>
-                                        <Divider sx={{ mt: 2, mb: 2 }} />
-                                        <Stack spacing={1}>
-                                            {tagsArray.map((tag) => {
-                                                return (
-                                                    <Grid container key={tag}>
-                                                        <Grid
-                                                            item
-                                                            xs={5}
-                                                            sx={{
-                                                                display: "flex",
-                                                                justifyContent:
-                                                                    "center",
-                                                                alignItems:
-                                                                    "center",
-                                                            }}
-                                                        >
-                                                            <Typography>
-                                                                {tag}
-                                                            </Typography>
-                                                        </Grid>
-                                                        <Grid
-                                                            item
-                                                            xs={2}
-                                                            sx={{
-                                                                display: "flex",
-                                                                justifyContent:
-                                                                    "center",
-                                                                alignItems:
-                                                                    "center",
-                                                            }}
-                                                        >
-                                                            <Switch
-                                                                checked={
-                                                                    tagForm[tag]
-                                                                        .checked
-                                                                }
-                                                                onChange={() =>
-                                                                    handleToggleChecked(
-                                                                        tag
-                                                                    )
-                                                                }
-                                                            />
-                                                        </Grid>
-                                                        <Grid
-                                                            item
-                                                            xs={5}
-                                                            sx={{
-                                                                display: "flex",
-                                                                justifyContent:
-                                                                    "center",
-                                                                alignItems:
-                                                                    "center",
-                                                            }}
-                                                        >
-                                                            <TextField
-                                                                sx={{
-                                                                    width: "50%",
-                                                                }}
-                                                                inputProps={{
-                                                                    sx: {
-                                                                        textAlign:
-                                                                            "center",
-                                                                    },
-                                                                }}
-                                                                value={
-                                                                    tagForm[tag]
-                                                                        .amount ??
-                                                                    ""
-                                                                }
-                                                                onChange={(e) =>
-                                                                    handleSetValue(
-                                                                        tag,
-                                                                        e.target
-                                                                            .value
-                                                                    )
-                                                                }
-                                                                disabled={
-                                                                    !tagForm[
-                                                                        tag
-                                                                    ].checked
-                                                                }
-                                                            />
-                                                        </Grid>
-                                                    </Grid>
-                                                );
-                                            })}
-                                        </Stack>
-                                    </DialogContent>
-                                    <DialogActions>
-                                        <Button onClick={handleCloseDialog}>
-                                            Cancel
-                                        </Button>
-                                        <Button onClick={handleSaveTagForm}>
-                                            Save
-                                        </Button>
-                                    </DialogActions>
-                                </Dialog>
-                            </>
-                        )}
-                        {type === "raid" && (
-                            <SpeedDial
-                                ariaLabel="SpeedDial openIcon "
-                                icon={<SpeedDialIcon />}
-                                sx={{
-                                    position: "fixed",
-                                    transform: "translate(80px, 65px)",
-                                }}
-                                FabProps={{
-                                    sx: { width: "32px", height: "30px" },
-                                }}
-                                direction="down"
-                            >
-                                <SpeedDialAction
-                                    icon={
-                                        <EditAttributesIcon
+                        <ButtonGroup
+                            aria-label="outlined primary button group"
+                            size="small"
+                            spacing={2}
+                        >
+                            {type === "raid" && (
+                                <>
+                                    <Tooltip title="Edit Tags">
+                                        <IconButton
                                             onClick={handleClickOpenDialog}
-                                        />
-                                    }
-                                    tooltipTitle="Edit Tags"
-                                />
-                                {onRemove ? (
-                                    <SpeedDialAction
-                                        icon={<DeleteIcon onClick={onRemove} />}
-                                        tooltipTitle="Delete Raid"
+                                            size="small"
+                                            sx={{ borderRadius: 1 }}
+                                        >
+                                            <EditAttributesIcon
+                                                sx={{ width: "20px" }}
+                                            />
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Divider
+                                        orientation="vertical"
+                                        flexItem
+                                        color={theme.palette.primary.main}
+                                        sx={{
+                                            borderRightWidth: 2,
+                                            borderColor:
+                                                theme.palette.grey[400],
+                                            marginRight: 1,
+                                            marginLeft: 1,
+                                        }}
                                     />
-                                ) : null}
-                            </SpeedDial>
-                        )}
-
-                        <StyledActions className="buttons">
-                            {isOpen ? (
-                                <IconButton onClick={toggleOpen}>
-                                    <KeyboardDoubleArrowUpIcon />
-                                </IconButton>
-                            ) : (
-                                <IconButton onClick={toggleOpen}>
-                                    <KeyboardDoubleArrowDownIcon />
-                                </IconButton>
+                                </>
                             )}
-                        </StyledActions>
+                            {type !== "category" && (
+                                <>
+                                    <Tooltip
+                                        title={
+                                            type === "raid"
+                                                ? "Delete Raid"
+                                                : "Delete Group"
+                                        }
+                                    >
+                                        <IconButton
+                                            onClick={onRemove}
+                                            size="small"
+                                            sx={{ borderRadius: 1 }}
+                                        >
+                                            <DeleteIcon
+                                                sx={{ width: "20px" }}
+                                            />
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Divider
+                                        orientation="vertical"
+                                        flexItem
+                                        sx={{
+                                            borderRightWidth: 2,
+                                            borderColor:
+                                                theme.palette.grey[400],
+                                            marginRight: 1,
+                                            marginLeft: 1,
+                                        }}
+                                    />
+                                </>
+                            )}
+
+                            <Tooltip
+                                title={
+                                    type === "raid"
+                                        ? "Collapse Raid"
+                                        : type === "group"
+                                        ? "Collapse Group"
+                                        : isOpen
+                                        ? "Collapse Category"
+                                        : "Expand Category"
+                                }
+                            >
+                                <IconButton
+                                    onClick={toggleOpenContainer}
+                                    size="small"
+                                    sx={{ borderRadius: 1 }}
+                                >
+                                    {isOpen ? (
+                                        <KeyboardDoubleArrowUpIcon
+                                            sx={{ width: "20px" }}
+                                        />
+                                    ) : (
+                                        <KeyboardDoubleArrowDownIcon
+                                            sx={{ width: "20px" }}
+                                        />
+                                    )}
+                                </IconButton>
+                            </Tooltip>
+                        </ButtonGroup>
                     </Box>
                 ) : null}
                 {isOpen && <ul>{children}</ul>}
+                {type === "raid" && (
+                    <>
+                        <Stack
+                            direction="row"
+                            spacing={1}
+                            divider={
+                                <Divider orientation="vertical" flexItem />
+                            }
+                        >
+                            {container?.tags &&
+                                container.tags?.length > 0 &&
+                                container.tags?.map((tag) => {
+                                    return (
+                                        <Badge
+                                            key={tag.tag}
+                                            badgeContent={Number(tag.amount)}
+                                            color="secondary"
+                                        >
+                                            <Chip
+                                                label={tag.tag}
+                                                size="small"
+                                                onDelete={() =>
+                                                    handleRemoveTag(tag.tag)
+                                                }
+                                            />
+                                        </Badge>
+                                    );
+                                })}
+                        </Stack>
+                        <Dialog
+                            open={tagDialogOpen}
+                            onClose={handleCloseDialog}
+                        >
+                            <DialogTitle
+                                sx={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    fontSize: "1.5em",
+                                }}
+                            >
+                                {container.name}
+                            </DialogTitle>
+                            <Divider sx={{ mb: 2 }} />
+                            <DialogContent>
+                                <DialogContentText>
+                                    Set the number of tags (0 for exclusive) to
+                                    control raid composition.
+                                </DialogContentText>
+                                <Divider sx={{ mt: 2, mb: 2 }} />
+                                <Stack spacing={1}>
+                                    {tagsArray.map((tag) => {
+                                        return (
+                                            <Grid container key={tag}>
+                                                <Grid
+                                                    item
+                                                    xs={5}
+                                                    sx={{
+                                                        display: "flex",
+                                                        justifyContent:
+                                                            "center",
+                                                        alignItems: "center",
+                                                    }}
+                                                >
+                                                    <Typography>
+                                                        {tag}
+                                                    </Typography>
+                                                </Grid>
+                                                <Grid
+                                                    item
+                                                    xs={2}
+                                                    sx={{
+                                                        display: "flex",
+                                                        justifyContent:
+                                                            "center",
+                                                        alignItems: "center",
+                                                    }}
+                                                >
+                                                    <Switch
+                                                        checked={
+                                                            tagForm[tag].checked
+                                                        }
+                                                        onChange={() =>
+                                                            handleToggleChecked(
+                                                                tag
+                                                            )
+                                                        }
+                                                    />
+                                                </Grid>
+                                                <Grid
+                                                    item
+                                                    xs={5}
+                                                    sx={{
+                                                        display: "flex",
+                                                        justifyContent:
+                                                            "center",
+                                                        alignItems: "center",
+                                                    }}
+                                                >
+                                                    <TextField
+                                                        sx={{
+                                                            width: "50%",
+                                                        }}
+                                                        inputProps={{
+                                                            sx: {
+                                                                textAlign:
+                                                                    "center",
+                                                            },
+                                                        }}
+                                                        value={
+                                                            tagForm[tag]
+                                                                .amount ?? ""
+                                                        }
+                                                        onChange={(e) =>
+                                                            handleSetValue(
+                                                                tag,
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            !tagForm[tag]
+                                                                .checked
+                                                        }
+                                                    />
+                                                </Grid>
+                                            </Grid>
+                                        );
+                                    })}
+                                </Stack>
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={handleCloseDialog}>
+                                    Cancel
+                                </Button>
+                                <Button onClick={handleSaveTagForm}>
+                                    Save
+                                </Button>
+                            </DialogActions>
+                        </Dialog>
+                    </>
+                )}
             </Component>
         );
     }

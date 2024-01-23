@@ -740,11 +740,12 @@ export default function RosterBuilderActual({
         const currentContainer = findContainer(containerId);
         return (
             <Container
-                label={containerId}
+                label={currentContainer.name}
                 shadow
                 onRemove={() => {}}
                 type={currentContainer.type}
                 overlay={"overlay"}
+                id={containerId}
             >
                 {currentContainer.type === "category"
                     ? currentContainer.data.map((item, index) => {
@@ -779,6 +780,7 @@ export default function RosterBuilderActual({
                                   key={group}
                                   onRemove={() => {}}
                                   type={currentGroup.type}
+                                  id={group}
                               >
                                   {currentGroup.data.map((item) => {
                                       const currentItem = findContainer(item);

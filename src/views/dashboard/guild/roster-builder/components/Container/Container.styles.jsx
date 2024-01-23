@@ -227,7 +227,3 @@ export const StyledLabel = styled.div`
     text-wrap: nowrap;
     overflow: hidden;
 `;
-
-export const StyledActions = styled.div`
-    display: flex;
-`;
