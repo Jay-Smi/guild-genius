@@ -1,7 +1,8 @@
-import React, { forwardRef, useContext, useState } from "react";
+import React, { forwardRef, useContext, useRef, useState } from "react";
 import { classNames } from "../../../../../../utils/helpers.js";
 import KeyboardDoubleArrowUpIcon from "@mui/icons-material/KeyboardDoubleArrowUp";
 import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrowDown";
+import AddToPhotosIcon from "@mui/icons-material/AddToPhotos";
 
 import { Handle } from "../Handle.jsx";
 import { Remove } from "../Remove.jsx";
@@ -26,6 +27,7 @@ import {
     Divider,
     Grid,
     IconButton,
+    Popover,
     SpeedDial,
     SpeedDialAction,
     SpeedDialIcon,
@@ -81,6 +83,9 @@ const Container = forwardRef(
         const container = containers.find((container) => container.id === id);
         const categories = useStore(rosterStore, (state) => state.categories);
         const tagsArray = [...tags, "Tanks", "Healers", "Melee", "Ranged"];
+        const [popperAnchor, setPopperAnchor] = useState(null);
+        const anchorOpen = Boolean(popperAnchor);
+        const popperId = anchorOpen ? "delete-popover" : undefined;
 
         const tagFormInitialState = {};
         tagsArray.forEach((tag) => {
@@ -112,6 +117,14 @@ const Container = forwardRef(
                 },
             }));
         };
+
+        function handleClickPopper(event) {
+            setPopperAnchor(event.currentTarget);
+        }
+
+        function handleClosePopper() {
+            setPopperAnchor(null);
+        }
 
         function handleSaveTagForm() {
             const newContainers = [...containers];
@@ -148,6 +161,24 @@ const Container = forwardRef(
         function handleCloseDialog() {
             setTagDialogOpen(false);
         }
+        function handleAddGroup() {
+            const groupId = crypto.randomUUID();
+            const newContainers = [
+                ...containers,
+                {
+                    id: groupId,
+                    type: "group",
+                    name: "New Group",
+                    data: [],
+                },
+            ];
+            const raidContainer = newContainers.find(
+                (container) => container.id === id
+            );
+            console.log(raidContainer);
+            raidContainer.data.push(groupId);
+            setContainers(newContainers);
+        }
 
         return (
             <Component
@@ -177,6 +208,29 @@ const Container = forwardRef(
                         >
                             {type === "raid" && (
                                 <>
+                                    <Tooltip title="Add Group">
+                                        <IconButton
+                                            onClick={handleAddGroup}
+                                            size="small"
+                                            sx={{ borderRadius: 1 }}
+                                        >
+                                            <AddToPhotosIcon
+                                                sx={{ width: "20px" }}
+                                            />
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Divider
+                                        orientation="vertical"
+                                        flexItem
+                                        color={theme.palette.primary.main}
+                                        sx={{
+                                            borderRightWidth: 2,
+                                            borderColor:
+                                                theme.palette.grey[400],
+                                            marginRight: 1,
+                                            marginLeft: 1,
+                                        }}
+                                    />
                                     <Tooltip title="Edit Tags">
                                         <IconButton
                                             onClick={handleClickOpenDialog}
@@ -212,7 +266,7 @@ const Container = forwardRef(
                                         }
                                     >
                                         <IconButton
-                                            onClick={onRemove}
+                                            onClick={handleClickPopper}
                                             size="small"
                                             sx={{ borderRadius: 1 }}
                                         >
@@ -232,6 +286,23 @@ const Container = forwardRef(
                                             marginLeft: 1,
                                         }}
                                     />
+                                    <Popover
+                                        id={popperId}
+                                        open={anchorOpen}
+                                        anchorEl={popperAnchor}
+                                        onClose={handleClosePopper}
+                                        anchorOrigin={{
+                                            vertical: "bottom",
+                                            horizontal: "left",
+                                        }}
+                                    >
+                                        <Button
+                                            variant="contained"
+                                            onClick={onRemove}
+                                        >
+                                            Delete
+                                        </Button>
+                                    </Popover>
                                 </>
                             )}
 

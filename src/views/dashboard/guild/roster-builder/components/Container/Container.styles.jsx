@@ -43,7 +43,7 @@ export const StyledRaid = styled.div`
     border-radius: var(--border-radius-sm);
     min-height: ${(props) => (props.isopen ? "100px" : 0)};
 
-    background-color: var(--color-grey-50);
+    background-color: var(#fff);
 
     font-size: 1em;
 
@@ -53,17 +53,9 @@ export const StyledRaid = styled.div`
         padding-right: 8px;
         justify-content: space-between;
         align-items: center;
-        background-color: ${(props) =>
-            props.open ? "var(--color-grey-50)" : "var(--color-grey-200)"};
+        background-color: #fff;
         border-top-left-radius: var(--border-radius-sm);
         border-top-right-radius: var(--border-radius-sm);
-        & > .handle {
-            visibility: hidden;
-        }
-
-        & > .buttons {
-            visibility: hidden;
-        }
     }
 
     & ul {
@@ -74,26 +66,11 @@ export const StyledRaid = styled.div`
         gap: 10px 20px;
         padding: 20px;
         margin: 0;
+        background-color: #ececec;
     }
 
     &.shadow {
         box-shadow: 0 1px 10px 0 rgba(34, 33, 81, 0.1);
-    }
-
-    &:hover {
-        background-color: var(--color-grey-200);
-    }
-
-    &:hover > .containerHeader {
-        background-color: var(--color-grey-100);
-    }
-
-    &:hover .handle {
-        visibility: visible;
-    }
-
-    &:hover .buttons {
-        visibility: visible;
     }
 
     &::after {
@@ -150,6 +127,7 @@ export const StyledGroup = styled.div`
         list-style: none;
         padding: 20px;
         margin: 0;
+        background-color: #e4e4e4;
     }
 
     &.shadow {
