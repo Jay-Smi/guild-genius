@@ -161,15 +161,23 @@ export default function RosterBuilderActual({
                         const group = findContainer(groupId);
                         group.data.forEach((characterId) => {
                             const character = findContainer(characterId);
-                            let role = "";
-                            if (isTank(character)) role = "Tanks";
-                            else if (isHealer(character)) role = "Healers";
-                            else if (isMelee(character)) role = "Melee";
-                            else if (isRanged(character)) role = "Ranged";
-                            const category = modifiedContainers.find(
-                                (category) => category.name === role
-                            );
-                            category.data.push(characterId);
+                            if (character.tags) {
+                                const category = modifiedContainers.find(
+                                    (container) =>
+                                        container.name === character.tags[0]
+                                );
+                                category.data.push(characterId);
+                            } else {
+                                let role = "";
+                                if (isTank(character)) role = "Tanks";
+                                else if (isHealer(character)) role = "Healers";
+                                else if (isMelee(character)) role = "Melee";
+                                else if (isRanged(character)) role = "Ranged";
+                                const category = modifiedContainers.find(
+                                    (category) => category.name === role
+                                );
+                                category.data.push(characterId);
+                            }
                         });
                     });
                 }
