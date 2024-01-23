@@ -32,7 +32,7 @@ export default function SidebarCalendar({
                 chosenLockouts={chosenLockouts}
             />
             <Button variant="contained" onClick={handleAddLockout}>
-                Add Lockout
+                Select Lockout
             </Button>
             <Accordion>
                 <AccordionSummary

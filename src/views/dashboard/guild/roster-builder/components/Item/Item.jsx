@@ -1,4 +1,4 @@
-import React, { useEffect, memo, forwardRef } from "react";
+import React, { useEffect, memo, forwardRef, useContext } from "react";
 import { classNames } from "../../../../../../utils/helpers.js";
 
 import { Handle } from "../Handle.jsx";
@@ -9,6 +9,8 @@ import {
     StyledItem,
     StyledWrapper,
 } from "./Item.styles.jsx";
+import { RosterContext } from "../../store/RosterContextProvider.jsx";
+import { useStore } from "zustand";
 
 export const Item = memo(
     forwardRef(
@@ -30,23 +32,24 @@ export const Item = memo(
                 transform,
                 value,
                 wrapperStyle,
-                character,
-                activeCharacter,
-                player,
-                activePlayer,
+                characterId,
+                activeCharacterId,
+
                 ...props
             },
             ref
         ) => {
-            const isActiveCharacter = activeCharacter
-                ? activeCharacter.id === character.id
-                : false;
-            // console.log("activePlayer", activePlayer);
-            // console.log("character", character);
-            const isActivePlayer = activePlayer
-                ? activePlayer.name === character.player
-                : "";
+            const rosterStore = useContext(RosterContext);
+            const character = useStore(rosterStore, (state) =>
+                state.getCharacter(characterId)
+            );
+            const activeCharacter = useStore(rosterStore, (state) =>
+                state.getCharacter(activeCharacterId)
+            );
 
+            const isActivePlayer =
+                activeCharacter &&
+                character.player_id === activeCharacter.player_id;
             useEffect(() => {
                 if (!dragOverlay) {
                     return;

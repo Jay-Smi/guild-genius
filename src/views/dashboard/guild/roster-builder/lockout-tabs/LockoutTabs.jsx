@@ -1,9 +1,17 @@
 import { Box, Tab, Tabs, tabsClasses } from "@mui/material";
 import { useStore } from "../../../../../store";
 import { format, parseISO } from "date-fns";
+import { useStore as zusUseStore } from "zustand";
+import { useContext } from "react";
+import { RosterContext } from "../store/RosterContextProvider";
 
-function LockoutTabs({ chosenLockouts, selectedTab, handleChangeTab }) {
+function LockoutTabs({ selectedTab, handleChangeTab }) {
     const borderRadius = useStore((state) => state.borderRadius);
+    const rosterStore = useContext(RosterContext);
+    const chosenLockouts = zusUseStore(
+        rosterStore,
+        (state) => state.chosenLockouts
+    );
 
     return (
         <Box

@@ -22,9 +22,9 @@ function SortableItem({
     style,
     containerId,
     getIndex,
-    character,
-    activeCharacter,
-    player,
+    characterId,
+    activeCharacterId,
+
     activePlayer,
 }) {
     const {
@@ -57,10 +57,8 @@ function SortableItem({
             fadeIn={mountedWhileDragging}
             listeners={listeners}
             renderItem={renderItem}
-            character={character}
-            activeCharacter={activeCharacter}
-            player={player}
-            activePlayer={activePlayer}
+            characterId={characterId}
+            activeCharacterId={activeCharacterId}
         />
     );
 }

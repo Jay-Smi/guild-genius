@@ -85,7 +85,7 @@ function GuildRaids() {
     const [value, setValue] = useState(0);
 
     if (isLoadingAny) return <Loader />;
-    console.log(guildCharacters);
+
     const selectedLockout = allGuildInstanceLockouts[value];
     const handleChange = (event, newValue) => {
         setValue(newValue);

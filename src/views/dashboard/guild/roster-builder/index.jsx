@@ -11,7 +11,7 @@ import { isEqual, parseISO } from "date-fns";
 import dayjs from "dayjs";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
-import { Box, Paper, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Divider, Paper, useMediaQuery, useTheme } from "@mui/material";
 import RosterBuilderSidebar from "./roster-builder-sidebar";
 import LockoutTabs from "./lockout-tabs/LockoutTabs";
 import SidebarItems from "./roster-builder-sidebar/sidebar-items";
@@ -23,28 +23,16 @@ import useUserInfo from "../../../../hooks/useUserInfo";
 import useAllGuildCharacterTags from "../../../../hooks/character/useAllGuildCharacterTags";
 import Loader from "../../../../components/Loader";
 import { IconFileFilled } from "@tabler/icons-react";
+import RosterContextProvider from "./store/RosterContextProvider";
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
 
 export default function RosterBuilder() {
     const theme = useTheme();
     const [selectedTab, setSelectedTab] = useState(0);
-    const [hoveredDay, setHoveredDay] = useState(null);
-    const [selectedLockout, setSelectedLockout] = useState(null);
-    const [instanceSelectValue, setInstanceSelectValue] = useState("");
-    const [chosenLockouts, setChosenLockouts] = useState([{ type: "all" }]);
+
+    // const [chosenLockouts, setChosenLockouts] = useState([{ type: "all" }]);
     const matchUpLg = useMediaQuery(theme.breakpoints.up("lg"));
-    const sideBarItems = SidebarItems({
-        instanceSelectValue,
-        handleInstanceSelectChange,
-        hoveredDay,
-        setHoveredDay,
-        selectedLockout,
-        setSelectedLockout,
-        chosenLockouts,
-        handleAddLockout,
-        handleDeleteLockout,
-    });
 
     /* Queries */
     const user = useStore((state) => state.session.user);
@@ -67,7 +55,12 @@ export default function RosterBuilder() {
         useAllGuildCharacterTags(mainGuildId);
 
     const isLoadingAny =
-        isLoadingCharacters || isLoadingPlayers || isLoadingCharacterTags;
+        isLoadingCharacters ||
+        isLoadingPlayers ||
+        isLoadingCharacterTags ||
+        guildCharacters === undefined ||
+        guildCharacterTags === undefined ||
+        guildPlayers === undefined;
 
     const tagCategories = [];
     const roleCategories = [
@@ -78,7 +71,7 @@ export default function RosterBuilder() {
     ];
 
     let categories = [];
-
+    let modifiedCharacters = null;
     if (!isLoadingAny) {
         const extractedCharacterTags = guildCharacterTags.map((tag) => {
             return tag.tag_name;
@@ -119,6 +112,10 @@ export default function RosterBuilder() {
             );
 
             if (tagMatch) {
+                const tags = guildCharacterTags
+                    .filter((tag) => tag.character_id === id)
+                    .map((tag) => tag.tag_name);
+                character.tags = tags;
                 const tagCategory = tagCategories.find(
                     (category) => category.name === tagMatch.tag_name
                 );
@@ -145,34 +142,51 @@ export default function RosterBuilder() {
             }
         });
 
-        // Concatenate the tag and role categories
         categories = [...tagCategories, ...roleCategories];
+
+        modifiedCharacters = guildCharacters?.map((character) => {
+            const charPlayer = guildPlayers.find((player) => {
+                return character.player_name === player.name;
+            });
+            return {
+                ...character,
+                player: charPlayer,
+            };
+        });
     }
-    console.log(guildPlayers);
-    return (
-        <>
-            <Box sx={{ height: "100%", mr: matchUpLg ? "334px" : "40px" }}>
+
+    function handleChangeTab(event, newValue) {
+        setSelectedTab(newValue);
+    }
+
+    return isLoadingAny ||
+        categories.length === 0 ||
+        modifiedCharacters === null ? (
+        <Loader />
+    ) : (
+        <RosterContextProvider
+            categories={categories}
+            characters={modifiedCharacters}
+            players={guildPlayers}
+            characterTags={guildCharacterTags}
+        >
+            <Box
+                sx={{
+                    mr: matchUpLg ? "334px" : "40px",
+                }}
+            >
                 <LockoutTabs
-                    chosenLockouts={chosenLockouts}
                     selectedTab={selectedTab}
                     handleChangeTab={handleChangeTab}
                 />
-                {isLoadingAny ? (
-                    <Loader />
-                ) : (
-                    <RosterBuilderActual
-                        categories={categories}
-                        characters={guildCharacters}
-                        guildCharacterTags={guildCharacterTags}
-                        // raids={raids}
-                        // groups={groups}
-                        players={guildPlayers}
-                    />
-                )}
+                <Divider sx={{ mt: 1, mb: 1 }} />
+
+                <RosterBuilderActual />
             </Box>
-            <RosterBuilderSidebar listItems={sideBarItems} />
-        </>
+            <RosterBuilderSidebar />
+        </RosterContextProvider>
     );
+
     // if (isLoading) {
     //     return <div>Loading...</div>;
     // }
@@ -185,47 +199,4 @@ export default function RosterBuilder() {
     //         players={players}
     //     />
     // );
-
-    function handleDeleteLockout(lockout) {
-        setChosenLockouts((prev) => {
-            return prev.filter((prevLockout) => {
-                return !isEqual(
-                    parseISO(prevLockout.startDate),
-                    parseISO(lockout.startDate)
-                );
-            });
-        });
-    }
-
-    function handleAddLockout() {
-        if (selectedLockout === null) {
-            return;
-        }
-
-        const { startDate, endDate } =
-            getLockoutStartAndEndDates(selectedLockout);
-
-        const alreadyAdded = chosenLockouts.some((lockout) => {
-            return dayjs(lockout.startDate).isSame(dayjs(startDate));
-        });
-        if (alreadyAdded) {
-            return;
-        }
-
-        setChosenLockouts((prev) => [
-            ...prev,
-            {
-                startDate,
-                endDate,
-            },
-        ]);
-    }
-
-    function handleInstanceSelectChange(event) {
-        setInstanceSelectValue(event.target.value);
-    }
-
-    function handleChangeTab(event, newValue) {
-        setSelectedTab(newValue);
-    }
 }

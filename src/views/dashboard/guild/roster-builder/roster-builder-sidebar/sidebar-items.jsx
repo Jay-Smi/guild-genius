@@ -1,10 +1,18 @@
 import { mdiAxeBattle } from "@mdi/js";
 import Icon from "@mdi/react";
-import { MenuItem, Select, useMediaQuery, useTheme } from "@mui/material";
+import {
+    Box,
+    Button,
+    MenuItem,
+    Select,
+    useMediaQuery,
+    useTheme,
+} from "@mui/material";
 import EditCalendarIcon from "@mui/icons-material/EditCalendar";
 
 import SettingsIcon from "@mui/icons-material/Settings";
 import SidebarCalendar from "./calendar";
+import RosterSettings from "./settings";
 
 export default function SidebarItems({
     instanceSelectValue,
@@ -23,6 +31,19 @@ export default function SidebarItems({
     const mdiIconSize = matchDownSm ? 1.15 : 1.6;
     return [
         {
+            id: 3,
+            name: "Controls",
+            icon: (
+                <SettingsIcon
+                    sx={{
+                        fontSize: materialIconSize,
+                        color: theme.palette.secondary.main,
+                    }}
+                />
+            ),
+            content: <RosterSettings />,
+        },
+        {
             id: 1,
             name: "Instance",
             icon: (
@@ -39,6 +60,7 @@ export default function SidebarItems({
                     value={instanceSelectValue}
                     label="Instance"
                     onChange={handleInstanceSelectChange}
+                    sx={{ width: "80%" }}
                 >
                     <MenuItem value="Blackfathom_Deeps">
                         Blackfathom Deeps
@@ -69,19 +91,6 @@ export default function SidebarItems({
                     handleDeleteLockout={handleDeleteLockout}
                 />
             ),
-        },
-        {
-            id: 3,
-            name: "Settings",
-            icon: (
-                <SettingsIcon
-                    sx={{
-                        fontSize: materialIconSize,
-                        color: theme.palette.secondary.main,
-                    }}
-                />
-            ),
-            content: null,
         },
     ];
 }

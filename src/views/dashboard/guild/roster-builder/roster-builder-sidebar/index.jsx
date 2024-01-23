@@ -14,12 +14,79 @@ import {
 } from "@mui/material";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import "react-perfect-scrollbar/dist/css/styles.css";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import SidebarItems from "./sidebar-items";
+import { isEqual, parseISO } from "date-fns";
+import { getLockoutStartAndEndDates } from "../../../../../utils/wowHelpers";
+import dayjs from "dayjs";
+import { useStore } from "zustand";
+import { RosterContext } from "../store/RosterContextProvider";
 
-const RosterBuilderSidebar = ({ listItems }) => {
+const RosterBuilderSidebar = () => {
     const theme = useTheme();
     const matchUpLg = useMediaQuery(theme.breakpoints.up("lg"));
     const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+    const rosterStore = useContext(RosterContext);
+    const chosenLockouts = useStore(
+        rosterStore,
+        (state) => state.chosenLockouts
+    );
+    const setChosenLockouts = useStore(
+        rosterStore,
+        (state) => state.setChosenLockouts
+    );
+
+    const [hoveredDay, setHoveredDay] = useState(null);
+    const [selectedLockout, setSelectedLockout] = useState(null);
+    const [instanceSelectValue, setInstanceSelectValue] = useState("");
+    const sideBarItems = SidebarItems({
+        instanceSelectValue,
+        handleInstanceSelectChange,
+        hoveredDay,
+        setHoveredDay,
+        selectedLockout,
+        setSelectedLockout,
+        chosenLockouts,
+        handleAddLockout,
+        handleDeleteLockout,
+    });
+
+    function handleDeleteLockout(lockout) {
+        const newLockouts = chosenLockouts.filter((prevLockout) => {
+            return !isEqual(
+                parseISO(prevLockout.startDate),
+                parseISO(lockout.startDate)
+            );
+        });
+        setChosenLockouts(newLockouts);
+    }
+
+    function handleAddLockout() {
+        if (selectedLockout === null) {
+            return;
+        }
+
+        const { startDate, endDate } =
+            getLockoutStartAndEndDates(selectedLockout);
+
+        const alreadyAdded = chosenLockouts.some((lockout) => {
+            return dayjs(lockout.startDate).isSame(dayjs(startDate));
+        });
+        if (alreadyAdded) {
+            return;
+        }
+        const newLockouts = [
+            ...chosenLockouts,
+            {
+                startDate,
+                endDate,
+            },
+        ];
+        setChosenLockouts(newLockouts);
+    }
+    function handleInstanceSelectChange(event) {
+        setInstanceSelectValue(event.target.value);
+    }
 
     function toggleMobileDrawer() {
         setMobileDrawerOpen(!mobileDrawerOpen);
@@ -39,20 +106,23 @@ const RosterBuilderSidebar = ({ listItems }) => {
                 divider={<Divider />}
                 sx={{ paddingTop: matchUpLg ? 0 : "30px" }}
             >
-                {listItems.map((item) => (
+                {sideBarItems.map((item) => (
                     <Box
                         key={item.id}
                         sx={{
                             width: "100%",
                             display: "flex",
                             flexDirection: "column",
+                            alignItems: "center",
                             color: theme.palette.grey[500],
                         }}
                     >
                         <Box
                             sx={{
+                                width: "100%",
                                 display: "flex",
                                 alignItems: "center",
+                                justifyContent: "start",
                                 mb: 1,
                             }}
                         >
@@ -83,7 +153,7 @@ const RosterBuilderSidebar = ({ listItems }) => {
                     alignItems: "center",
                 }}
             >
-                {listItems.map((item) => (
+                {sideBarItems.map((item) => (
                     <ListItem disablePadding key={item.id}>
                         <ListItemButton
                             sx={{
