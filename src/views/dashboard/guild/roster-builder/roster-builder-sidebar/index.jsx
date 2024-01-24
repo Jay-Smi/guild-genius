@@ -35,7 +35,10 @@ const RosterBuilderSidebar = () => {
         rosterStore,
         (state) => state.setChosenLockouts
     );
-
+    const createTabsContainer = useStore(
+        rosterStore,
+        (state) => state.createTabsContainer
+    );
     const [hoveredDay, setHoveredDay] = useState(null);
     const [selectedLockout, setSelectedLockout] = useState(null);
     const [instanceSelectValue, setInstanceSelectValue] = useState("");
@@ -75,13 +78,17 @@ const RosterBuilderSidebar = () => {
         if (alreadyAdded) {
             return;
         }
+
+        const newLockoutId = crypto.randomUUID();
         const newLockouts = [
             ...chosenLockouts,
             {
+                id: newLockoutId,
                 startDate,
                 endDate,
             },
         ];
+        createTabsContainer(newLockoutId);
         setChosenLockouts(newLockouts);
     }
     function handleInstanceSelectChange(event) {

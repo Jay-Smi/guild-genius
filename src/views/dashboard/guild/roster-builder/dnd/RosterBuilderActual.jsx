@@ -19,7 +19,14 @@ import {
     verticalListSortingStrategy,
     rectSortingStrategy,
 } from "@dnd-kit/sortable";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import {
+    useCallback,
+    useContext,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from "react";
 import { createPortal } from "react-dom";
 
 import Container from "../components/Container/Container";
@@ -56,48 +63,37 @@ export default function RosterBuilderActual({
     characters: initialCharacters,
     players,
 }) {
-    // const updatedCharacters = initialCharacters.map((character) => {
-    //     return {
-    //         ...character,
-    //         player: players.find((player) => character.player_id === player.id)
-    //             .name,
-    //     };
-    // });
-    // const initialContainers = [
-    //     ...initialCategories,
-    //     ...updatedCharacters,
-    //     {
-    //         id: "initialRaid1",
-    //         type: "raid",
-    //         data: ["initialGroup1", "initialGroup2"],
-    //         name: "Raid 1",
-    //     },
-    //     { id: "initialGroup1", type: "group", data: [], name: "Group 1" },
-    //     { id: "initialGroup2", type: "group", data: [], name: "Group 2" },
-    //     {
-    //         id: "initialRaid2",
-    //         type: "raid",
-    //         data: ["initialGroup3", "initialGroup4"],
-    //         name: "Raid 2",
-    //     },
-    //     { id: "initialGroup3", type: "group", data: [], name: "Group 3" },
-    //     { id: "initialGroup4", type: "group", data: [], name: "Group 4" },
-    //     {
-    //         id: "categoriesContainer",
-    //         type: "container",
-    //         data: initialCategories.map((category) => category.id),
-    //     },
-    //     {
-    //         id: "raidsContainer",
-    //         type: "container",
-    //         data: ["initialRaid1", "initialRaid2"],
-    //     },
-    // ];
-
     const rosterStore = useContext(RosterContext);
-    const containers = useStore(rosterStore, (state) => state.containers);
+    const storeContainers = useStore(rosterStore, (state) => state.containers);
+    const setStoreContainers = useStore(
+        rosterStore,
+        (state) => state.setContainers
+    );
+    const selectedTab = useStore(rosterStore, (state) => state.selectedTab);
+    const chosenLockouts = useStore(
+        rosterStore,
+        (state) => state.chosenLockouts
+    );
 
-    const setContainers = useStore(rosterStore, (state) => state.setContainers);
+    const tabsContainers = useStore(
+        rosterStore,
+        (state) => state.tabsContainers
+    );
+    const setTabContainer = useStore(
+        rosterStore,
+        (state) => state.setTabContainer
+    );
+    const lockoutsIndex = chosenLockouts[selectedTab].id;
+    const containers =
+        selectedTab === 0 ? storeContainers : tabsContainers[lockoutsIndex];
+
+    const setContainers = useMemo(
+        () =>
+            selectedTab === 0
+                ? setStoreContainers
+                : (containers) => setTabContainer(lockoutsIndex, containers),
+        [selectedTab, setStoreContainers, setTabContainer, lockoutsIndex]
+    );
 
     const [activePlayer, setActivePlayer] = useState(null);
     const [activeCharacter, setActiveCharacter] = useState(null);

@@ -24,12 +24,12 @@ import useAllGuildCharacterTags from "../../../../hooks/character/useAllGuildCha
 import Loader from "../../../../components/Loader";
 import { IconFileFilled } from "@tabler/icons-react";
 import RosterContextProvider from "./store/RosterContextProvider";
+import AlteredTabAlert from "./components/AlteredTabAlert";
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
 
 export default function RosterBuilder() {
     const theme = useTheme();
-    const [selectedTab, setSelectedTab] = useState(0);
 
     // const [chosenLockouts, setChosenLockouts] = useState([{ type: "all" }]);
     const matchUpLg = useMediaQuery(theme.breakpoints.up("lg"));
@@ -155,10 +155,6 @@ export default function RosterBuilder() {
         });
     }
 
-    function handleChangeTab(event, newValue) {
-        setSelectedTab(newValue);
-    }
-
     return isLoadingAny ||
         categories.length === 0 ||
         modifiedCharacters === null ? (
@@ -175,15 +171,13 @@ export default function RosterBuilder() {
                     mr: matchUpLg ? "334px" : "40px",
                 }}
             >
-                <LockoutTabs
-                    selectedTab={selectedTab}
-                    handleChangeTab={handleChangeTab}
-                />
+                <LockoutTabs />
                 <Divider sx={{ mt: 1, mb: 1 }} />
 
                 <RosterBuilderActual />
             </Box>
             <RosterBuilderSidebar />
+            <AlteredTabAlert />
         </RosterContextProvider>
     );
 

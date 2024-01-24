@@ -1,4 +1,6 @@
-import { createStore } from "zustand";
+import { createStore, useStore } from "zustand";
+import { RosterContext } from "./RosterContextProvider";
+import { useContext } from "react";
 
 const createRosterStore = ({
     categories,
@@ -9,13 +11,15 @@ const createRosterStore = ({
     return createStore((set, get) => {
         return {
             chosenLockouts: [{ type: "all" }],
-
+            hasAlteredTabContainer: false,
+            hasAcknowledgedAlteredTabContainer: false,
+            selectedTab: 0,
             categories,
             characters,
             players,
             characterTags,
             tags: [...new Set(characterTags.map((tag) => tag.tag_name))],
-
+            tabsContainers: {},
             containers: [
                 ...categories,
                 ...characters,
@@ -67,11 +71,52 @@ const createRosterStore = ({
                 },
             ],
 
-            setContainers: (containers) =>
+            setHasAcknowledgedAlteredTabContainer: (hasAcknowledged) => {
+                set((state) => ({
+                    ...state,
+                    hasAcknowledgedAlteredTabContainer: hasAcknowledged,
+                }));
+            },
+
+            setSelectedTab: (selectedTab) =>
+                set((state) => ({ ...state, selectedTab })),
+
+            createTabsContainer: (tab) =>
+                set((state) => ({
+                    ...state,
+                    tabsContainers: {
+                        ...state.tabsContainers,
+                        [tab]: [...get().containers],
+                    },
+                })),
+            setTabContainer: (tab, container) => {
+                set((state) => ({
+                    ...state,
+                    hasAlteredTabContainer: true,
+                }));
+                set((state) => ({
+                    ...state,
+                    tabsContainers: {
+                        ...state.tabsContainers,
+                        [tab]: container,
+                    },
+                }));
+            },
+            setContainers: (containers) => {
+                const newTabsContainers = {};
+                Object.keys(get().tabsContainers).forEach((tab) => {
+                    newTabsContainers[tab] = containers;
+                });
                 set((state) => ({
                     ...state,
                     containers: containers,
-                })),
+                    tabsContainers: {},
+                }));
+                set((state) => ({
+                    ...state,
+                    tabsContainers: newTabsContainers,
+                }));
+            },
 
             getCharacter: (characterId) =>
                 get().characters.find(
@@ -92,3 +137,8 @@ const createRosterStore = ({
 };
 
 export default createRosterStore;
+
+export function useTabsContainers() {
+    const rosterContext = useContext(RosterContext);
+    return useStore(rosterContext);
+}

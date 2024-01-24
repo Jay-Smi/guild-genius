@@ -5,14 +5,22 @@ import { useStore as zusUseStore } from "zustand";
 import { useContext } from "react";
 import { RosterContext } from "../store/RosterContextProvider";
 
-function LockoutTabs({ selectedTab, handleChangeTab }) {
+function LockoutTabs() {
     const borderRadius = useStore((state) => state.borderRadius);
     const rosterStore = useContext(RosterContext);
+    const setSelectedTab = zusUseStore(
+        rosterStore,
+        (state) => state.setSelectedTab
+    );
     const chosenLockouts = zusUseStore(
         rosterStore,
         (state) => state.chosenLockouts
     );
+    const selectedTab = zusUseStore(rosterStore, (state) => state.selectedTab);
 
+    function handleChangeTab(event, newValue) {
+        setSelectedTab(newValue);
+    }
     return (
         <Box
             sx={{
