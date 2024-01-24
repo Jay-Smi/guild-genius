@@ -90,16 +90,16 @@ const createRosterStore = ({
                     },
                 })),
             setTabContainer: (tab, container) => {
-                set((state) => ({
-                    ...state,
-                    hasAlteredTabContainer: true,
-                }));
+                // console.log("tab", tab);
+                // console.log("container", container);
+
                 set((state) => ({
                     ...state,
                     tabsContainers: {
                         ...state.tabsContainers,
                         [tab]: container,
                     },
+                    hasAlteredTabContainer: true,
                 }));
             },
             setContainers: (containers) => {
@@ -110,7 +110,6 @@ const createRosterStore = ({
                 set((state) => ({
                     ...state,
                     containers: containers,
-                    tabsContainers: {},
                 }));
                 set((state) => ({
                     ...state,

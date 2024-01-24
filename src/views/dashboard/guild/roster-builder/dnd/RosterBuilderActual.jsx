@@ -94,7 +94,8 @@ export default function RosterBuilderActual({
                 : (containers) => setTabContainer(lockoutsIndex, containers),
         [selectedTab, setStoreContainers, setTabContainer, lockoutsIndex]
     );
-
+    console.log("containers", containers);
+    console.log("setContainers", setContainers);
     const [activePlayer, setActivePlayer] = useState(null);
     const [activeCharacter, setActiveCharacter] = useState(null);
     const [activeId, setActiveId] = useState(null);
@@ -126,69 +127,155 @@ export default function RosterBuilderActual({
 
     const handleRemove = useCallback(
         (id) => {
-            const modifiedContainers = [...containers];
-            const removedContainer = findContainer(id);
+            const cloneContainer = (containerId) => {
+                const container = findContainer(containerId);
+                return container ? { ...container } : null;
+            };
 
-            if (removedContainer.data.length > 0) {
+            const cloneAndUpdateContainers = (
+                originalContainers,
+                updatedContainer
+            ) => {
+                return originalContainers.map((container) =>
+                    container.id === updatedContainer.id
+                        ? updatedContainer
+                        : { ...container }
+                );
+            };
+
+            let modifiedContainers = [...containers];
+
+            const removedContainer = cloneContainer(id);
+
+            if (removedContainer && removedContainer.data.length > 0) {
                 if (removedContainer.type === "group") {
                     removedContainer.data.forEach((characterId) => {
-                        const character = findContainer(characterId);
-                        if (character.tags) {
+                        const character = cloneContainer(characterId);
+                        if (character && character.tags) {
                             const category = modifiedContainers.find(
                                 (container) =>
                                     container.name === character.tags[0]
                             );
-                            category.data.push(characterId);
+                            if (category) {
+                                const updatedCategory = {
+                                    ...category,
+                                    data: [...category.data, characterId],
+                                };
+                                modifiedContainers = cloneAndUpdateContainers(
+                                    modifiedContainers,
+                                    updatedCategory
+                                );
+                            }
                         } else {
                             let role = "";
-                            if (isTank(character)) role = "Tanks";
-                            else if (isHealer(character)) role = "Healers";
-                            else if (isMelee(character)) role = "Melee";
-                            else if (isRanged(character)) role = "Ranged";
+                            if (character && isTank(character)) role = "Tanks";
+                            else if (character && isHealer(character))
+                                role = "Healers";
+                            else if (character && isMelee(character))
+                                role = "Melee";
+                            else if (character && isRanged(character))
+                                role = "Ranged";
+
                             const category = modifiedContainers.find(
-                                (category) => category.name === role
+                                (container) => container.name === role
                             );
-                            category.data.push(characterId);
+
+                            if (category) {
+                                const updatedCategory = {
+                                    ...category,
+                                    data: [...category.data, characterId],
+                                };
+                                modifiedContainers = cloneAndUpdateContainers(
+                                    modifiedContainers,
+                                    updatedCategory
+                                );
+                            }
                         }
                     });
                 }
                 if (removedContainer.type === "raid") {
                     removedContainer.data.forEach((groupId) => {
-                        const group = findContainer(groupId);
-                        group.data.forEach((characterId) => {
-                            const character = findContainer(characterId);
-                            if (character.tags) {
-                                const category = modifiedContainers.find(
-                                    (container) =>
-                                        container.name === character.tags[0]
-                                );
-                                category.data.push(characterId);
-                            } else {
-                                let role = "";
-                                if (isTank(character)) role = "Tanks";
-                                else if (isHealer(character)) role = "Healers";
-                                else if (isMelee(character)) role = "Melee";
-                                else if (isRanged(character)) role = "Ranged";
-                                const category = modifiedContainers.find(
-                                    (category) => category.name === role
-                                );
-                                category.data.push(characterId);
-                            }
-                        });
+                        const group = cloneContainer(groupId);
+                        if (group) {
+                            group.data.forEach((characterId) => {
+                                const character = cloneContainer(characterId);
+                                if (character && character.tags) {
+                                    const category = modifiedContainers.find(
+                                        (container) =>
+                                            container.name === character.tags[0]
+                                    );
+                                    if (category) {
+                                        const updatedCategory = {
+                                            ...category,
+                                            data: [
+                                                ...category.data,
+                                                characterId,
+                                            ],
+                                        };
+                                        modifiedContainers =
+                                            cloneAndUpdateContainers(
+                                                modifiedContainers,
+                                                updatedCategory
+                                            );
+                                    }
+                                } else {
+                                    let role = "";
+                                    if (character && isTank(character))
+                                        role = "Tanks";
+                                    else if (character && isHealer(character))
+                                        role = "Healers";
+                                    else if (character && isMelee(character))
+                                        role = "Melee";
+                                    else if (character && isRanged(character))
+                                        role = "Ranged";
+
+                                    const category = modifiedContainers.find(
+                                        (container) => container.name === role
+                                    );
+
+                                    if (category) {
+                                        const updatedCategory = {
+                                            ...category,
+                                            data: [
+                                                ...category.data,
+                                                characterId,
+                                            ],
+                                        };
+                                        modifiedContainers =
+                                            cloneAndUpdateContainers(
+                                                modifiedContainers,
+                                                updatedCategory
+                                            );
+                                    }
+                                }
+                            });
+                        }
                     });
                 }
             }
-            const parentContainer = modifiedContainers.find((container) =>
-                container.data?.includes(id)
+
+            const parentContainerIndex = modifiedContainers.findIndex(
+                (container) => container.data?.includes(id)
             );
 
-            parentContainer.data = parentContainer.data.filter(
-                (item) => item !== id
-            );
+            if (parentContainerIndex !== -1) {
+                const parentContainer = cloneContainer(
+                    modifiedContainers[parentContainerIndex].id
+                );
+                parentContainer.data = parentContainer.data.filter(
+                    (item) => item !== id
+                );
+
+                modifiedContainers = cloneAndUpdateContainers(
+                    modifiedContainers,
+                    parentContainer
+                );
+            }
 
             const newContainers = modifiedContainers.filter(
                 (container) => container.id !== id
             );
+
             setContainers(newContainers);
         },
         [containers, findContainer, setContainers]
@@ -460,6 +547,9 @@ export default function RosterBuilderActual({
                                                                 findContainer(
                                                                     groupId
                                                                 );
+                                                            console.log(
+                                                                groupId
+                                                            );
                                                             return (
                                                                 <DroppableContainer
                                                                     key={

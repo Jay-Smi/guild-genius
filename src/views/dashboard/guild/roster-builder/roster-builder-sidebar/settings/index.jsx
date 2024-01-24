@@ -1,5 +1,5 @@
 import { Box, Button, Grid, Typography } from "@mui/material";
-import { useContext } from "react";
+import { useContext, useMemo } from "react";
 import { RosterContext } from "../../store/RosterContextProvider";
 import { useStore } from "zustand";
 
@@ -16,13 +16,42 @@ export default function RosterSettings() {
     const raids = useStore(rosterStore, (state) =>
         state.containers.filter((container) => container.type === "raid")
     );
-    const containers = useStore(rosterStore, (state) => state.containers);
-    const setContainers = useStore(rosterStore, (state) => state.setContainers);
+    const storeContainers = useStore(rosterStore, (state) => state.containers);
+    const setStoreContainers = useStore(
+        rosterStore,
+        (state) => state.setContainers
+    );
+    const selectedTab = useStore(rosterStore, (state) => state.selectedTab);
+    const chosenLockouts = useStore(
+        rosterStore,
+        (state) => state.chosenLockouts
+    );
+
+    const tabsContainers = useStore(
+        rosterStore,
+        (state) => state.tabsContainers
+    );
+    const setTabContainer = useStore(
+        rosterStore,
+        (state) => state.setTabContainer
+    );
+    const lockoutsIndex = chosenLockouts[selectedTab].id;
+    const containers =
+        selectedTab === 0 ? storeContainers : tabsContainers[lockoutsIndex];
+
+    const setContainers = useMemo(
+        () =>
+            selectedTab === 0
+                ? setStoreContainers
+                : (container) => setTabContainer(lockoutsIndex, container),
+        [selectedTab, setStoreContainers, setTabContainer, lockoutsIndex]
+    );
 
     function handleAddRaid() {
         const newRaidId = crypto.randomUUID();
         const newGroup1Id = crypto.randomUUID();
         const newGroup2Id = crypto.randomUUID();
+
         const newContainers = [
             ...containers,
             {
@@ -44,10 +73,20 @@ export default function RosterSettings() {
                 name: "Group 2",
             },
         ];
-        newContainers
-            .find((container) => container.id === "raidsContainer")
-            .data.push(newRaidId);
-        setContainers(newContainers);
+
+        const raidsContainer = newContainers.find(
+            (container) => container.id === "raidsContainer"
+        );
+        const newRaidsContainer = {
+            ...raidsContainer,
+            data: [...raidsContainer.data, newRaidId],
+        };
+
+        const updatedContainers = newContainers.map((container) =>
+            container.id === "raidsContainer" ? newRaidsContainer : container
+        );
+
+        setContainers(updatedContainers);
     }
     return (
         <Box

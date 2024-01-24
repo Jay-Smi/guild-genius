@@ -172,8 +172,14 @@ export default function RosterBuilder() {
                 }}
             >
                 <LockoutTabs />
-                <Divider sx={{ mt: 1, mb: 1 }} />
-
+                <Divider
+                    sx={{
+                        mt: 1,
+                        mb: 1,
+                        borderBottomWidth: "2px",
+                        borderColor: theme.palette.grey[400],
+                    }}
+                />
                 <RosterBuilderActual />
             </Box>
             <RosterBuilderSidebar />

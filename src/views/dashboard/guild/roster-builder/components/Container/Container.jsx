@@ -1,11 +1,8 @@
-import React, { forwardRef, useContext, useRef, useState } from "react";
+import { forwardRef, useContext, useMemo, useState } from "react";
 import { classNames } from "../../../../../../utils/helpers.js";
 import KeyboardDoubleArrowUpIcon from "@mui/icons-material/KeyboardDoubleArrowUp";
 import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrowDown";
-import AddToPhotosIcon from "@mui/icons-material/AddToPhotos";
-
 import { Handle } from "../Handle.jsx";
-import { Remove } from "../Remove.jsx";
 import {
     StyledRaid,
     StyledGroup,
@@ -16,34 +13,19 @@ import {
 import {
     Badge,
     Box,
-    Button,
     ButtonGroup,
     Chip,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
     Divider,
-    Grid,
     IconButton,
-    Popover,
-    SpeedDial,
-    SpeedDialAction,
-    SpeedDialIcon,
     Stack,
-    Switch,
-    TextField,
     Tooltip,
-    Typography,
     useTheme,
 } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
-import SettingsSuggestIcon from "@mui/icons-material/SettingsSuggest";
-import EditAttributesIcon from "@mui/icons-material/EditAttributes";
 import { RosterContext } from "../../store/RosterContextProvider.jsx";
 import { useStore } from "zustand";
-import { ThemeContext } from "@emotion/react";
+import RaidContainerButtons from "./RaidContainerButtons.jsx";
+import NonCategoryContainerButtons from "./NonCategoryContainerButtons.jsx";
+import RaidTagForm from "./RaidTagForm.jsx";
 
 const Container = forwardRef(
     (
@@ -74,12 +56,41 @@ const Container = forwardRef(
         const [tagDialogOpen, setTagDialogOpen] = useState(false);
 
         const rosterStore = useContext(RosterContext);
-        const containers = useStore(rosterStore, (state) => state.containers);
         const tags = useStore(rosterStore, (state) => state.tags);
-        const setContainers = useStore(
+        const storeContainers = useStore(
+            rosterStore,
+            (state) => state.containers
+        );
+        const setStoreContainers = useStore(
             rosterStore,
             (state) => state.setContainers
         );
+        const selectedTab = useStore(rosterStore, (state) => state.selectedTab);
+        const chosenLockouts = useStore(
+            rosterStore,
+            (state) => state.chosenLockouts
+        );
+
+        const tabsContainers = useStore(
+            rosterStore,
+            (state) => state.tabsContainers
+        );
+        const setTabContainer = useStore(
+            rosterStore,
+            (state) => state.setTabContainer
+        );
+        const lockoutsIndex = chosenLockouts[selectedTab].id;
+        const containers =
+            selectedTab === 0 ? storeContainers : tabsContainers[lockoutsIndex];
+
+        const setContainers = useMemo(
+            () =>
+                selectedTab === 0
+                    ? setStoreContainers
+                    : (container) => setTabContainer(lockoutsIndex, container),
+            [selectedTab, setStoreContainers, setTabContainer, lockoutsIndex]
+        );
+
         const container = containers.find((container) => container.id === id);
         const categories = useStore(rosterStore, (state) => state.categories);
         const tagsArray = [...tags, "Tanks", "Healers", "Melee", "Ranged"];
@@ -127,27 +138,34 @@ const Container = forwardRef(
         }
 
         function handleSaveTagForm() {
-            const newContainers = [...containers];
-            const raidContainer = newContainers.find(
-                (container) => container.id === id
+            const newContainers = containers.map((container) =>
+                container.id === id
+                    ? {
+                          ...container,
+                          tags: Object.keys(tagForm)
+                              .filter((tag) => tagForm[tag].checked)
+                              .map((tag) => ({
+                                  tag: tag,
+                                  amount: tagForm[tag].amount || null,
+                              })),
+                      }
+                    : container
             );
-            const raidTags = Object.keys(tagForm)
-                .filter((tag) => tagForm[tag].checked)
-                .map((tag) => {
-                    return { tag: tag, amount: tagForm[tag].amount };
-                });
-            raidContainer.tags = raidTags;
+
             setContainers(newContainers);
             handleCloseDialog();
         }
 
         function handleRemoveTag(tag) {
-            const newContainers = [...containers];
-            const raidContainer = newContainers.find(
-                (container) => container.id === id
+            const newContainers = containers.map((container) =>
+                container.id === id
+                    ? {
+                          ...container,
+                          tags: container.tags.filter((t) => t.tag !== tag),
+                      }
+                    : container
             );
-            const raidTags = raidContainer.tags.filter((t) => t.tag !== tag);
-            raidContainer.tags = raidTags;
+
             setContainers(newContainers);
         }
 
@@ -163,20 +181,23 @@ const Container = forwardRef(
         }
         function handleAddGroup() {
             const groupId = crypto.randomUUID();
-            const newContainers = [
-                ...containers,
-                {
-                    id: groupId,
-                    type: "group",
-                    name: "New Group",
-                    data: [],
-                },
-            ];
-            const raidContainer = newContainers.find(
-                (container) => container.id === id
+
+            // Create a new array with the added group
+            const newContainers = containers.map((container) =>
+                container.id === id
+                    ? {
+                          ...container,
+                          data: [...container.data, groupId],
+                      }
+                    : container
             );
-            console.log(raidContainer);
-            raidContainer.data.push(groupId);
+            newContainers.push({
+                id: groupId,
+                type: "group",
+                name: "New Group",
+                data: [],
+            });
+            // Update state with the modified newContainers array
             setContainers(newContainers);
         }
 
@@ -192,151 +213,73 @@ const Container = forwardRef(
                 open={isOpen}
                 type={type}
             >
-                {label ? (
-                    <Box className="containerHeader">
-                        <StyledDragHandle
-                            className={`handle ${overlay ? "" : "overlay"}`}
-                        >
-                            <Handle {...handleProps} overlay={overlay} />
-                        </StyledDragHandle>
-                        <StyledLabel>{label}</StyledLabel>
+                <Box className="containerHeader">
+                    <StyledDragHandle
+                        className={`handle ${overlay ? "" : "overlay"}`}
+                    >
+                        <Handle {...handleProps} overlay={overlay} />
+                    </StyledDragHandle>
 
-                        <ButtonGroup
-                            aria-label="outlined primary button group"
-                            size="small"
-                            spacing={2}
-                        >
-                            {type === "raid" && (
-                                <>
-                                    <Tooltip title="Add Group">
-                                        <IconButton
-                                            onClick={handleAddGroup}
-                                            size="small"
-                                            sx={{ borderRadius: 1 }}
-                                        >
-                                            <AddToPhotosIcon
-                                                sx={{ width: "20px" }}
-                                            />
-                                        </IconButton>
-                                    </Tooltip>
-                                    <Divider
-                                        orientation="vertical"
-                                        flexItem
-                                        color={theme.palette.primary.main}
-                                        sx={{
-                                            borderRightWidth: 2,
-                                            borderColor:
-                                                theme.palette.grey[400],
-                                            marginRight: 1,
-                                            marginLeft: 1,
-                                        }}
-                                    />
-                                    <Tooltip title="Edit Tags">
-                                        <IconButton
-                                            onClick={handleClickOpenDialog}
-                                            size="small"
-                                            sx={{ borderRadius: 1 }}
-                                        >
-                                            <EditAttributesIcon
-                                                sx={{ width: "20px" }}
-                                            />
-                                        </IconButton>
-                                    </Tooltip>
-                                    <Divider
-                                        orientation="vertical"
-                                        flexItem
-                                        color={theme.palette.primary.main}
-                                        sx={{
-                                            borderRightWidth: 2,
-                                            borderColor:
-                                                theme.palette.grey[400],
-                                            marginRight: 1,
-                                            marginLeft: 1,
-                                        }}
-                                    />
-                                </>
-                            )}
-                            {type !== "category" && (
-                                <>
-                                    <Tooltip
-                                        title={
-                                            type === "raid"
-                                                ? "Delete Raid"
-                                                : "Delete Group"
-                                        }
-                                    >
-                                        <IconButton
-                                            onClick={handleClickPopper}
-                                            size="small"
-                                            sx={{ borderRadius: 1 }}
-                                        >
-                                            <DeleteIcon
-                                                sx={{ width: "20px" }}
-                                            />
-                                        </IconButton>
-                                    </Tooltip>
-                                    <Divider
-                                        orientation="vertical"
-                                        flexItem
-                                        sx={{
-                                            borderRightWidth: 2,
-                                            borderColor:
-                                                theme.palette.grey[400],
-                                            marginRight: 1,
-                                            marginLeft: 1,
-                                        }}
-                                    />
-                                    <Popover
-                                        id={popperId}
-                                        open={anchorOpen}
-                                        anchorEl={popperAnchor}
-                                        onClose={handleClosePopper}
-                                        anchorOrigin={{
-                                            vertical: "bottom",
-                                            horizontal: "left",
-                                        }}
-                                    >
-                                        <Button
-                                            variant="contained"
-                                            onClick={onRemove}
-                                        >
-                                            Delete
-                                        </Button>
-                                    </Popover>
-                                </>
-                            )}
+                    <StyledLabel>{label}</StyledLabel>
 
-                            <Tooltip
-                                title={
-                                    type === "raid"
-                                        ? "Collapse Raid"
-                                        : type === "group"
-                                        ? "Collapse Group"
-                                        : isOpen
-                                        ? "Collapse Category"
-                                        : "Expand Category"
-                                }
+                    <ButtonGroup
+                        aria-label="outlined primary button group"
+                        size="small"
+                        spacing={2}
+                    >
+                        {type === "raid" && (
+                            <RaidContainerButtons
+                                handleAddGroup={handleAddGroup}
+                                handleClickOpenDialog={handleClickOpenDialog}
+                                type={type}
+                            />
+                        )}
+                        {type !== "category" && (
+                            <NonCategoryContainerButtons
+                                type={type}
+                                handleClickPopper={handleClickPopper}
+                                handleClosePopper={handleClosePopper}
+                                popperId={popperId}
+                                anchorOpen={anchorOpen}
+                                popperAnchor={popperAnchor}
+                                onRemove={onRemove}
+                            />
+                        )}
+
+                        <Tooltip
+                            title={
+                                type === "raid"
+                                    ? "Collapse Raid"
+                                    : type === "group"
+                                    ? "Collapse Group"
+                                    : isOpen
+                                    ? "Collapse Category"
+                                    : "Expand Category"
+                            }
+                        >
+                            <IconButton
+                                onClick={toggleOpenContainer}
+                                size="small"
+                                sx={{ borderRadius: 1 }}
                             >
-                                <IconButton
-                                    onClick={toggleOpenContainer}
-                                    size="small"
-                                    sx={{ borderRadius: 1 }}
-                                >
-                                    {isOpen ? (
-                                        <KeyboardDoubleArrowUpIcon
-                                            sx={{ width: "20px" }}
-                                        />
-                                    ) : (
-                                        <KeyboardDoubleArrowDownIcon
-                                            sx={{ width: "20px" }}
-                                        />
-                                    )}
-                                </IconButton>
-                            </Tooltip>
-                        </ButtonGroup>
-                    </Box>
-                ) : null}
+                                {isOpen ? (
+                                    <KeyboardDoubleArrowUpIcon
+                                        sx={{ width: "20px" }}
+                                    />
+                                ) : (
+                                    <KeyboardDoubleArrowDownIcon
+                                        sx={{ width: "20px" }}
+                                    />
+                                )}
+                            </IconButton>
+                        </Tooltip>
+                    </ButtonGroup>
+                </Box>
+
                 {isOpen && <ul>{children}</ul>}
+
+                {/* RAID TAG CHIPS */}
+
                 {type === "raid" && (
                     <>
                         <Stack
@@ -366,116 +309,16 @@ const Container = forwardRef(
                                     );
                                 })}
                         </Stack>
-                        <Dialog
-                            open={tagDialogOpen}
-                            onClose={handleCloseDialog}
-                        >
-                            <DialogTitle
-                                sx={{
-                                    display: "flex",
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                    fontSize: "1.5em",
-                                }}
-                            >
-                                {container.name}
-                            </DialogTitle>
-                            <Divider sx={{ mb: 2 }} />
-                            <DialogContent>
-                                <DialogContentText>
-                                    Set the number of tags (0 for exclusive) to
-                                    control raid composition.
-                                </DialogContentText>
-                                <Divider sx={{ mt: 2, mb: 2 }} />
-                                <Stack spacing={1}>
-                                    {tagsArray.map((tag) => {
-                                        return (
-                                            <Grid container key={tag}>
-                                                <Grid
-                                                    item
-                                                    xs={5}
-                                                    sx={{
-                                                        display: "flex",
-                                                        justifyContent:
-                                                            "center",
-                                                        alignItems: "center",
-                                                    }}
-                                                >
-                                                    <Typography>
-                                                        {tag}
-                                                    </Typography>
-                                                </Grid>
-                                                <Grid
-                                                    item
-                                                    xs={2}
-                                                    sx={{
-                                                        display: "flex",
-                                                        justifyContent:
-                                                            "center",
-                                                        alignItems: "center",
-                                                    }}
-                                                >
-                                                    <Switch
-                                                        checked={
-                                                            tagForm[tag].checked
-                                                        }
-                                                        onChange={() =>
-                                                            handleToggleChecked(
-                                                                tag
-                                                            )
-                                                        }
-                                                    />
-                                                </Grid>
-                                                <Grid
-                                                    item
-                                                    xs={5}
-                                                    sx={{
-                                                        display: "flex",
-                                                        justifyContent:
-                                                            "center",
-                                                        alignItems: "center",
-                                                    }}
-                                                >
-                                                    <TextField
-                                                        sx={{
-                                                            width: "50%",
-                                                        }}
-                                                        inputProps={{
-                                                            sx: {
-                                                                textAlign:
-                                                                    "center",
-                                                            },
-                                                        }}
-                                                        value={
-                                                            tagForm[tag]
-                                                                .amount ?? ""
-                                                        }
-                                                        onChange={(e) =>
-                                                            handleSetValue(
-                                                                tag,
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                        disabled={
-                                                            !tagForm[tag]
-                                                                .checked
-                                                        }
-                                                    />
-                                                </Grid>
-                                            </Grid>
-                                        );
-                                    })}
-                                </Stack>
-                            </DialogContent>
-                            <DialogActions>
-                                <Button onClick={handleCloseDialog}>
-                                    Cancel
-                                </Button>
-                                <Button onClick={handleSaveTagForm}>
-                                    Save
-                                </Button>
-                            </DialogActions>
-                        </Dialog>
+                        <RaidTagForm
+                            container={container}
+                            tagDialogOpen={tagDialogOpen}
+                            handleCloseDialog={handleCloseDialog}
+                            tagForm={tagForm}
+                            handleToggleChecked={handleToggleChecked}
+                            handleSetValue={handleSetValue}
+                            handleSaveTagForm={handleSaveTagForm}
+                            tagsArray={tagsArray}
+                        />
                     </>
                 )}
             </Component>
