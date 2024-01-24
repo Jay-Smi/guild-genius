@@ -105,18 +105,7 @@ function ChooseTime({ id: raidId }) {
                         display: "flex",
                         flexDirection: "column",
                     }}
-                >
-                    {days.map((day, index) => (
-                        <Button
-                            key={index}
-                            onClick={() =>
-                                handleSelectDate(day.format("YYYY-MM-DD"))
-                            }
-                        >
-                            {day.format("ddd MMM D")}
-                        </Button>
-                    ))}
-                </Box>
+                ></Box>
             </Popover>
         </>
     );
