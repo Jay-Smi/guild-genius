@@ -2,13 +2,14 @@ import { Divider, IconButton, Tooltip, useTheme } from "@mui/material";
 import SettingsSuggestIcon from "@mui/icons-material/SettingsSuggest";
 import EditAttributesIcon from "@mui/icons-material/EditAttributes";
 import AddToPhotosIcon from "@mui/icons-material/AddToPhotos";
-import EventIcon from "@mui/icons-material/Event";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
+
 import { useContext } from "react";
 import { RosterContext } from "../../store/RosterContextProvider";
 import { useStore } from "zustand";
+import ChooseDate from "./ChooseDate";
+import ChooseTime from "./ChooseTime";
 
-function RaidContainerButtons({ handleAddGroup, handleClickOpenDialog }) {
+function RaidContainerButtons({ handleAddGroup, handleClickOpenDialog, id }) {
     const theme = useTheme();
     const rosterStore = useContext(RosterContext);
     const selectedTab = useStore(rosterStore, (state) => state.selectedTab);
@@ -37,15 +38,8 @@ function RaidContainerButtons({ handleAddGroup, handleClickOpenDialog }) {
             {/*///////////////////////////////////////////////////*/}
             {selectedTab !== 0 && (
                 <>
-                    <Tooltip title="Choose Date">
-                        <IconButton
-                            onClick={() => {}}
-                            size="small"
-                            sx={{ borderRadius: 1 }}
-                        >
-                            <EventIcon sx={{ width: "20px" }} />
-                        </IconButton>
-                    </Tooltip>
+                    <ChooseDate id={id} />
+
                     <Divider
                         orientation="vertical"
                         flexItem
@@ -58,15 +52,7 @@ function RaidContainerButtons({ handleAddGroup, handleClickOpenDialog }) {
                         }}
                     />
                     {/*///////////////////////////////////////////////////*/}
-                    <Tooltip title="Choose Time">
-                        <IconButton
-                            onClick={() => {}}
-                            size="small"
-                            sx={{ borderRadius: 1 }}
-                        >
-                            <AccessTimeIcon sx={{ width: "20px" }} />
-                        </IconButton>
-                    </Tooltip>
+                    <ChooseTime id={id} />
                     <Divider
                         orientation="vertical"
                         flexItem

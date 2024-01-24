@@ -38,8 +38,8 @@ export const StyledRaid = styled.div`
     box-sizing: border-box;
     appearance: none;
     outline: none;
-    min-width: 300px;
-
+    /* min-width: 300px; */
+    /* width: "auto"; */
     border-radius: var(--border-radius-sm);
     min-height: ${(props) => (props.isopen ? "100px" : 0)};
 
@@ -67,19 +67,11 @@ export const StyledRaid = styled.div`
         padding: 20px;
         margin: 0;
         background-color: #ececec;
+        box-shadow: inset 0 0 10px 4px rgba(0, 0, 0, 0.05);
     }
 
     &.shadow {
         box-shadow: 0 1px 10px 0 rgba(34, 33, 81, 0.1);
-    }
-
-    &::after {
-        content: "";
-        margin: 10px 0;
-
-        height: 2px;
-        width: 100%;
-        background-color: var(--color-grey-200);
     }
 `;
 
@@ -198,10 +190,4 @@ export const StyledContainerHeader = styled.div`
 
 export const StyledDragHandle = styled.div`
     cursor: grabbing;
-`;
-
-export const StyledLabel = styled.div`
-    max-width: 200px;
-    text-wrap: nowrap;
-    overflow: hidden;
 `;

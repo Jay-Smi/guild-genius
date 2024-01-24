@@ -8,7 +8,6 @@ import {
     StyledGroup,
     StyledCategory,
     StyledDragHandle,
-    StyledLabel,
 } from "./Container.styles.jsx";
 import {
     Badge,
@@ -16,9 +15,11 @@ import {
     ButtonGroup,
     Chip,
     Divider,
+    Grid,
     IconButton,
     Stack,
     Tooltip,
+    Typography,
     useTheme,
 } from "@mui/material";
 import { RosterContext } from "../../store/RosterContextProvider.jsx";
@@ -26,6 +27,7 @@ import { useStore } from "zustand";
 import RaidContainerButtons from "./RaidContainerButtons.jsx";
 import NonCategoryContainerButtons from "./NonCategoryContainerButtons.jsx";
 import RaidTagForm from "./RaidTagForm.jsx";
+import dayjs from "dayjs";
 
 const Container = forwardRef(
     (
@@ -56,6 +58,11 @@ const Container = forwardRef(
         const [tagDialogOpen, setTagDialogOpen] = useState(false);
 
         const rosterStore = useContext(RosterContext);
+        const selectedTab = useStore(rosterStore, (state) => state.selectedTab);
+        const chosenLockouts = useStore(
+            rosterStore,
+            (state) => state.chosenLockouts
+        );
         const tags = useStore(rosterStore, (state) => state.tags);
         const storeContainers = useStore(
             rosterStore,
@@ -64,11 +71,6 @@ const Container = forwardRef(
         const setStoreContainers = useStore(
             rosterStore,
             (state) => state.setContainers
-        );
-        const selectedTab = useStore(rosterStore, (state) => state.selectedTab);
-        const chosenLockouts = useStore(
-            rosterStore,
-            (state) => state.chosenLockouts
         );
 
         const tabsContainers = useStore(
@@ -219,9 +221,9 @@ const Container = forwardRef(
                     >
                         <Handle {...handleProps} overlay={overlay} />
                     </StyledDragHandle>
-
-                    <StyledLabel>{label}</StyledLabel>
-
+                    {type !== "raid" && (
+                        <Typography variant="subtitle1">{label}</Typography>
+                    )}
                     <ButtonGroup
                         aria-label="outlined primary button group"
                         size="small"
@@ -232,6 +234,7 @@ const Container = forwardRef(
                                 handleAddGroup={handleAddGroup}
                                 handleClickOpenDialog={handleClickOpenDialog}
                                 type={type}
+                                id={id}
                             />
                         )}
                         {type !== "category" && (
@@ -275,7 +278,26 @@ const Container = forwardRef(
                         </Tooltip>
                     </ButtonGroup>
                 </Box>
-
+                {type === "raid" && (
+                    <Grid container>
+                        <Grid item xs={4} textAlign="center">
+                            <Typography variant="subtitle1">
+                                {container.date &&
+                                    dayjs(container.date).format("ddd MMM D")}
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={4}>
+                            <Typography variant="subtitle1" textAlign="center">
+                                {container.name}
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={4}>
+                            <Typography variant="subtitle1" textAlign="center">
+                                {container.time}
+                            </Typography>
+                        </Grid>
+                    </Grid>
+                )}
                 {isOpen && <ul>{children}</ul>}
 
                 {/* RAID TAG CHIPS */}

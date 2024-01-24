@@ -94,8 +94,7 @@ export default function RosterBuilderActual({
                 : (containers) => setTabContainer(lockoutsIndex, containers),
         [selectedTab, setStoreContainers, setTabContainer, lockoutsIndex]
     );
-    console.log("containers", containers);
-    console.log("setContainers", setContainers);
+
     const [activePlayer, setActivePlayer] = useState(null);
     const [activeCharacter, setActiveCharacter] = useState(null);
     const [activeId, setActiveId] = useState(null);
@@ -547,9 +546,7 @@ export default function RosterBuilderActual({
                                                                 findContainer(
                                                                     groupId
                                                                 );
-                                                            console.log(
-                                                                groupId
-                                                            );
+
                                                             return (
                                                                 <DroppableContainer
                                                                     key={
