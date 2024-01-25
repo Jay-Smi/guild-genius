@@ -15,10 +15,20 @@ import { RosterContext } from "../../store/RosterContextProvider";
 import { useStore } from "zustand";
 import dayjs from "dayjs";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import { StaticTimePicker } from "@mui/x-date-pickers";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+import { format, parseISO, set } from "date-fns";
+
+dayjs.extend(customParseFormat);
 
 function ChooseTime({ id: raidId }) {
+    const defaultTime = new Date();
+    defaultTime.setHours(20);
+    defaultTime.setMinutes(0);
+    defaultTime.setSeconds(0);
+
     const [anchorEl, setAnchorEl] = useState(null);
-    const [selectedDate, setSelectedDate] = useState("");
+    const [selectedTime, setSelectedTime] = useState(defaultTime);
     const rosterStore = useContext(RosterContext);
     const selectedTab = useStore(rosterStore, (state) => state.selectedTab);
     const chosenLockouts = useStore(
@@ -55,18 +65,19 @@ function ChooseTime({ id: raidId }) {
     const open = Boolean(anchorEl);
     const id = open ? "choose-time-popover" : undefined;
 
-    const handleSelectDate = (date) => {
+    const handleSelectTime = (time) => {
+        console.log(time);
         const newContainers = containers.map((container) =>
             container.id === raidId
                 ? {
                       ...container,
                       data: [...container.data],
-                      date: date,
+                      time: format(time, "h:mm a"),
                   }
                 : { ...container, data: container.data && [...container.data] }
         );
         setContainers(newContainers);
-        setSelectedDate(event.target.value);
+
         handleClose();
     };
 
@@ -105,7 +116,9 @@ function ChooseTime({ id: raidId }) {
                         display: "flex",
                         flexDirection: "column",
                     }}
-                ></Box>
+                >
+                    <StaticTimePicker onAccept={handleSelectTime} />
+                </Box>
             </Popover>
         </>
     );

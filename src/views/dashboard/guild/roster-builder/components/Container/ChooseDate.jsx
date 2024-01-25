@@ -17,7 +17,6 @@ import dayjs from "dayjs";
 
 function ChooseDate({ id: raidId }) {
     const [anchorEl, setAnchorEl] = useState(null);
-    const [selectedDate, setSelectedDate] = useState("");
     const rosterStore = useContext(RosterContext);
     const selectedTab = useStore(rosterStore, (state) => state.selectedTab);
     const chosenLockouts = useStore(
@@ -70,7 +69,6 @@ function ChooseDate({ id: raidId }) {
                 : { ...container, data: container.data && [...container.data] }
         );
         setContainers(newContainers);
-        setSelectedDate(event.target.value);
         handleClose();
     };
 

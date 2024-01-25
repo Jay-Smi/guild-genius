@@ -283,7 +283,7 @@ const Container = forwardRef(
                         <Grid item xs={4} textAlign="center">
                             <Typography variant="subtitle1">
                                 {container.date &&
-                                    dayjs(container.date).format("ddd MMM D")}
+                                    dayjs(container.date).format("ddd MMM DD")}
                             </Typography>
                         </Grid>
                         <Grid item xs={4}>

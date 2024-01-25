@@ -25,6 +25,8 @@ import Loader from "../../../../components/Loader";
 import { IconFileFilled } from "@tabler/icons-react";
 import RosterContextProvider from "./store/RosterContextProvider";
 import AlteredTabAlert from "./components/AlteredTabAlert";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
 
@@ -166,24 +168,26 @@ export default function RosterBuilder() {
             players={guildPlayers}
             characterTags={guildCharacterTags}
         >
-            <Box
-                sx={{
-                    mr: matchUpLg ? "334px" : "40px",
-                }}
-            >
-                <LockoutTabs />
-                <Divider
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <Box
                     sx={{
-                        mt: 1,
-                        mb: 1,
-                        borderBottomWidth: "2px",
-                        borderColor: theme.palette.grey[400],
+                        mr: matchUpLg ? "334px" : "40px",
                     }}
-                />
-                <RosterBuilderActual />
-            </Box>
-            <RosterBuilderSidebar />
-            <AlteredTabAlert />
+                >
+                    <LockoutTabs />
+                    <Divider
+                        sx={{
+                            mt: 1,
+                            mb: 1,
+                            borderBottomWidth: "2px",
+                            borderColor: theme.palette.grey[400],
+                        }}
+                    />
+                    <RosterBuilderActual />
+                </Box>
+                <RosterBuilderSidebar />
+                <AlteredTabAlert />
+            </LocalizationProvider>
         </RosterContextProvider>
     );
 

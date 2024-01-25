@@ -267,29 +267,6 @@ const RosterBuilderSidebar = () => {
                     {mobileDrawer}
                 </Drawer>
             )}
-            {/*
-            {!matchUpLg && mobileDrawerOpen && (
-                <Drawer
-                    variant="temporary"
-                    open={mobileDrawerOpen}
-                    anchor="right"
-                    sx={{
-                        "& .MuiDrawer-paper": {
-                            width: "auto",
-                            background: theme.palette.background.default,
-                            color: theme.palette.text.primary,
-                            borderRight: "none",
-                            [theme.breakpoints.down("lg")]: {
-                                top: "80px",
-                                paddingTop: "24px",
-                            },
-                            zIndex: 1,
-                        },
-                    }}
-                >
-                    {mobileDrawer}
-                </Drawer>
-            )} */}
         </Box>
     );
 };
