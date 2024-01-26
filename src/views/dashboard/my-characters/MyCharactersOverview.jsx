@@ -13,7 +13,6 @@ function MyCharactersOverview() {
         userId,
         discordName
     );
-    console.log(characters);
 
     return (
         <Grid container spacing={gridSpacing}>

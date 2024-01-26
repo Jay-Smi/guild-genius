@@ -15,7 +15,7 @@ import SidebarCalendar from "./calendar";
 import RosterSettings from "./settings";
 
 export default function SidebarItems({
-    instanceSelectValue,
+    selectedInstance,
     handleInstanceSelectChange,
     hoveredDay,
     setHoveredDay,
@@ -57,7 +57,7 @@ export default function SidebarItems({
                 <Select
                     labelId="instance-select-label"
                     id="instance-select"
-                    value={instanceSelectValue}
+                    value={selectedInstance}
                     label="Instance"
                     onChange={handleInstanceSelectChange}
                     sx={{ width: "80%" }}

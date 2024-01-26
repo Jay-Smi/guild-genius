@@ -193,10 +193,15 @@ const Container = forwardRef(
                       }
                     : container
             );
+
+            const groupsLength = newContainers.find((c) =>
+                c.data?.includes(groupId)
+            ).data.length;
+
             newContainers.push({
                 id: groupId,
                 type: "group",
-                name: "New Group",
+                name: `Group ${groupsLength}`,
                 data: [],
             });
             // Update state with the modified newContainers array

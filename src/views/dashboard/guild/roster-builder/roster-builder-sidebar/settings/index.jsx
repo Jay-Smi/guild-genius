@@ -2,6 +2,15 @@ import { Box, Button, Grid, Typography } from "@mui/material";
 import { useContext, useMemo } from "react";
 import { RosterContext } from "../../store/RosterContextProvider";
 import { useStore } from "zustand";
+import { useStore as userStore } from "../../../../../../store";
+import useUserInfo from "../../../../../../hooks/useUserInfo";
+import useGuild from "../../../../../../hooks/useGuild";
+import { format, parse } from "date-fns";
+import useCreateGuildInstanceLockouts from "../../../../../../hooks/postLockout/useCreateGuildInstanceLockouts";
+import useCreateRaids from "../../../../../../hooks/postLockout/useCreateRaids";
+import useCreateGroups from "../../../../../../hooks/postLockout/useCreateGroups";
+import useCreateGroupCharacters from "../../../../../../hooks/postLockout/useCreateGroupCharacters";
+import useCreateRaidTags from "../../../../../../hooks/postLockout/useCreateRaidTags";
 
 export default function RosterSettings() {
     const rosterStore = useContext(RosterContext);
@@ -47,18 +56,276 @@ export default function RosterSettings() {
         [selectedTab, setStoreContainers, setTabContainer, lockoutsIndex]
     );
 
+    const selectedInstance = useStore(
+        rosterStore,
+        (state) => state.selectedInstance
+    );
+
+    const user = userStore((state) => state.session.user);
+
+    const userId = user.id;
+
+    const discordName = user.user_metadata.name;
+    const { profile, characters, players } = useUserInfo(userId, discordName);
+    const somePlayerisInGuild =
+        players?.some((player) => player.guild_id !== null) || false;
+
+    const { guild } = useGuild(players[0].guild_id, somePlayerisInGuild);
+    const guildId = guild[0].id;
+
+    const mutateGuildInstanceLockouts = useCreateGuildInstanceLockouts();
+    const mutateRaids = useCreateRaids();
+    const mutateGroups = useCreateGroups();
+    const mutateGroupCharacters = useCreateGroupCharacters();
+    const mutateRaidsTags = useCreateRaidTags();
+
+    function handleSaveLockouts() {
+        if (selectedLockoutsLength < 2) {
+            window.alert("Please select a lockout in order to save.");
+            return;
+        }
+        if (!selectedInstance) {
+            window.alert("Please select an instance in order to save.");
+            return;
+        }
+        const missingDates = AnyRaidHasNoDate();
+        if (missingDates) {
+            window.alert("At least 1 raid is missing a date.");
+            return;
+        }
+        const missingTimes = AnyRaidHasNoTime();
+        if (missingTimes) {
+            window.alert("At least 1 raid is missing a time.");
+            return;
+        }
+
+        const readyToMutate = buildLockouts();
+        const inOrder = [
+            "guild_instance_lockout",
+            "raids",
+            "groups",
+            "group_characters",
+            "raid_tags",
+        ];
+        console.log(readyToMutate);
+        mutateGuildInstanceLockouts.mutate(
+            readyToMutate.guild_instance_lockout,
+            {
+                onSuccess: (data) => {
+                    mutateRaids.mutate(readyToMutate.raids, {
+                        onSuccess: (data) => {
+                            mutateRaidsTags.mutate(readyToMutate.raid_tags);
+                        },
+                    });
+                    mutateGroups.mutate(readyToMutate.groups, {
+                        onSuccess: (data) => {
+                            mutateGroupCharacters.mutate(
+                                readyToMutate.group_characters
+                            );
+                        },
+                    });
+                },
+            }
+        );
+    }
+
+    //group_characters
+    //groups
+    //guild_instance_lockouts
+    //raid_tags
+    //raids
+
+    //invalidate
+    //"guilds-groups","cf4d9cea-8722-433d-93df-2f636dc7784c"
+    //"guilds-raids","cf4d9cea-8722-433d-93df-2f636dc7784c"
+    //"guilds-groups-characters","cf4d9cea-8722-433d-93df-2f636dc7784c"
+    //"guild-instance-lockouts","cf4d9cea-8722-433d-93df-2f636dc7784c"
+
+    function buildLockouts() {
+        const lockouts = Object.keys(tabsContainers).map((tabKey) => {
+            return BuildLockoutData(tabKey);
+        });
+        const lockoutsCombined = lockouts.reduce((acc, curr) => {
+            for (const key in curr) {
+                if (Object.hasOwnProperty.call(curr, key)) {
+                    if (key in acc) {
+                        acc[key] = acc[key].concat(curr[key]);
+                    } else {
+                        acc[key] = curr[key];
+                    }
+                }
+            }
+            return acc;
+        }, {});
+        Object.keys(lockoutsCombined).forEach((key) => {
+            if (key !== "group_characters" && key !== "raid_tags") return;
+            lockoutsCombined[key] = lockoutsCombined[key].flat();
+        });
+        return lockoutsCombined;
+    }
+
+    function remapRaidAndGroupIds(tabKey) {
+        const newGroups = [];
+        const newRaids = tabsContainers[tabKey]
+            .filter((container) => container.type === "raid")
+            .map((raid) => {
+                const newRaidId = crypto.randomUUID();
+                tabsContainers[tabKey]
+                    .filter(
+                        (container) =>
+                            container.type === "group" &&
+                            raid.data.includes(container.id)
+                    )
+                    .forEach((group) => {
+                        const newGroupId = crypto.randomUUID();
+                        newGroups.push({
+                            ...group,
+                            id: newGroupId,
+                        });
+                    });
+                return {
+                    ...raid,
+                    id: newRaidId,
+                    data: newGroups.map((group) => group.newId),
+                };
+            });
+
+        return { newRaids, newGroups };
+    }
+
+    function BuildLockoutData(tabKey) {
+        const guild_instance_lockout_id = crypto.randomUUID();
+        const { newRaids, newGroups } = remapRaidAndGroupIds(tabKey);
+
+        const guild_instance_lockout = [
+            chosenLockouts.find((lockout) => lockout.id === tabKey),
+        ].map((lockout) => {
+            return {
+                id: guild_instance_lockout_id,
+                end_date: lockout.endDate,
+                start_date: lockout.startDate,
+                instance_name: selectedInstance,
+                guild_id: guildId,
+            };
+        });
+
+        const raids = newRaids.map((raid) => {
+            const { date, time, id, name } = raid;
+
+            return {
+                id: id,
+                name,
+                date,
+                time: format(parse(time, "h:mm a", new Date()), "HH:mm:ss"),
+                guild_id: guildId,
+                guild_instance_lockout_id,
+            };
+        });
+
+        const groups = newGroups.map((group) => {
+            const newGroup = {
+                id: group.id,
+                name: group.name,
+                guild_id: guildId,
+                guild_instance_lockout_id,
+                raid_id: newRaids.find((container) =>
+                    container.data?.includes(group.id)
+                ),
+            };
+
+            return newGroup;
+        });
+
+        const group_characters = newGroups.map((group) => {
+            return group.data.map((characterId) => {
+                return {
+                    id: crypto.randomUUID(),
+                    group_id: group.id,
+                    character_id: characterId,
+                    guild_id: guildId,
+                    guild_instance_lockout_id,
+                };
+            });
+        });
+        const raid_tags = newRaids
+            .map((raid) => {
+                return raid.tags?.map((tag) => {
+                    return {
+                        id: crypto.randomUUID(),
+                        raid_id: raid.id,
+                        tag_name: tag.tag,
+                        amount: tag.amount || 0,
+                        guild_id: guildId,
+                        guild_instance_lockout_id,
+                    };
+                });
+            })
+            .filter(Boolean);
+        return {
+            guild_instance_lockout,
+            raids,
+            groups,
+            group_characters,
+            raid_tags,
+        };
+    }
+
+    function findParent(id) {
+        return containers?.find((container) => container.data?.includes(id));
+    }
+
+    function AnyRaidHasNoTime() {
+        const tabRaidsWithNoTime = {};
+        Object.keys(tabsContainers).forEach((lockoutId) => {
+            const raidContainers = tabsContainers[lockoutId].filter(
+                (container) => container.type === "raid"
+            );
+            const raidsWithNoTime = raidContainers.filter((raid) => !raid.time);
+
+            if (raidsWithNoTime.length !== 0) {
+                tabRaidsWithNoTime[lockoutId] = raidsWithNoTime;
+            }
+        });
+        const missingLength = Object.keys(tabRaidsWithNoTime);
+        if (missingLength.length === 0) {
+            return false;
+        }
+        return tabRaidsWithNoTime;
+    }
+
+    function AnyRaidHasNoDate() {
+        const tabRaidsWithNoDate = {};
+        Object.keys(tabsContainers).forEach((lockoutId) => {
+            const raidContainers = tabsContainers[lockoutId].filter(
+                (container) => container.type === "raid"
+            );
+            const raidsWithNoDate = raidContainers.filter((raid) => !raid.date);
+
+            if (raidsWithNoDate.length !== 0) {
+                tabRaidsWithNoDate[lockoutId] = raidsWithNoDate;
+            }
+        });
+        const missingLength = Object.keys(tabRaidsWithNoDate);
+        if (missingLength.length === 0) {
+            return false;
+        }
+        return tabRaidsWithNoDate;
+    }
+
     function handleAddRaid() {
         const newRaidId = crypto.randomUUID();
         const newGroup1Id = crypto.randomUUID();
         const newGroup2Id = crypto.randomUUID();
-
+        const raidsLength = containers.filter(
+            (container) => container.type === "raid"
+        ).length;
         const newContainers = [
             ...containers,
             {
                 id: newRaidId,
                 type: "raid",
                 data: [newGroup1Id, newGroup2Id],
-                name: "New Raid",
+                name: `Raid ${raidsLength + 1}`,
             },
             {
                 id: newGroup1Id,
@@ -88,6 +355,7 @@ export default function RosterSettings() {
 
         setContainers(updatedContainers);
     }
+
     return (
         <Box
             sx={{
@@ -173,7 +441,7 @@ export default function RosterSettings() {
                         <Button
                             variant="contained"
                             color="secondary"
-                            onClick={() => console.log("clicked")}
+                            onClick={handleSaveLockouts}
                             sx={{ width: "100%" }}
                         >
                             {selectedLockoutsLength > 2

@@ -27,7 +27,7 @@ import { allClasses, allSpecs } from "../../../utils/wowHelpers";
 import { useStore } from "../../../store";
 import useUserInfo from "../../../hooks/useUserInfo";
 import useGuild from "../../../hooks/useGuild";
-import useCreateCharacter from "../../../hooks/useCreateCharacter";
+import useCreateCharacter from "../../../hooks/character/useCreateCharacter";
 import { queryClient } from "../../../config";
 import { useNavigate } from "react-router-dom";
 function CharacterForm({ ...others }) {

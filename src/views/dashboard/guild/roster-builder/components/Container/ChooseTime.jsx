@@ -66,7 +66,6 @@ function ChooseTime({ id: raidId }) {
     const id = open ? "choose-time-popover" : undefined;
 
     const handleSelectTime = (time) => {
-        console.log(time);
         const newContainers = containers.map((container) =>
             container.id === raidId
                 ? {

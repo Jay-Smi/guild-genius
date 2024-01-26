@@ -39,11 +39,19 @@ const RosterBuilderSidebar = () => {
         rosterStore,
         (state) => state.createTabsContainer
     );
+    const selectedInstance = useStore(
+        rosterStore,
+        (state) => state.selectedInstance
+    );
+    const setSelectedInstance = useStore(
+        rosterStore,
+        (state) => state.setSelectedInstance
+    );
     const [hoveredDay, setHoveredDay] = useState(null);
     const [selectedLockout, setSelectedLockout] = useState(null);
     const [instanceSelectValue, setInstanceSelectValue] = useState("");
     const sideBarItems = SidebarItems({
-        instanceSelectValue,
+        selectedInstance,
         handleInstanceSelectChange,
         hoveredDay,
         setHoveredDay,
@@ -88,11 +96,12 @@ const RosterBuilderSidebar = () => {
                 endDate,
             },
         ];
+
         createTabsContainer(newLockoutId);
         setChosenLockouts(newLockouts);
     }
     function handleInstanceSelectChange(event) {
-        setInstanceSelectValue(event.target.value);
+        setSelectedInstance(event.target.value);
     }
 
     function toggleMobileDrawer() {

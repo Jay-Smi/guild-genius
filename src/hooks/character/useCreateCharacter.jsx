@@ -1,5 +1,16 @@
 import { useMutation } from "@tanstack/react-query";
-import supabase from "../services/supabase";
+import supabase from "../../services/supabase";
+//group_characters
+//groups
+//guild_instance_lockouts
+//raid_tags
+//raids
+
+//invalidate
+//"guilds-groups","cf4d9cea-8722-433d-93df-2f636dc7784c"
+//"guilds-raids","cf4d9cea-8722-433d-93df-2f636dc7784c"
+//"guilds-groups-characters","cf4d9cea-8722-433d-93df-2f636dc7784c"
+//"guild-instance-lockouts","cf4d9cea-8722-433d-93df-2f636dc7784c"
 
 export default function useCreateCharacter() {
     const characterMutation = useMutation({
