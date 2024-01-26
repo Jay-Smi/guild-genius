@@ -47,6 +47,15 @@ const RosterBuilderSidebar = () => {
         rosterStore,
         (state) => state.setSelectedInstance
     );
+    const selectedTab = useStore(rosterStore, (state) => state.selectedTab);
+    const setSelectedTab = useStore(
+        rosterStore,
+        (state) => state.setSelectedTab
+    );
+    const removeTabContainer = useStore(
+        rosterStore,
+        (state) => state.removeTabContainer
+    );
     const [hoveredDay, setHoveredDay] = useState(null);
     const [selectedLockout, setSelectedLockout] = useState(null);
     const [instanceSelectValue, setInstanceSelectValue] = useState("");
@@ -69,6 +78,10 @@ const RosterBuilderSidebar = () => {
                 parseISO(lockout.startDate)
             );
         });
+        if (chosenLockouts[selectedTab].id === lockout.id) {
+            setSelectedTab(0);
+        }
+        removeTabContainer(lockout.id);
         setChosenLockouts(newLockouts);
     }
 

@@ -14,6 +14,7 @@ import themes from "./themes";
 import { useStore } from "./store";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { queryClient } from "./config";
+import { Toaster } from "react-hot-toast";
 
 const router = Routes();
 
@@ -49,6 +50,7 @@ const App = () => {
                             horizontal: "right",
                         }}
                     >
+                        <Toaster />
                         <CssBaseline />
                         <RouterProvider router={router} />
                     </SnackbarProvider>

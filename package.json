@@ -44,6 +44,7 @@
         "react-auth-kit": "^3.0.2-alpha.8",
         "react-device-detect": "^2.2.3",
         "react-dom": "^18.2.0",
+        "react-hot-toast": "^2.4.1",
         "react-perfect-scrollbar": "^1.5.8",
         "react-router-dom": "^6.21.1",
         "react-window": "^1.8.10",

@@ -103,6 +103,14 @@ const createRosterStore = ({
                             hasAlteredTabContainer: true,
                         }));
                     },
+                    removeTabContainer: (tab) => {
+                        const newTabsContainers = { ...get().tabsContainers };
+                        delete newTabsContainers[tab];
+                        set((state) => ({
+                            ...state,
+                            tabsContainers: newTabsContainers,
+                        }));
+                    },
                     setContainers: (containers) => {
                         const newTabsContainers = {};
                         Object.keys(get().tabsContainers).forEach((tab) => {

@@ -1,5 +1,5 @@
 import { Box, Button, Grid, Typography } from "@mui/material";
-import { useContext, useMemo } from "react";
+import { useContext, useMemo, useState } from "react";
 import { RosterContext } from "../../store/RosterContextProvider";
 import { useStore } from "zustand";
 import { useStore as userStore } from "../../../../../../store";
@@ -11,8 +11,11 @@ import useCreateRaids from "../../../../../../hooks/postLockout/useCreateRaids";
 import useCreateGroups from "../../../../../../hooks/postLockout/useCreateGroups";
 import useCreateGroupCharacters from "../../../../../../hooks/postLockout/useCreateGroupCharacters";
 import useCreateRaidTags from "../../../../../../hooks/postLockout/useCreateRaidTags";
+import { queryClient } from "../../../../../../config";
+import toast from "react-hot-toast";
 
 export default function RosterSettings() {
+    const [submitting, setSubmitting] = useState(false);
     const rosterStore = useContext(RosterContext);
     const charactersLength = useStore(
         rosterStore,
@@ -107,39 +110,85 @@ export default function RosterSettings() {
             "group_characters",
             "raid_tags",
         ];
-        console.log(readyToMutate);
-        mutateGuildInstanceLockouts.mutate(
+        setSubmitting(true);
+        let promises = [
+            new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve();
+                }, 1000);
+            }),
+        ];
+        let guildInstanceLockoutPromise = null;
+        let raidsPromise = null;
+        let groupsPromise = null;
+        let groupCharactersPromise = null;
+        let raidTagsPromise = null;
+
+        guildInstanceLockoutPromise = mutateGuildInstanceLockouts.mutate(
             readyToMutate.guild_instance_lockout,
             {
-                onSuccess: (data) => {
-                    mutateRaids.mutate(readyToMutate.raids, {
-                        onSuccess: (data) => {
-                            mutateRaidsTags.mutate(readyToMutate.raid_tags);
+                onSuccess: () => {
+                    queryClient.invalidateQueries([
+                        "guild-instance-lockouts",
+                        guildId,
+                    ]);
+                    raidsPromise = mutateRaids.mutate(readyToMutate.raids, {
+                        onSuccess: () => {
+                            queryClient.invalidateQueries([
+                                "guild-raids",
+                                guildId,
+                            ]);
+                            raidTagsPromise = mutateRaidsTags.mutate(
+                                readyToMutate.raid_tags,
+                                {
+                                    onSuccess: () => {
+                                        queryClient.invalidateQueries([
+                                            "raid-tags",
+                                            guildId,
+                                        ]);
+                                    },
+                                }
+                            );
                         },
                     });
-                    mutateGroups.mutate(readyToMutate.groups, {
-                        onSuccess: (data) => {
-                            mutateGroupCharacters.mutate(
-                                readyToMutate.group_characters
-                            );
+                    groupsPromise = mutateGroups.mutate(readyToMutate.groups, {
+                        onSuccess: () => {
+                            queryClient.invalidateQueries([
+                                "guilds-groups",
+                                guildId,
+                            ]);
+                            groupCharactersPromise =
+                                mutateGroupCharacters.mutate(
+                                    readyToMutate.group_characters,
+                                    {
+                                        onSuccess: () => {
+                                            queryClient.invalidateQueries([
+                                                "guilds-groups-characters",
+                                                guildId,
+                                            ]);
+                                            setSubmitting(false);
+                                        },
+                                    }
+                                );
                         },
                     });
                 },
             }
         );
+        if (guildInstanceLockoutPromise)
+            promises.push(guildInstanceLockoutPromise);
+        if (raidsPromise) promises.push(raidsPromise);
+        if (groupsPromise) promises.push(groupsPromise);
+        if (groupCharactersPromise) promises.push(groupCharactersPromise);
+        if (raidTagsPromise) promises.push(raidTagsPromise);
+
+        const combinedPromise = Promise.all(promises);
+        toast.promise(combinedPromise, {
+            loading: "Saving...",
+            success: "Saved!",
+            error: "Error saving.",
+        });
     }
-
-    //group_characters
-    //groups
-    //guild_instance_lockouts
-    //raid_tags
-    //raids
-
-    //invalidate
-    //"guilds-groups","cf4d9cea-8722-433d-93df-2f636dc7784c"
-    //"guilds-raids","cf4d9cea-8722-433d-93df-2f636dc7784c"
-    //"guilds-groups-characters","cf4d9cea-8722-433d-93df-2f636dc7784c"
-    //"guild-instance-lockouts","cf4d9cea-8722-433d-93df-2f636dc7784c"
 
     function buildLockouts() {
         const lockouts = Object.keys(tabsContainers).map((tabKey) => {
@@ -443,6 +492,7 @@ export default function RosterSettings() {
                             color="secondary"
                             onClick={handleSaveLockouts}
                             sx={{ width: "100%" }}
+                            disabled={submitting}
                         >
                             {selectedLockoutsLength > 2
                                 ? "Save Lockouts"
