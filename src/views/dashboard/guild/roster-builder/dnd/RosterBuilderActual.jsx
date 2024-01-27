@@ -111,6 +111,7 @@ export default function RosterBuilderActual({
             coordinateGetter,
         })
     );
+
     useEffect(() => {
         requestAnimationFrame(() => {
             recentlyMovedToNewContainer.current = false;
@@ -507,10 +508,7 @@ export default function RosterBuilderActual({
                         paddingBottom: "100px",
                     }}
                 >
-                    <Stack
-                        spacing={2}
-                        direction={matchDownMd ? "row" : "column"}
-                    >
+                    <Grid spacing={2} container>
                         {/* //Sortable Raids */}
 
                         <SortableContext
@@ -521,111 +519,120 @@ export default function RosterBuilderActual({
                                 (raidId) => {
                                     const currentRaid = findContainer(raidId);
                                     return (
-                                        <DroppableContainer
+                                        <Grid
+                                            item
                                             key={currentRaid.id}
-                                            id={currentRaid.id}
-                                            label={currentRaid.name}
-                                            items={currentRaid.data}
-                                            onRemove={() =>
-                                                handleRemove(currentRaid.id)
-                                            }
-                                            type={currentRaid.type}
+                                            sx={{
+                                                justifyContent: "center",
+                                                alignItems: "center",
+                                                height: "auto",
+                                            }}
                                         >
-                                            <SortableContext
+                                            <DroppableContainer
+                                                id={currentRaid.id}
+                                                label={currentRaid.name}
                                                 items={currentRaid.data}
-                                                strategy={strategy}
+                                                onRemove={() =>
+                                                    handleRemove(currentRaid.id)
+                                                }
+                                                type={currentRaid.type}
                                             >
-                                                {currentRaid.data.map(
-                                                    (groupId) => {
-                                                        const currentGroup =
-                                                            findContainer(
-                                                                groupId
-                                                            );
+                                                <SortableContext
+                                                    items={currentRaid.data}
+                                                    strategy={strategy}
+                                                >
+                                                    {currentRaid.data.map(
+                                                        (groupId) => {
+                                                            const currentGroup =
+                                                                findContainer(
+                                                                    groupId
+                                                                );
 
-                                                        return (
-                                                            <DroppableContainer
-                                                                key={
-                                                                    currentGroup.id
-                                                                }
-                                                                id={
-                                                                    currentGroup.id
-                                                                }
-                                                                label={
-                                                                    currentGroup.name
-                                                                }
-                                                                items={
-                                                                    currentGroup.data
-                                                                }
-                                                                onRemove={() =>
-                                                                    handleRemove(
+                                                            return (
+                                                                <DroppableContainer
+                                                                    key={
                                                                         currentGroup.id
-                                                                    )
-                                                                }
-                                                                type={
-                                                                    currentGroup.type
-                                                                }
-                                                            >
-                                                                <SortableContext
-                                                                    items={
-                                                                        currentGroup?.data
                                                                     }
-                                                                    strategy={
-                                                                        strategy
+                                                                    id={
+                                                                        currentGroup.id
+                                                                    }
+                                                                    label={
+                                                                        currentGroup.name
+                                                                    }
+                                                                    items={
+                                                                        currentGroup.data
+                                                                    }
+                                                                    onRemove={() =>
+                                                                        handleRemove(
+                                                                            currentGroup.id
+                                                                        )
+                                                                    }
+                                                                    type={
+                                                                        currentGroup.type
                                                                     }
                                                                 >
-                                                                    {currentGroup?.data.map(
-                                                                        (
-                                                                            characterId
-                                                                        ) => {
-                                                                            const currentCharacter =
-                                                                                findContainer(
-                                                                                    characterId
-                                                                                );
-                                                                            return (
-                                                                                <SortableItem
-                                                                                    key={
-                                                                                        currentCharacter?.id
-                                                                                    }
-                                                                                    id={
-                                                                                        currentCharacter?.id
-                                                                                    }
-                                                                                    style={
-                                                                                        getItemStyles
-                                                                                    }
-                                                                                    wrapperStyle={
-                                                                                        wrapperStyle
-                                                                                    }
-                                                                                    renderItem={
-                                                                                        renderItem
-                                                                                    }
-                                                                                    containerId={
-                                                                                        groupId
-                                                                                    }
-                                                                                    getIndex={
-                                                                                        getIndex
-                                                                                    }
-                                                                                    characterId={
-                                                                                        currentCharacter.id
-                                                                                    }
-                                                                                    activeCharacterId={
-                                                                                        activeCharacter
-                                                                                    }
-                                                                                />
-                                                                            );
+                                                                    <SortableContext
+                                                                        items={
+                                                                            currentGroup?.data
                                                                         }
-                                                                    )}
-                                                                </SortableContext>
-                                                            </DroppableContainer>
-                                                        );
-                                                    }
-                                                )}
-                                            </SortableContext>
-                                        </DroppableContainer>
+                                                                        strategy={
+                                                                            strategy
+                                                                        }
+                                                                    >
+                                                                        {currentGroup?.data.map(
+                                                                            (
+                                                                                characterId
+                                                                            ) => {
+                                                                                const currentCharacter =
+                                                                                    findContainer(
+                                                                                        characterId
+                                                                                    );
+                                                                                return (
+                                                                                    <SortableItem
+                                                                                        key={
+                                                                                            currentCharacter?.id
+                                                                                        }
+                                                                                        id={
+                                                                                            currentCharacter?.id
+                                                                                        }
+                                                                                        style={
+                                                                                            getItemStyles
+                                                                                        }
+                                                                                        wrapperStyle={
+                                                                                            wrapperStyle
+                                                                                        }
+                                                                                        renderItem={
+                                                                                            renderItem
+                                                                                        }
+                                                                                        containerId={
+                                                                                            groupId
+                                                                                        }
+                                                                                        getIndex={
+                                                                                            getIndex
+                                                                                        }
+                                                                                        characterId={
+                                                                                            currentCharacter.id
+                                                                                        }
+                                                                                        activeCharacterId={
+                                                                                            activeCharacter
+                                                                                        }
+                                                                                    />
+                                                                                );
+                                                                            }
+                                                                        )}
+                                                                    </SortableContext>
+                                                                </DroppableContainer>
+                                                            );
+                                                        }
+                                                    )}
+                                                </SortableContext>
+                                            </DroppableContainer>
+                                        </Grid>
                                     );
                                 }
                             )}
                         </SortableContext>
-                    </Stack>
+                    </Grid>
                 </PerfectScrollbar>
             </Box>
             {createPortal(

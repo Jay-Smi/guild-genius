@@ -11,6 +11,7 @@ import {
     Switch,
     TextField,
     Typography,
+    useTheme,
 } from "@mui/material";
 import { useRef } from "react";
 
@@ -25,7 +26,7 @@ function RaidTagForm({
     tagsArray,
 }) {
     const inputRefs = useRef([]);
-
+    const theme = useTheme();
     function handleFocus(tag, index) {
         handleToggleChecked(tag);
         setTimeout(() => {
@@ -40,6 +41,10 @@ function RaidTagForm({
                     justifyContent: "center",
                     alignItems: "center",
                     fontSize: "1.5em",
+                    color:
+                        theme.palette.mode === "dark"
+                            ? "text.dark"
+                            : "primary.dark",
                 }}
             >
                 {container.name}
@@ -64,7 +69,15 @@ function RaidTagForm({
                                         alignItems: "center",
                                     }}
                                 >
-                                    <Typography>{tag}</Typography>
+                                    <Typography
+                                        color={
+                                            theme.palette.mode === "dark"
+                                                ? "text.dark"
+                                                : "primary.dark"
+                                        }
+                                    >
+                                        {tag}
+                                    </Typography>
                                 </Grid>
                                 <Grid
                                     item
@@ -93,6 +106,13 @@ function RaidTagForm({
                                         type="number"
                                         sx={{
                                             width: "50%",
+                                            "& input": {
+                                                color:
+                                                    theme.palette.mode ===
+                                                    "dark"
+                                                        ? "text.dark"
+                                                        : "primary.dark",
+                                            },
                                         }}
                                         inputProps={{
                                             sx: {
@@ -116,8 +136,12 @@ function RaidTagForm({
                 </Stack>
             </DialogContent>
             <DialogActions>
-                <Button onClick={handleCloseDialog}>Cancel</Button>
-                <Button onClick={handleSaveTagForm}>Save</Button>
+                <Button onClick={handleCloseDialog} variant="outlined">
+                    Cancel
+                </Button>
+                <Button onClick={handleSaveTagForm} variant="contained">
+                    Save
+                </Button>
             </DialogActions>
         </Dialog>
     );

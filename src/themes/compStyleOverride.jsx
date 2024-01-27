@@ -1,5 +1,4 @@
 export default function componentStyleOverrides(theme) {
-    console.log("theme", theme);
     const bgColor =
         theme.customization.navType === "dark"
             ? theme.colors.darkPaper

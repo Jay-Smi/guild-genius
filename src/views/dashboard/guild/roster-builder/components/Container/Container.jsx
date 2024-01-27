@@ -232,7 +232,7 @@ const Container = forwardRef(
                             variant="h4"
                             color={
                                 theme.palette.mode === "dark"
-                                    ? theme.palette.text.secondary
+                                    ? theme.palette.text.dark
                                     : theme.palette.text.secondary
                             }
                         >
@@ -286,7 +286,7 @@ const Container = forwardRef(
                                             width: "22px",
                                             color:
                                                 theme.palette.mode === "dark"
-                                                    ? theme.palette.text.hint
+                                                    ? theme.palette.text.dark
                                                     : theme.palette.grey[500],
                                         }}
                                     />
@@ -296,7 +296,7 @@ const Container = forwardRef(
                                             width: "22px",
                                             color:
                                                 theme.palette.mode === "dark"
-                                                    ? theme.palette.text.hint
+                                                    ? theme.palette.text.dark
                                                     : theme.palette.grey[500],
                                         }}
                                     />
@@ -308,18 +308,41 @@ const Container = forwardRef(
                 {type === "raid" && (
                     <Grid container>
                         <Grid item xs={4} textAlign="center">
-                            <Typography variant="subtitle1">
+                            <Typography
+                                variant="subtitle1"
+                                color={
+                                    theme.palette.mode === "dark"
+                                        ? theme.palette.text.dark
+                                        : theme.palette.text.secondary
+                                }
+                            >
                                 {container.date &&
                                     dayjs(container.date).format("ddd MMM DD")}
                             </Typography>
                         </Grid>
                         <Grid item xs={4}>
-                            <Typography variant="subtitle1" textAlign="center">
+                            <Typography
+                                variant="subtitle1"
+                                textAlign="center"
+                                color={
+                                    theme.palette.mode === "dark"
+                                        ? theme.palette.text.dark
+                                        : theme.palette.text.secondary
+                                }
+                            >
                                 {container.name}
                             </Typography>
                         </Grid>
                         <Grid item xs={4}>
-                            <Typography variant="subtitle1" textAlign="center">
+                            <Typography
+                                variant="subtitle1"
+                                textAlign="center"
+                                color={
+                                    theme.palette.mode === "dark"
+                                        ? theme.palette.text.dark
+                                        : theme.palette.text.secondary
+                                }
+                            >
                                 {container.time}
                             </Typography>
                         </Grid>
@@ -337,6 +360,12 @@ const Container = forwardRef(
                             divider={
                                 <Divider orientation="vertical" flexItem />
                             }
+                            sx={{
+                                p: 2,
+                                flexWrap: "wrap",
+                                justifyContent: "center",
+                                width: "100%",
+                            }}
                         >
                             {container?.tags &&
                                 container.tags?.length > 0 &&
@@ -346,6 +375,7 @@ const Container = forwardRef(
                                             key={tag.tag}
                                             badgeContent={Number(tag.amount)}
                                             color="secondary"
+                                            sx={{ pb: 1 }}
                                         >
                                             <Chip
                                                 label={tag.tag}

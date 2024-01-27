@@ -4,11 +4,13 @@ import { useTheme } from "@mui/material";
 export const StyledRaid = styled.div`
     display: flex;
     flex-direction: column;
-
     overflow: hidden;
     box-sizing: border-box;
     appearance: none;
     outline: none;
+    resize: horizontal;
+    min-width: 330px;
+    height: "auto";
     min-height: ${(props) => (props.isopen ? "100px" : 0)};
     border-radius: 12px;
     background-color: ${(props) => {
@@ -31,6 +33,7 @@ export const StyledRaid = styled.div`
 
     & > .containerHeader {
         display: flex;
+
         padding: 5px 20px;
         padding-right: 8px;
         justify-content: space-between;
@@ -48,11 +51,12 @@ export const StyledRaid = styled.div`
             }};
     }
 
-    & ul {
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
+    & > ul {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        justify-items: center;
         list-style: none;
+
         gap: 20px 20px;
         padding: 20px;
         margin: 0;
@@ -78,7 +82,8 @@ export const StyledGroup = styled.div`
     box-sizing: border-box;
     appearance: none;
     outline: none;
-    min-width: 300px;
+    min-width: 250px;
+    max-width: 300px;
     min-height: ${(props) => (props.isopen ? "100px" : 0)};
     transition: background-color 350ms ease;
     font-size: 1em;
@@ -178,6 +183,7 @@ export const StyledCategory = styled.div`
         padding: 5px 10px;
         padding-right: 8px;
         align-items: center;
+
         background-color: ${(props) => {
             return props.theme.palette.background.paper;
         }};
@@ -213,16 +219,16 @@ export const StyledCategory = styled.div`
     }
 `;
 
-export const StyledContainerHeader = styled.div`
-    display: flex;
-    padding: 5px 20px;
-    padding-right: 8px;
-    align-items: center;
-    background-color: #fff;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-`;
+// export const StyledContainerHeader = styled.div`
+//     display: flex;
+//     padding: 5px 20px;
+//     padding-right: 8px;
+//     align-items: center;
+//     background-color: #fff;
+//     border-top-left-radius: 5px;
+//     border-top-right-radius: 5px;
+//     border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+// `;
 
 export const StyledDragHandle = styled.div`
     cursor: grabbing;

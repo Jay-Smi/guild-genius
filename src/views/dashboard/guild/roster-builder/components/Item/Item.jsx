@@ -11,6 +11,7 @@ import {
 } from "./Item.styles.jsx";
 import { RosterContext } from "../../store/RosterContextProvider.jsx";
 import { useStore } from "zustand";
+import { Typography, useTheme } from "@mui/material";
 
 export const Item = memo(
     forwardRef(
@@ -39,6 +40,7 @@ export const Item = memo(
             },
             ref
         ) => {
+            const theme = useTheme();
             const rosterStore = useContext(RosterContext);
             const character = useStore(rosterStore, (state) =>
                 state.getCharacter(characterId)
@@ -61,6 +63,8 @@ export const Item = memo(
                     document.body.style.cursor = "";
                 };
             }, [dragOverlay]);
+
+            const lowerCaseClass = character.class.toLowerCase();
 
             return (
                 <StyledWrapper
@@ -86,7 +90,7 @@ export const Item = memo(
                         "--scale-y": transform?.scaleY
                             ? `${transform.scaleY}`
                             : undefined,
-                        boxShadow: isActivePlayer ? "0 0 0 1px green" : "",
+                        borderRadius: "5px",
                     }}
                     ref={ref}
                 >
@@ -96,13 +100,35 @@ export const Item = memo(
                             dragOverlay && "dragOverlay",
                             disabled && "disabled"
                         )}
-                        style={style}
+                        style={{
+                            ...style,
+                            backgroundColor:
+                                isActivePlayer &&
+                                characterId !== activeCharacterId
+                                    ? theme.palette.error.dark
+                                    : `${theme.palette.wow[lowerCaseClass]}${
+                                          theme.palette.mode === "dark"
+                                              ? "B5"
+                                              : "F9"
+                                      }`,
+                        }}
                         {...props}
                     >
                         <StyledDragHandle>
                             <Handle {...handleProps} {...listeners} />
                         </StyledDragHandle>
-                        {character.character_name}
+                        <Typography
+                            variant="h5"
+                            sx={{
+                                fontWeight: "800",
+                                color:
+                                    theme.palette.mode === "dark"
+                                        ? theme.palette.background.dark3
+                                        : "inherit",
+                            }}
+                        >
+                            {character.character_name}
+                        </Typography>
                         <StyledActions>
                             {onRemove ? <Remove onClick={onRemove} /> : null}
                         </StyledActions>

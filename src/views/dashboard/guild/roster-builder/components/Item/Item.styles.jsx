@@ -28,19 +28,20 @@ export const StyledItem = styled.div`
     display: flex;
     flex-grow: 1;
     align-items: center;
+    justify-content: center;
     padding: 8px 10px;
-    background-color: ${(props) => {
+    /* background-color: ${(props) => {
         return props.theme.palette.mode === "dark"
             ? props.theme.palette.grey[700]
             : props.theme.palette.grey[100];
-    }};
+    }}; */
     box-shadow: ${(props) => {
         return props.theme.palette.mode === "dark"
             ? "4px 5px 5px 2px rgba(0, 0, 0, 0.459)"
             : " 2px 3px 10px 1px rgba(0, 0, 0, 0.155)";
     }};
     outline: none;
-    border-radius: calc(4px / var(--scale-x, 1));
+    border-radius: 5px;
     box-sizing: border-box;
     list-style: none;
     transform-origin: 50% 50%;
