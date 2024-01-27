@@ -1,4 +1,4 @@
-import { Box, Tab, Tabs, tabsClasses } from "@mui/material";
+import { Box, Tab, Tabs, tabsClasses, useTheme } from "@mui/material";
 import { useStore } from "../../../../../store";
 import { format, parseISO } from "date-fns";
 import { useStore as zusUseStore } from "zustand";
@@ -6,6 +6,7 @@ import { useContext } from "react";
 import { RosterContext } from "../store/RosterContextProvider";
 
 function LockoutTabs() {
+    const theme = useTheme();
     const borderRadius = useStore((state) => state.borderRadius);
     const rosterStore = useContext(RosterContext);
     const setSelectedTab = zusUseStore(
@@ -29,6 +30,10 @@ function LockoutTabs() {
                 width: "100%",
                 bgcolor: "background.paper",
                 borderRadius: borderRadius,
+                boxShadow:
+                    theme.palette.mode === "dark"
+                        ? "4px 5px 5px 2px rgba(0, 0, 0, 0.459)"
+                        : " 2px 3px 10px 1px rgba(0, 0, 0, 0.155)",
             }}
         >
             <Tabs

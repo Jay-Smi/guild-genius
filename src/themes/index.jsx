@@ -43,8 +43,19 @@ export const theme = (customization) => {
                 },
             },
         },
+        paper: "",
         typography: themeTypography(themeOption),
     };
+
+    // switch (customization.navType) {
+    //     case "dark":
+    //         themeOptions.paper = color.darkLevel2;
+    //         break;
+    //     case "light":
+    //         break;
+    //     default:
+    //         break;
+    // }
 
     const themes = createTheme(themeOptions);
     themes.components = componentStyleOverrides(themeOption);

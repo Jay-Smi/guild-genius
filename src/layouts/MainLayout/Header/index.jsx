@@ -80,7 +80,13 @@ const Header = ({ handleLeftDrawerToggle }) => {
             <SearchSection />
             <Typography
                 variant="h4"
-                sx={{ ml: 3, color: theme.palette.secondary.dark }}
+                sx={{
+                    ml: 3,
+                    color:
+                        theme.palette.mode === "dark"
+                            ? theme.palette.primary[200]
+                            : theme.palette.primary.dark,
+                }}
             >
                 {small
                     ? `Current Lockout: ${start} - ${end}`

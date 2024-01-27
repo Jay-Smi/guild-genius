@@ -172,6 +172,10 @@ export default function RosterBuilder() {
                 <Box
                     sx={{
                         mr: matchUpLg ? "334px" : "40px",
+                        backgroundColor:
+                            theme.palette.mode === "dark"
+                                ? theme.palette.background.dark3
+                                : theme.palette.grey[100],
                     }}
                 >
                     <LockoutTabs />
@@ -180,7 +184,14 @@ export default function RosterBuilder() {
                             mt: 1,
                             mb: 1,
                             borderBottomWidth: "2px",
-                            borderColor: theme.palette.grey[400],
+                            borderColor:
+                                theme.palette.mode === "dark"
+                                    ? theme.palette.grey[600]
+                                    : theme.palette.grey[400],
+                            boxShadow:
+                                theme.palette.mode === "dark"
+                                    ? "4px 5px 5px 2px rgba(0, 0, 0, 0.459)"
+                                    : " 2px 3px 10px 1px rgba(0, 0, 0, 0.155)",
                         }}
                     />
                     <RosterBuilderActual />

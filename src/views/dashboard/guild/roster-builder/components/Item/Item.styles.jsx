@@ -29,9 +29,16 @@ export const StyledItem = styled.div`
     flex-grow: 1;
     align-items: center;
     padding: 8px 10px;
-    background-color: #fff;
-    box-shadow: 0 0 0 calc(1px / var(--scale-x, 1)) rgba(63, 63, 68, 0.05),
-        0 0 0 calc(1px / var(--scale-x, 1)) rgba(63, 63, 68, 0.05);
+    background-color: ${(props) => {
+        return props.theme.palette.mode === "dark"
+            ? props.theme.palette.grey[700]
+            : props.theme.palette.grey[100];
+    }};
+    box-shadow: ${(props) => {
+        return props.theme.palette.mode === "dark"
+            ? "4px 5px 5px 2px rgba(0, 0, 0, 0.459)"
+            : " 2px 3px 10px 1px rgba(0, 0, 0, 0.155)";
+    }};
     outline: none;
     border-radius: calc(4px / var(--scale-x, 1));
     box-sizing: border-box;
@@ -40,7 +47,11 @@ export const StyledItem = styled.div`
 
     -webkit-tap-highlight-color: transparent;
 
-    color: #333;
+    color: ${(props) => {
+        return props.theme.palette.mode === "dark"
+            ? props.theme.palette.text.title
+            : props.theme.palette.text.primary;
+    }};
     font-weight: 400;
     font-size: 1rem;
     white-space: nowrap;

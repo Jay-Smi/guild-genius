@@ -1,5 +1,9 @@
 export default function componentStyleOverrides(theme) {
-    const bgColor = theme.colors?.grey50;
+    console.log("theme", theme);
+    const bgColor =
+        theme.customization.navType === "dark"
+            ? theme.colors.darkPaper
+            : theme.colors.paper;
     return {
         MuiButton: {
             styleOverrides: {
@@ -50,21 +54,36 @@ export default function componentStyleOverrides(theme) {
         MuiListItemButton: {
             styleOverrides: {
                 root: {
-                    color: theme.darkTextPrimary,
+                    color:
+                        theme.customization.navType === "dark"
+                            ? theme.colors.darkSecondary800
+                            : theme.darkTextPrimary,
                     paddingTop: "10px",
                     paddingBottom: "10px",
                     "&.Mui-selected": {
-                        color: theme.menuSelected,
-                        backgroundColor: theme.menuSelectedBack,
+                        color:
+                            theme.customization.navType === "dark"
+                                ? theme.colors.darkSecondaryMain
+                                : theme.menuSelected,
+                        backgroundColor:
+                            theme.customization.navType === "dark"
+                                ? theme.colors.darkSecondaryLight
+                                : theme.menuSelectedBack,
                         "&:hover": {
-                            backgroundColor: theme.menuSelectedBack,
+                            backgroundColor:
+                                theme.customization.navType === "dark"
+                                    ? theme.colors.darkSecondary200
+                                    : theme.menuSelectedBack,
                         },
                         "& .MuiListItemIcon-root": {
                             color: theme.menuSelected,
                         },
                     },
                     "&:hover": {
-                        backgroundColor: theme.menuSelectedBack,
+                        backgroundColor:
+                            theme.customization.navType === "dark"
+                                ? theme.colors.darkSecondary200
+                                : theme.menuSelectedBack,
                         color: theme.menuSelected,
                         "& .MuiListItemIcon-root": {
                             color: theme.menuSelected,

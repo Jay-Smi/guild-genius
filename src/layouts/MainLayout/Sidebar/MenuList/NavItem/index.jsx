@@ -93,7 +93,16 @@ const NavItem = ({ item, level }) => {
             selected={isOpen.findIndex((id) => id === item.id) > -1}
             onClick={() => itemHandler(item.id)}
         >
-            <ListItemIcon sx={{ my: "auto", minWidth: !item?.icon ? 18 : 36 }}>
+            <ListItemIcon
+                sx={{
+                    my: "auto",
+                    minWidth: !item?.icon ? 18 : 36,
+                    color:
+                        theme.palette.mode === "dark"
+                            ? theme.palette.text.secondary
+                            : "inherit",
+                }}
+            >
                 {itemIcon}
             </ListItemIcon>
             <ListItemText
@@ -104,7 +113,11 @@ const NavItem = ({ item, level }) => {
                                 ? "h5"
                                 : "body1"
                         }
-                        color="inherit"
+                        color={
+                            theme.palette.mode === "dark"
+                                ? theme.palette.text.secondary
+                                : "inherit"
+                        }
                     >
                         {item.title}
                     </Typography>
@@ -116,6 +129,11 @@ const NavItem = ({ item, level }) => {
                             sx={{ ...theme.typography.subMenuCaption }}
                             display="block"
                             gutterBottom
+                            color={
+                                theme.palette.mode === "dark"
+                                    ? theme.palette.text.secondary
+                                    : "inherit"
+                            }
                         >
                             {item.caption}
                         </Typography>

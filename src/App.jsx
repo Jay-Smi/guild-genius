@@ -21,21 +21,22 @@ const router = Routes();
 // ==============================|| APP ||============================== //
 
 const App = () => {
-    const { isOpen, defaultId, fontFamily, borderRadius, opened } = useStore(
-        (state) => ({
+    const { isOpen, defaultId, fontFamily, borderRadius, opened, navType } =
+        useStore((state) => ({
             isOpen: state.isOpen,
             defaultId: state.defaultId,
             fontFamily: state.fontFamily,
             borderRadius: state.borderRadius,
             opened: state.opened,
-        })
-    );
+            navType: state.navType,
+        }));
     const customization = {
         isOpen,
         defaultId,
         fontFamily,
         borderRadius,
         opened,
+        navType,
     };
 
     return (

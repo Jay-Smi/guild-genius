@@ -26,7 +26,15 @@ function NonCategoryContainerButtons({
                     size="small"
                     sx={{ borderRadius: 1 }}
                 >
-                    <DeleteIcon sx={{ width: "20px" }} />
+                    <DeleteIcon
+                        sx={{
+                            width: "20px",
+                            color:
+                                theme.palette.mode === "dark"
+                                    ? theme.palette.text.hint
+                                    : theme.palette.grey[500],
+                        }}
+                    />
                 </IconButton>
             </Tooltip>
             <Divider
@@ -34,7 +42,10 @@ function NonCategoryContainerButtons({
                 flexItem
                 sx={{
                     borderRightWidth: 2,
-                    borderColor: theme.palette.grey[400],
+                    borderColor:
+                        theme.palette.mode === "dark"
+                            ? theme.palette.text.hint
+                            : theme.palette.grey[400],
                     marginRight: 1,
                     marginLeft: 1,
                 }}

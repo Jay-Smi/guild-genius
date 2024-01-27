@@ -71,7 +71,11 @@ const MainLayout = () => {
     };
 
     return (
-        <Box sx={{ display: "flex" }}>
+        <Box
+            sx={{
+                display: "flex",
+            }}
+        >
             <CssBaseline />
             {/* header */}
             <AppBar
@@ -99,7 +103,20 @@ const MainLayout = () => {
             />
 
             {/* main content */}
-            <Main theme={theme} open={leftDrawerOpened}>
+            <Main
+                theme={theme}
+                open={leftDrawerOpened}
+                sx={{
+                    backgroundColor:
+                        theme.palette.mode === "dark"
+                            ? theme.palette.background.dark3
+                            : theme.palette.grey[100],
+                    boxShadow:
+                        theme.palette.mode === "dark"
+                            ? "inset 4px 5px 10px 5px rgba(0, 0, 0, 0.555)"
+                            : "inset 2px 3px 10px 1px rgba(0, 0, 0, 0.155)",
+                }}
+            >
                 {/* breadcrumb */}
                 <Breadcrumbs
                     separator={IconChevronRight}
@@ -108,7 +125,15 @@ const MainLayout = () => {
                     title
                     rightAlign
                 />
-                <Box id="main-content-container">
+                <Box
+                    id="main-content-container"
+                    sx={{
+                        backgroundColor:
+                            theme.palette.mode === "dark"
+                                ? theme.palette.background.dark3
+                                : theme.palette.grey[100],
+                    }}
+                >
                     <Outlet />
                 </Box>
             </Main>

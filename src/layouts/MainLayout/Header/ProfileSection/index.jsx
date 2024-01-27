@@ -25,6 +25,8 @@ import {
     Switch,
     Typography,
 } from "@mui/material";
+import LightModeIcon from "@mui/icons-material/LightMode";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
 
 // third-party
 import PerfectScrollbar from "react-perfect-scrollbar";
@@ -70,6 +72,7 @@ const ProfileSection = () => {
 
     const theme = useTheme();
     const borderRadius = useStore((state) => state.borderRadius);
+    const setNavType = useStore((state) => state.setNavType);
     const navigate = useNavigate();
 
     const [sdm, setSdm] = useState(true);
@@ -104,6 +107,11 @@ const ProfileSection = () => {
         setOpen((prevOpen) => !prevOpen);
     };
 
+    const handleToggleTheme = () => {
+        const newTheme = theme.palette.mode === "dark" ? "light" : "dark";
+        setNavType(newTheme);
+    };
+
     const prevOpen = useRef(open);
     useEffect(() => {
         if (prevOpen.current === true && open === false) {
@@ -121,8 +129,14 @@ const ProfileSection = () => {
                     alignItems: "center",
                     borderRadius: "27px",
                     transition: "all .2s ease-in-out",
-                    borderColor: theme.palette.primary.light,
-                    backgroundColor: theme.palette.primary.light,
+                    borderColor:
+                        theme.palette.mode === "dark"
+                            ? theme.palette.background.paper
+                            : theme.palette.primary.light,
+                    backgroundColor:
+                        theme.palette.mode === "dark"
+                            ? theme.palette.background.dark3
+                            : theme.palette.primary.light,
                     '&[aria-controls="menu-list-grow"], &:hover': {
                         borderColor: theme.palette.primary.main,
                         background: `${theme.palette.primary.main}!important`,
@@ -180,11 +194,17 @@ const ProfileSection = () => {
                         },
                     ],
                 }}
-                style={{ zIndex: 9999 }}
             >
                 {({ TransitionProps }) => (
                     <Transitions in={open} {...TransitionProps}>
-                        <Paper>
+                        <Paper
+                            sx={{
+                                backgroundColor:
+                                    theme.palette.mode === "dark"
+                                        ? theme.palette.background.dark3
+                                        : theme.palette.primary.light,
+                            }}
+                        >
                             <ClickAwayListener onClickAway={handleClose}>
                                 <MainCard
                                     border={false}
@@ -192,6 +212,13 @@ const ProfileSection = () => {
                                     content={false}
                                     boxShadow
                                     shadow={theme.shadows[16]}
+                                    sx={{
+                                        backgroundColor:
+                                            theme.palette.mode === "dark"
+                                                ? theme.palette.background.dark1
+                                                : theme.palette.background
+                                                      .paper,
+                                    }}
                                 >
                                     <Box sx={{ p: 2 }}>
                                         <Stack>
@@ -200,13 +227,35 @@ const ProfileSection = () => {
                                                 spacing={0.5}
                                                 alignItems="center"
                                             >
-                                                <Typography variant="h4">
+                                                <Typography
+                                                    variant="h4"
+                                                    sx={{
+                                                        color:
+                                                            theme.palette
+                                                                .mode === "dark"
+                                                                ? theme.palette
+                                                                      .text.dark
+                                                                : theme.palette
+                                                                      .background
+                                                                      .paper,
+                                                    }}
+                                                >
                                                     Hello,
                                                 </Typography>
                                                 <Typography
                                                     component="span"
                                                     variant="h4"
-                                                    sx={{ fontWeight: 400 }}
+                                                    sx={{
+                                                        fontWeight: 400,
+                                                        color:
+                                                            theme.palette
+                                                                .mode === "dark"
+                                                                ? theme.palette
+                                                                      .text.dark
+                                                                : theme.palette
+                                                                      .background
+                                                                      .paper,
+                                                    }}
                                                 >
                                                     {profile[0].display_name}
                                                 </Typography>
@@ -225,6 +274,27 @@ const ProfileSection = () => {
                                                 pr: 1,
                                                 pl: 2,
                                                 my: 2,
+                                                backgroundColor:
+                                                    theme.palette.mode ===
+                                                    "dark"
+                                                        ? theme.palette
+                                                              .background.dark3
+                                                        : null,
+                                                "& input": {
+                                                    backgroundColor:
+                                                        theme.palette.mode ===
+                                                        "dark"
+                                                            ? theme.palette
+                                                                  .background
+                                                                  .dark3
+                                                            : null,
+                                                    color:
+                                                        theme.palette.mode ===
+                                                        "dark"
+                                                            ? theme.palette
+                                                                  .primary[200]
+                                                            : null,
+                                                },
                                             }}
                                             id="input-search-profile"
                                             value={value}
@@ -264,8 +334,14 @@ const ProfileSection = () => {
                                             <Card
                                                 sx={{
                                                     bgcolor:
-                                                        theme.palette.primary
-                                                            .light,
+                                                        theme.palette.mode ===
+                                                        "dark"
+                                                            ? theme.palette
+                                                                  .background
+                                                                  .paper
+                                                            : theme.palette
+                                                                  .primary
+                                                                  .light,
                                                     my: 2,
                                                 }}
                                             >
@@ -283,7 +359,21 @@ const ProfileSection = () => {
                                                                 justifyContent="space-between"
                                                             >
                                                                 <Grid item>
-                                                                    <Typography variant="subtitle1">
+                                                                    <Typography
+                                                                        variant="subtitle1"
+                                                                        sx={{
+                                                                            color:
+                                                                                theme
+                                                                                    .palette
+                                                                                    .mode ===
+                                                                                "dark"
+                                                                                    ? theme
+                                                                                          .palette
+                                                                                          .text
+                                                                                          .dark
+                                                                                    : null,
+                                                                        }}
+                                                                    >
                                                                         Start
                                                                         DND Mode
                                                                     </Typography>
@@ -317,7 +407,21 @@ const ProfileSection = () => {
                                                                 justifyContent="space-between"
                                                             >
                                                                 <Grid item>
-                                                                    <Typography variant="subtitle1">
+                                                                    <Typography
+                                                                        variant="subtitle1"
+                                                                        sx={{
+                                                                            color:
+                                                                                theme
+                                                                                    .palette
+                                                                                    .mode ===
+                                                                                "dark"
+                                                                                    ? theme
+                                                                                          .palette
+                                                                                          .text
+                                                                                          .dark
+                                                                                    : null,
+                                                                        }}
+                                                                    >
                                                                         Allow
                                                                         Notifications
                                                                     </Typography>
@@ -353,8 +457,14 @@ const ProfileSection = () => {
                                                     maxWidth: 350,
                                                     minWidth: 300,
                                                     backgroundColor:
-                                                        theme.palette.background
-                                                            .paper,
+                                                        theme.palette.mode ===
+                                                        "dark"
+                                                            ? theme.palette
+                                                                  .background
+                                                                  .dark1
+                                                            : theme.palette
+                                                                  .background
+                                                                  .paper,
                                                     borderRadius: "10px",
                                                     [theme.breakpoints.down(
                                                         "md"
@@ -386,11 +496,35 @@ const ProfileSection = () => {
                                                         <IconSettings
                                                             stroke={1.5}
                                                             size="1.3rem"
+                                                            color={
+                                                                theme.palette
+                                                                    .mode ===
+                                                                "dark"
+                                                                    ? theme
+                                                                          .palette
+                                                                          .primary[200]
+                                                                    : theme
+                                                                          .palette
+                                                                          .grey[700]
+                                                            }
                                                         />
                                                     </ListItemIcon>
                                                     <ListItemText
                                                         primary={
-                                                            <Typography variant="body2">
+                                                            <Typography
+                                                                variant="body2"
+                                                                sx={{
+                                                                    color:
+                                                                        theme
+                                                                            .palette
+                                                                            .mode ===
+                                                                        "dark"
+                                                                            ? theme
+                                                                                  .palette
+                                                                                  .primary[200]
+                                                                            : null,
+                                                                }}
+                                                            >
                                                                 Account Settings
                                                             </Typography>
                                                         }
@@ -415,6 +549,17 @@ const ProfileSection = () => {
                                                         <IconUser
                                                             stroke={1.5}
                                                             size="1.3rem"
+                                                            color={
+                                                                theme.palette
+                                                                    .mode ===
+                                                                "dark"
+                                                                    ? theme
+                                                                          .palette
+                                                                          .primary[200]
+                                                                    : theme
+                                                                          .palette
+                                                                          .grey[700]
+                                                            }
                                                         />
                                                     </ListItemIcon>
                                                     <ListItemText
@@ -425,7 +570,20 @@ const ProfileSection = () => {
                                                                 justifyContent="space-between"
                                                             >
                                                                 <Grid item>
-                                                                    <Typography variant="body2">
+                                                                    <Typography
+                                                                        variant="body2"
+                                                                        sx={{
+                                                                            color:
+                                                                                theme
+                                                                                    .palette
+                                                                                    .mode ===
+                                                                                "dark"
+                                                                                    ? theme
+                                                                                          .palette
+                                                                                          .primary[200]
+                                                                                    : null,
+                                                                        }}
+                                                                    >
                                                                         Profile
                                                                     </Typography>
                                                                 </Grid>
@@ -455,7 +613,85 @@ const ProfileSection = () => {
                                                         borderRadius: `${borderRadius}px`,
                                                     }}
                                                     selected={
-                                                        selectedIndex === 4
+                                                        selectedIndex === 2
+                                                    }
+                                                    onClick={handleToggleTheme}
+                                                >
+                                                    <ListItemIcon
+                                                        sx={{
+                                                            color:
+                                                                theme.palette
+                                                                    .mode ===
+                                                                "dark"
+                                                                    ? theme
+                                                                          .palette
+                                                                          .primary[200]
+                                                                    : theme
+                                                                          .palette
+                                                                          .grey[700],
+                                                        }}
+                                                    >
+                                                        {theme.palette.mode ===
+                                                        "light" ? (
+                                                            <DarkModeIcon
+                                                                sx={{
+                                                                    color:
+                                                                        theme
+                                                                            .palette
+                                                                            .mode ===
+                                                                        "dark"
+                                                                            ? theme
+                                                                                  .palette
+                                                                                  .primary[200]
+                                                                            : theme
+                                                                                  .palette
+                                                                                  .grey[700],
+                                                                }}
+                                                            />
+                                                        ) : (
+                                                            <LightModeIcon
+                                                                color={
+                                                                    theme
+                                                                        .palette
+                                                                        .mode ===
+                                                                    "dark"
+                                                                        ? theme
+                                                                              .palette
+                                                                              .primary[200]
+                                                                        : theme
+                                                                              .palette
+                                                                              .grey[700]
+                                                                }
+                                                            />
+                                                        )}
+                                                    </ListItemIcon>
+                                                    <ListItemText
+                                                        primary={
+                                                            <Typography
+                                                                variant="body2"
+                                                                sx={{
+                                                                    color:
+                                                                        theme
+                                                                            .palette
+                                                                            .mode ===
+                                                                        "dark"
+                                                                            ? theme
+                                                                                  .palette
+                                                                                  .primary[200]
+                                                                            : null,
+                                                                }}
+                                                            >
+                                                                Theme
+                                                            </Typography>
+                                                        }
+                                                    />
+                                                </ListItemButton>
+                                                <ListItemButton
+                                                    sx={{
+                                                        borderRadius: `${borderRadius}px`,
+                                                    }}
+                                                    selected={
+                                                        selectedIndex === 3
                                                     }
                                                     onClick={handleLogout}
                                                 >
@@ -463,11 +699,35 @@ const ProfileSection = () => {
                                                         <IconLogout
                                                             stroke={1.5}
                                                             size="1.3rem"
+                                                            color={
+                                                                theme.palette
+                                                                    .mode ===
+                                                                "dark"
+                                                                    ? theme
+                                                                          .palette
+                                                                          .primary[200]
+                                                                    : theme
+                                                                          .palette
+                                                                          .grey[700]
+                                                            }
                                                         />
                                                     </ListItemIcon>
                                                     <ListItemText
                                                         primary={
-                                                            <Typography variant="body2">
+                                                            <Typography
+                                                                variant="body2"
+                                                                sx={{
+                                                                    color:
+                                                                        theme
+                                                                            .palette
+                                                                            .mode ===
+                                                                        "dark"
+                                                                            ? theme
+                                                                                  .palette
+                                                                                  .primary[200]
+                                                                            : null,
+                                                                }}
+                                                            >
                                                                 Logout
                                                             </Typography>
                                                         }

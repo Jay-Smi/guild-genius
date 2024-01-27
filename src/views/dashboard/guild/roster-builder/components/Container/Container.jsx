@@ -219,6 +219,7 @@ const Container = forwardRef(
                 as={as}
                 open={isOpen}
                 type={type}
+                mode={theme.palette.mode}
             >
                 <Box className="containerHeader">
                     <StyledDragHandle
@@ -227,7 +228,16 @@ const Container = forwardRef(
                         <Handle {...handleProps} overlay={overlay} />
                     </StyledDragHandle>
                     {type !== "raid" && (
-                        <Typography variant="subtitle1">{label}</Typography>
+                        <Typography
+                            variant="h4"
+                            color={
+                                theme.palette.mode === "dark"
+                                    ? theme.palette.text.secondary
+                                    : theme.palette.text.secondary
+                            }
+                        >
+                            {label}
+                        </Typography>
                     )}
                     <ButtonGroup
                         aria-label="outlined primary button group"
@@ -272,11 +282,23 @@ const Container = forwardRef(
                             >
                                 {isOpen ? (
                                     <KeyboardDoubleArrowUpIcon
-                                        sx={{ width: "20px" }}
+                                        sx={{
+                                            width: "22px",
+                                            color:
+                                                theme.palette.mode === "dark"
+                                                    ? theme.palette.text.hint
+                                                    : theme.palette.grey[500],
+                                        }}
                                     />
                                 ) : (
                                     <KeyboardDoubleArrowDownIcon
-                                        sx={{ width: "20px" }}
+                                        sx={{
+                                            width: "22px",
+                                            color:
+                                                theme.palette.mode === "dark"
+                                                    ? theme.palette.text.hint
+                                                    : theme.palette.grey[500],
+                                        }}
                                     />
                                 )}
                             </IconButton>

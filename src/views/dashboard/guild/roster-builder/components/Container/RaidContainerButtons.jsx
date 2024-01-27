@@ -21,16 +21,26 @@ function RaidContainerButtons({ handleAddGroup, handleClickOpenDialog, id }) {
                     size="small"
                     sx={{ borderRadius: 1 }}
                 >
-                    <AddToPhotosIcon sx={{ width: "20px" }} />
+                    <AddToPhotosIcon
+                        sx={{
+                            width: "20px",
+                            color:
+                                theme.palette.mode === "dark"
+                                    ? theme.palette.text.hint
+                                    : theme.palette.grey[500],
+                        }}
+                    />
                 </IconButton>
             </Tooltip>
             <Divider
                 orientation="vertical"
                 flexItem
-                color={theme.palette.primary.main}
                 sx={{
                     borderRightWidth: 2,
-                    borderColor: theme.palette.grey[400],
+                    borderColor:
+                        theme.palette.mode === "dark"
+                            ? theme.palette.text.hint
+                            : theme.palette.grey[400],
                     marginRight: 1,
                     marginLeft: 1,
                 }}
@@ -43,10 +53,12 @@ function RaidContainerButtons({ handleAddGroup, handleClickOpenDialog, id }) {
                     <Divider
                         orientation="vertical"
                         flexItem
-                        color={theme.palette.primary.main}
                         sx={{
                             borderRightWidth: 2,
-                            borderColor: theme.palette.grey[400],
+                            borderColor:
+                                theme.palette.mode === "dark"
+                                    ? theme.palette.text.hint
+                                    : theme.palette.grey[400],
                             marginRight: 1,
                             marginLeft: 1,
                         }}
@@ -56,10 +68,12 @@ function RaidContainerButtons({ handleAddGroup, handleClickOpenDialog, id }) {
                     <Divider
                         orientation="vertical"
                         flexItem
-                        color={theme.palette.primary.main}
                         sx={{
                             borderRightWidth: 2,
-                            borderColor: theme.palette.grey[400],
+                            borderColor:
+                                theme.palette.mode === "dark"
+                                    ? theme.palette.text.hint
+                                    : theme.palette.grey[400],
                             marginRight: 1,
                             marginLeft: 1,
                         }}
@@ -73,16 +87,26 @@ function RaidContainerButtons({ handleAddGroup, handleClickOpenDialog, id }) {
                     size="small"
                     sx={{ borderRadius: 1 }}
                 >
-                    <EditAttributesIcon sx={{ width: "20px" }} />
+                    <EditAttributesIcon
+                        sx={{
+                            width: "20px",
+                            color:
+                                theme.palette.mode === "dark"
+                                    ? theme.palette.text.hint
+                                    : theme.palette.grey[500],
+                        }}
+                    />
                 </IconButton>
             </Tooltip>
             <Divider
                 orientation="vertical"
                 flexItem
-                color={theme.palette.primary.main}
                 sx={{
                     borderRightWidth: 2,
-                    borderColor: theme.palette.grey[400],
+                    borderColor:
+                        theme.palette.mode === "dark"
+                            ? theme.palette.text.hint
+                            : theme.palette.grey[400],
                     marginRight: 1,
                     marginLeft: 1,
                 }}

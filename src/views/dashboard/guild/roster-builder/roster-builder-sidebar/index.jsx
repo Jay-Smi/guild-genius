@@ -159,7 +159,11 @@ const RosterBuilderSidebar = () => {
                             <Typography
                                 variant="h4"
                                 sx={{ fontWeight: "600", ml: 2 }}
-                                color={theme.palette.secondary.main}
+                                color={
+                                    theme.palette.mode === "dark"
+                                        ? theme.palette.primary[200]
+                                        : theme.palette.secondary.main
+                                }
                             >
                                 {item.name}
                             </Typography>

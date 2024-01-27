@@ -45,9 +45,14 @@ const OutlineInputStyle = styled(OutlinedInput, { shouldForwardProp })(
         marginLeft: 16,
         paddingLeft: 16,
         paddingRight: 16,
+
         "& input": {
             background: "transparent !important",
             paddingLeft: "4px !important",
+            color:
+                theme.palette.mode === "dark"
+                    ? theme.palette.primary[200]
+                    : null,
         },
         [theme.breakpoints.down("lg")]: {
             width: 250,
@@ -145,7 +150,14 @@ const SearchSection = () => {
 
     return (
         <>
-            <Box sx={{ display: { xs: "block", md: "none" } }}>
+            <Box
+                sx={{
+                    display: {
+                        xs: "block",
+                        md: "none",
+                    },
+                }}
+            >
                 <PopupState variant="popper" popupId="demo-popup-popper">
                     {(popupState) => (
                         <>
@@ -217,6 +229,12 @@ const SearchSection = () => {
                     value={value}
                     onChange={(e) => setValue(e.target.value)}
                     placeholder="Search"
+                    sx={{
+                        backgroundColor:
+                            theme.palette.mode === "dark"
+                                ? theme.palette.background.dark3
+                                : "transparent",
+                    }}
                     startAdornment={
                         <InputAdornment position="start">
                             <IconSearch

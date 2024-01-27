@@ -41,7 +41,13 @@ const NavGroup = ({ item }) => {
                     item.title && (
                         <Typography
                             variant="caption"
-                            sx={{ ...theme.typography.menuCaption }}
+                            sx={{
+                                ...theme.typography.menuCaption,
+                                color:
+                                    theme.palette.mode === "dark"
+                                        ? theme.palette.text.secondary
+                                        : "inherit",
+                            }}
                             display="block"
                             gutterBottom
                         >
@@ -49,7 +55,13 @@ const NavGroup = ({ item }) => {
                             {item.caption && (
                                 <Typography
                                     variant="caption"
-                                    sx={{ ...theme.typography.subMenuCaption }}
+                                    sx={{
+                                        ...theme.typography.subMenuCaption,
+                                        color:
+                                            theme.palette.mode === "dark"
+                                                ? theme.palette.text.secondary
+                                                : "inherit",
+                                    }}
                                     display="block"
                                     gutterBottom
                                 >
@@ -64,7 +76,16 @@ const NavGroup = ({ item }) => {
             </List>
 
             {/* group divider */}
-            <Divider sx={{ mt: 0.25, mb: 1.25 }} />
+            <Divider
+                sx={{
+                    mt: 0.25,
+                    mb: 1.25,
+                    color:
+                        theme.palette.mode === "dark"
+                            ? theme.palette.text.secondary
+                            : "inherit",
+                }}
+            />
         </>
     );
 };

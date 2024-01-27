@@ -3,6 +3,8 @@ import Icon from "@mdi/react";
 import {
     Box,
     Button,
+    FormControl,
+    InputLabel,
     MenuItem,
     Select,
     useMediaQuery,
@@ -37,7 +39,10 @@ export default function SidebarItems({
                 <SettingsIcon
                     sx={{
                         fontSize: materialIconSize,
-                        color: theme.palette.secondary.main,
+                        color:
+                            theme.palette.mode === "dark"
+                                ? theme.palette.primary[200]
+                                : theme.palette.secondary.main,
                     }}
                 />
             ),
@@ -50,23 +55,62 @@ export default function SidebarItems({
                 <Icon
                     path={mdiAxeBattle}
                     size={mdiIconSize}
-                    color={theme.palette.secondary.main}
+                    color={
+                        theme.palette.mode === "dark"
+                            ? theme.palette.primary[200]
+                            : theme.palette.secondary.main
+                    }
                 />
             ),
             content: (
-                <Select
-                    labelId="instance-select-label"
-                    id="instance-select"
-                    value={selectedInstance}
-                    label="Instance"
-                    onChange={handleInstanceSelectChange}
-                    sx={{ width: "80%" }}
-                >
-                    <MenuItem value="Blackfathom_Deeps">
-                        Blackfathom Deeps
-                    </MenuItem>
-                    <MenuItem value="Gnomeregan">Gnomeregan</MenuItem>
-                </Select>
+                <FormControl fullWidth>
+                    <InputLabel
+                        id="instance-select-label"
+                        htmlFor="instance-select"
+                        sx={{
+                            color:
+                                theme.palette.mode === "dark"
+                                    ? theme.palette.primary[200]
+                                    : theme.palette.secondary.main,
+                        }}
+                    >
+                        Instance
+                    </InputLabel>
+                    <Select
+                        labelId="instance-select-label"
+                        id="instance-select"
+                        value={selectedInstance}
+                        label="Instance"
+                        onChange={handleInstanceSelectChange}
+                        sx={{
+                            width: "80%",
+
+                            color:
+                                theme.palette.mode === "dark"
+                                    ? theme.palette.primary[200]
+                                    : theme.palette.secondary.main,
+                            ".MuiOutlinedInput-input": {
+                                color:
+                                    theme.palette.mode === "dark"
+                                        ? theme.palette.primary[200]
+                                        : theme.palette.secondary.main,
+                            },
+                        }}
+                        inputProps={{
+                            name: "instance",
+                            id: "instance-select",
+                            color:
+                                theme.palette.mode === "dark"
+                                    ? theme.palette.primary[200]
+                                    : theme.palette.secondary.main,
+                        }}
+                    >
+                        <MenuItem value="Blackfathom_Deeps">
+                            Blackfathom Deeps
+                        </MenuItem>
+                        <MenuItem value="Gnomeregan">Gnomeregan</MenuItem>
+                    </Select>
+                </FormControl>
             ),
         },
         {
@@ -76,7 +120,10 @@ export default function SidebarItems({
                 <EditCalendarIcon
                     sx={{
                         fontSize: materialIconSize,
-                        color: theme.palette.secondary.main,
+                        color:
+                            theme.palette.mode === "dark"
+                                ? theme.palette.primary[200]
+                                : theme.palette.secondary.main,
                     }}
                 />
             ),

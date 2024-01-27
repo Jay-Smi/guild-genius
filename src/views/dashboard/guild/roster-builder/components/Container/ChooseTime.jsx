@@ -9,6 +9,7 @@ import {
     Popover,
     Select,
     Tooltip,
+    useTheme,
 } from "@mui/material";
 import { useContext, useMemo, useState } from "react";
 import { RosterContext } from "../../store/RosterContextProvider";
@@ -22,6 +23,7 @@ import { format, parseISO, set } from "date-fns";
 dayjs.extend(customParseFormat);
 
 function ChooseTime({ id: raidId }) {
+    const theme = useTheme();
     const defaultTime = new Date();
     defaultTime.setHours(20);
     defaultTime.setMinutes(0);
@@ -96,7 +98,15 @@ function ChooseTime({ id: raidId }) {
                     size="small"
                     sx={{ borderRadius: 1 }}
                 >
-                    <AccessTimeIcon sx={{ width: "20px" }} />
+                    <AccessTimeIcon
+                        sx={{
+                            width: "20px",
+                            color:
+                                theme.palette.mode === "dark"
+                                    ? theme.palette.text.hint
+                                    : theme.palette.grey[500],
+                        }}
+                    />
                 </IconButton>
             </Tooltip>
             <Popover

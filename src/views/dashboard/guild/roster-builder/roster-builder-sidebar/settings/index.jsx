@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Typography } from "@mui/material";
+import { Box, Button, Grid, Typography, useTheme } from "@mui/material";
 import { useContext, useMemo, useState } from "react";
 import { RosterContext } from "../../store/RosterContextProvider";
 import { useStore } from "zustand";
@@ -15,6 +15,7 @@ import { queryClient } from "../../../../../../config";
 import toast from "react-hot-toast";
 
 export default function RosterSettings() {
+    const theme = useTheme();
     const [submitting, setSubmitting] = useState(false);
     const rosterStore = useContext(RosterContext);
     const charactersLength = useStore(
@@ -422,7 +423,14 @@ export default function RosterSettings() {
                             justifyContent: "center",
                         }}
                     >
-                        <Typography variant="subtitle1">
+                        <Typography
+                            variant="subtitle1"
+                            color={
+                                theme.palette.mode === "dark"
+                                    ? theme.palette.primary[200]
+                                    : theme.palette.secondary.main
+                            }
+                        >
                             Characters: {charactersLength}
                         </Typography>
                     </Box>
@@ -435,7 +443,14 @@ export default function RosterSettings() {
                             justifyContent: "center",
                         }}
                     >
-                        <Typography variant="subtitle1">
+                        <Typography
+                            variant="subtitle1"
+                            color={
+                                theme.palette.mode === "dark"
+                                    ? theme.palette.primary[200]
+                                    : theme.palette.secondary.main
+                            }
+                        >
                             Raids: {raids.length}
                         </Typography>
                     </Box>

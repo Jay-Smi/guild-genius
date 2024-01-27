@@ -97,6 +97,11 @@ const NavCollapse = ({ menu, level }) => {
             strokeWidth={1.5}
             size="1.3rem"
             style={{ marginTop: "auto", marginBottom: "auto" }}
+            color={
+                theme.palette.mode === "dark"
+                    ? theme.palette.text.secondary
+                    : "inherit"
+            }
         />
     ) : (
         <FiberManualRecordIcon
@@ -105,6 +110,11 @@ const NavCollapse = ({ menu, level }) => {
                 height: selected === menu.id ? 8 : 6,
             }}
             fontSize={level > 0 ? "inherit" : "medium"}
+            color={
+                theme.palette.mode === "dark"
+                    ? theme.palette.text.secondary
+                    : "inherit"
+            }
         />
     );
 
@@ -132,7 +142,11 @@ const NavCollapse = ({ menu, level }) => {
                     primary={
                         <Typography
                             variant={selected === menu.id ? "h5" : "body1"}
-                            color="inherit"
+                            color={
+                                theme.palette.mode === "dark"
+                                    ? theme.palette.text.secondary
+                                    : "inherit"
+                            }
                             sx={{ my: "auto" }}
                         >
                             {menu.title}
@@ -145,6 +159,11 @@ const NavCollapse = ({ menu, level }) => {
                                 sx={{ ...theme.typography.subMenuCaption }}
                                 display="block"
                                 gutterBottom
+                                color={
+                                    theme.palette.mode === "dark"
+                                        ? theme.palette.text.secondary
+                                        : "inherit"
+                                }
                             >
                                 {menu.caption}
                             </Typography>
@@ -156,12 +175,22 @@ const NavCollapse = ({ menu, level }) => {
                         stroke={1.5}
                         size="1rem"
                         style={{ marginTop: "auto", marginBottom: "auto" }}
+                        color={
+                            theme.palette.mode === "dark"
+                                ? theme.palette.text.secondary
+                                : "inherit"
+                        }
                     />
                 ) : (
                     <IconChevronDown
                         stroke={1.5}
                         size="1rem"
                         style={{ marginTop: "auto", marginBottom: "auto" }}
+                        color={
+                            theme.palette.mode === "dark"
+                                ? theme.palette.text.secondary
+                                : "inherit"
+                        }
                     />
                 )}
             </ListItemButton>

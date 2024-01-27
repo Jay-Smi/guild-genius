@@ -9,6 +9,7 @@ import {
     Popover,
     Select,
     Tooltip,
+    useTheme,
 } from "@mui/material";
 import { useContext, useMemo, useState } from "react";
 import { RosterContext } from "../../store/RosterContextProvider";
@@ -16,6 +17,7 @@ import { useStore } from "zustand";
 import dayjs from "dayjs";
 
 function ChooseDate({ id: raidId }) {
+    const theme = useTheme();
     const [anchorEl, setAnchorEl] = useState(null);
     const rosterStore = useContext(RosterContext);
     const selectedTab = useStore(rosterStore, (state) => state.selectedTab);
@@ -88,7 +90,15 @@ function ChooseDate({ id: raidId }) {
                     size="small"
                     sx={{ borderRadius: 1 }}
                 >
-                    <EventIcon sx={{ width: "20px" }} />
+                    <EventIcon
+                        sx={{
+                            width: "20px",
+                            color:
+                                theme.palette.mode === "dark"
+                                    ? theme.palette.text.hint
+                                    : theme.palette.grey[500],
+                        }}
+                    />
                 </IconButton>
             </Tooltip>
             <Popover
