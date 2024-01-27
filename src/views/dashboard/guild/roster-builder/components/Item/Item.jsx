@@ -113,10 +113,12 @@ export const Item = memo(
                                       }`,
                         }}
                         {...props}
+                        {...handleProps}
+                        {...listeners}
                     >
-                        <StyledDragHandle>
-                            <Handle {...handleProps} {...listeners} />
-                        </StyledDragHandle>
+                        {/* <StyledDragHandle>
+                            <Handle />
+                        </StyledDragHandle> */}
                         <Typography
                             variant="h5"
                             sx={{

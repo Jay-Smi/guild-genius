@@ -30,6 +30,7 @@ export const StyledItem = styled.div`
     align-items: center;
     justify-content: center;
     padding: 8px 10px;
+    cursor: grab;
     /* background-color: ${(props) => {
         return props.theme.palette.mode === "dark"
             ? props.theme.palette.grey[700]
@@ -59,10 +60,6 @@ export const StyledItem = styled.div`
 
     transform: scale(var(--scale, 1));
     transition: box-shadow 200ms cubic-bezier(0.18, 0.67, 0.6, 1.22);
-
-    &.activeplayer {
-        background-color: green;
-    }
 
     &:focus-visible {
         box-shadow: 0 0px 4px 1px #4c9ffe,
