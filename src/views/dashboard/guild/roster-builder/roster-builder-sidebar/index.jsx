@@ -10,6 +10,7 @@ import {
     ListItemIcon,
     Stack,
     Typography,
+    styled,
     useMediaQuery,
 } from "@mui/material";
 import PerfectScrollbar from "react-perfect-scrollbar";
@@ -21,6 +22,78 @@ import { getLockoutStartAndEndDates } from "../../../../../utils/wowHelpers";
 import dayjs from "dayjs";
 import { useStore } from "zustand";
 import { RosterContext } from "../store/RosterContextProvider";
+
+const StyledStack = styled(Stack, {
+    shouldForwardProp: (prop) => prop !== "matchUpLg",
+})(({ theme, matchUpLg }) => ({
+    paddingTop: matchUpLg ? 0 : "30px",
+}));
+
+const StyledAlphaBox = styled(Box)(({ theme }) => ({
+    width: "100%",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    color: theme.palette.grey[500],
+}));
+
+const StyledSecondaryBox = styled(Box)(({ theme }) => ({
+    width: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "start",
+    marginBottom: "0.5rem",
+}));
+
+const StyledTypography = styled(Typography)(({ theme }) => ({
+    fontWeight: "600",
+    marginLeft: "1rem",
+}));
+
+const StyledList = styled(List)(({ theme }) => ({
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+}));
+
+const StyledListItemButton = styled(ListItemButton)(({ theme }) => ({
+    padding: "0.3rem",
+    margin: 0,
+    marginBottom: "2rem",
+    justifyContent: "center",
+}));
+
+const StyledListItemIcon = styled(ListItemIcon)(({ theme }) => ({
+    justifyContent: "center",
+}));
+
+const StyledDesktopDrawer = styled(Drawer)(({ theme }) => ({
+    "& .MuiDrawer-paper": {
+        width: "auto",
+        background: theme.palette.background.default,
+        color: theme.palette.text.primary,
+        borderRight: "none",
+        [theme.breakpoints.up("lg")]: {
+            top: "88px",
+            paddingTop: "24px",
+        },
+        zIndex: 1,
+    },
+}));
+
+const StyledMobileDrawer = styled(Drawer)(({ theme }) => ({
+    "& .MuiDrawer-paper": {
+        width: "auto",
+        background: theme.palette.background.default,
+        color: theme.palette.text.primary,
+        borderRight: "none",
+        [theme.breakpoints.down("lg")]: {
+            top: "80px",
+            paddingTop: "24px",
+        },
+        zIndex: 1,
+    },
+}));
 
 const RosterBuilderSidebar = () => {
     const theme = useTheme();
@@ -58,7 +131,7 @@ const RosterBuilderSidebar = () => {
     );
     const [hoveredDay, setHoveredDay] = useState(null);
     const [selectedLockout, setSelectedLockout] = useState(null);
-    const [instanceSelectValue, setInstanceSelectValue] = useState("");
+
     const sideBarItems = SidebarItems({
         selectedInstance,
         handleInstanceSelectChange,
@@ -130,35 +203,17 @@ const RosterBuilderSidebar = () => {
                 paddingBottom: "100px",
             }}
         >
-            <Stack
+            <StyledStack
                 spacing={3}
                 divider={<Divider />}
-                sx={{ paddingTop: matchUpLg ? 0 : "30px" }}
+                matchUpLg={matchUpLg}
             >
                 {sideBarItems.map((item) => (
-                    <Box
-                        key={item.id}
-                        sx={{
-                            width: "100%",
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            color: theme.palette.grey[500],
-                        }}
-                    >
-                        <Box
-                            sx={{
-                                width: "100%",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "start",
-                                mb: 1,
-                            }}
-                        >
+                    <StyledAlphaBox key={item.id}>
+                        <StyledSecondaryBox>
                             {item.icon}
-                            <Typography
+                            <StyledTypography
                                 variant="h4"
-                                sx={{ fontWeight: "600", ml: 2 }}
                                 color={
                                     theme.palette.mode === "dark"
                                         ? theme.palette.primary[200]
@@ -166,132 +221,65 @@ const RosterBuilderSidebar = () => {
                                 }
                             >
                                 {item.name}
-                            </Typography>
-                        </Box>
+                            </StyledTypography>
+                        </StyledSecondaryBox>
 
                         {item.content}
-                    </Box>
+                    </StyledAlphaBox>
                 ))}
-            </Stack>
+            </StyledStack>
         </PerfectScrollbar>
     );
 
     const mobileDrawer = (
         <>
-            <List
-                disablePadding
-                sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                }}
-            >
+            <StyledList disablePadding>
                 {sideBarItems.map((item) => (
                     <ListItem disablePadding key={item.id}>
-                        <ListItemButton
-                            sx={{
-                                padding: 1,
-                                margin: 0,
-                                mb: 2,
-                                justifyContent: "center",
-                            }}
-                            onClick={toggleMobileDrawer}
-                        >
-                            <ListItemIcon sx={{ justifyContent: "center" }}>
-                                {item.icon}
-                            </ListItemIcon>
-                        </ListItemButton>
+                        <StyledListItemButton onClick={toggleMobileDrawer}>
+                            <StyledListItemIcon>{item.icon}</StyledListItemIcon>
+                        </StyledListItemButton>
                     </ListItem>
                 ))}
-            </List>
+            </StyledList>
         </>
     );
 
     return (
-        <Box
-            component="nav"
-            sx={{
-                flexShrink: { md: 0 },
-                width: "auto",
-            }}
-            aria-label="roster-builder-options"
-        >
+        <Box component="nav" aria-label="roster-builder-options">
             {/* DESKTOP VIEW */}
             {matchUpLg && (
-                <Drawer
-                    variant={"persistent"}
+                <StyledDesktopDrawer
+                    variant="persistent"
                     anchor="right"
                     open
-                    sx={{
-                        "& .MuiDrawer-paper": {
-                            width: "auto",
-                            background: theme.palette.background.default,
-                            color: theme.palette.text.primary,
-                            borderRight: "none",
-                            [theme.breakpoints.up("lg")]: {
-                                top: "88px",
-                                pt: "24px",
-                            },
-                            zIndex: 1,
-                        },
-                    }}
-                    PaperProps={{
-                        style: {},
-                    }}
-                    ModalProps={{ keepMounted: true }}
                     color="inherit"
                 >
                     {desktopDrawer}
-                </Drawer>
+                </StyledDesktopDrawer>
             )}
             {/* MOBILE CLOSED VIEW */}
 
             {!matchUpLg && mobileDrawerOpen && (
-                <Drawer
-                    variant={"temporary"}
+                <StyledDesktopDrawer
+                    variant="temporary"
                     anchor="right"
                     open={mobileDrawerOpen}
                     onClose={toggleMobileDrawer}
-                    sx={{
-                        "& .MuiDrawer-paper": {
-                            width: "auto",
-                            background: theme.palette.background.default,
-                            color: theme.palette.text.primary,
-                            borderRight: "none",
-                            [theme.breakpoints.up("lg")]: {
-                                top: "88px",
-                                pt: "24px",
-                            },
-                            zIndex: 1,
-                        },
-                    }}
                     ModalProps={{ keepMounted: true }}
                     color="inherit"
                 >
                     {desktopDrawer}
-                </Drawer>
+                </StyledDesktopDrawer>
             )}
             {!matchUpLg && !mobileDrawerOpen && (
-                <Drawer
+                <StyledMobileDrawer
                     variant="persistent"
                     open={!mobileDrawerOpen}
                     anchor="right"
-                    sx={{
-                        "& .MuiDrawer-paper": {
-                            width: "auto",
-                            background: theme.palette.background.default,
-                            color: theme.palette.text.primary,
-                            borderRight: "none",
-                            [theme.breakpoints.down("lg")]: {
-                                top: "80px",
-                                paddingTop: "24px",
-                            },
-                            zIndex: 1,
-                        },
-                    }}
                 >
                     {mobileDrawer}
-                </Drawer>
+                </StyledMobileDrawer>
             )}
         </Box>
     );

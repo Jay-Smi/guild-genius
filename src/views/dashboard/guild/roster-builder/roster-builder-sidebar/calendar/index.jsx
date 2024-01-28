@@ -6,12 +6,25 @@ import {
     Paper,
     Stack,
     Typography,
+    styled,
 } from "@mui/material";
 import WeekPicker from "./WeekPicker";
 
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { format, parseISO } from "date-fns";
 import DeleteIcon from "@mui/icons-material/Delete";
+
+const StyledStack = styled(Stack)(({ theme }) => ({
+    mt: 2,
+}));
+
+const StyledPaper = styled(Paper)(({ theme }) => ({
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+}));
+
+const StyledTypography = styled(Typography)(({ theme }) => ({ ml: 2 }));
 
 export default function SidebarCalendar({
     hoveredDay,
@@ -43,24 +56,18 @@ export default function SidebarCalendar({
                         Selected Lockouts
                     </Typography>
                 </AccordionSummary>
-                <Stack spacing={1} sx={{ mt: 2 }}>
+                <StyledStack spacing={1}>
                     {chosenLockouts.map((lockout) => {
                         if (lockout.type === "all") return;
                         return (
-                            <Paper
+                            <StyledPaper
                                 key={crypto.randomUUID()}
                                 elevation={2}
-                                sx={{
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    alignItems: "center",
-                                }}
                             >
-                                <Typography
+                                <StyledTypography
                                     variant="h4"
                                     fontSize="16px"
                                     color="inherit"
-                                    sx={{ ml: 2 }}
                                 >
                                     {format(
                                         parseISO(lockout.startDate),
@@ -71,16 +78,16 @@ export default function SidebarCalendar({
                                         parseISO(lockout.endDate),
                                         "MMM dd"
                                     )}
-                                </Typography>
+                                </StyledTypography>
                                 <IconButton
                                     onClick={() => handleDeleteLockout(lockout)}
                                 >
                                     <DeleteIcon />
                                 </IconButton>
-                            </Paper>
+                            </StyledPaper>
                         );
                     })}
-                </Stack>
+                </StyledStack>
             </Accordion>
         </>
     );

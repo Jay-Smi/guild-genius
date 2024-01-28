@@ -20,9 +20,35 @@ import {
     isRanged,
     isTank,
 } from "../../../../../utils/wowHelpers";
+import { styled } from "@mui/material";
+import { Style } from "@mui/icons-material";
+
+const StyledBox = styled(Box, {
+    shouldForwardProp: (prop) => prop !== "matchDownMd",
+})(({ theme, matchDownMd }) => {
+    return {
+        display: "grid",
+        gridTemplateColumns: matchDownMd ? "1fr" : "auto 1fr",
+        gridTemplateRows: matchDownMd ? "0.9fr 1.1fr" : "1fr",
+        height: "calc(100vh - 200px)",
+        overflow: "hidden",
+        backgroundColor:
+            theme.palette.mode === "dark"
+                ? theme.palette.background.dark3
+                : theme.palette.grey[100],
+    };
+});
+
+const StyledRaidGridItem = styled(Grid)(({ theme }) => {
+    return {
+        justifyContent: "center",
+        alignItems: "center",
+        height: "auto",
+    };
+});
 
 const RosterBuilderActual = memo(({ handleRemove, containers }) => {
-    console.log("RosterBuilder Actual Mount");
+    console.log("RosterBuilderActual rendered");
     const rosterStore = useContext(RosterContext);
 
     const activeId = useStore(rosterStore, (state) => state.activeId);
@@ -39,19 +65,7 @@ const RosterBuilderActual = memo(({ handleRemove, containers }) => {
 
     return (
         <>
-            <Box
-                sx={{
-                    display: "grid",
-                    gridTemplateColumns: matchDownMd ? "1fr" : "auto 1fr",
-                    gridTemplateRows: matchDownMd ? "0.9fr 1.1fr" : "1fr",
-                    height: "calc(100vh - 200px)",
-                    overflow: "hidden",
-                    backgroundColor:
-                        theme.palette.mode === "dark"
-                            ? theme.palette.background.dark3
-                            : theme.palette.grey[100],
-                }}
-            >
+            <StyledBox matchDownMd={matchDownMd}>
                 <PerfectScrollbar
                     component="div"
                     style={{
@@ -140,14 +154,9 @@ const RosterBuilderActual = memo(({ handleRemove, containers }) => {
                                 (raidId) => {
                                     const currentRaid = findContainer(raidId);
                                     return (
-                                        <Grid
+                                        <StyledRaidGridItem
                                             item
                                             key={currentRaid.id}
-                                            sx={{
-                                                justifyContent: "center",
-                                                alignItems: "center",
-                                                height: "auto",
-                                            }}
                                         >
                                             <DroppableContainer
                                                 id={currentRaid.id}
@@ -236,14 +245,14 @@ const RosterBuilderActual = memo(({ handleRemove, containers }) => {
                                                     )}
                                                 </SortableContext>
                                             </DroppableContainer>
-                                        </Grid>
+                                        </StyledRaidGridItem>
                                     );
                                 }
                             )}
                         </SortableContext>
                     </Grid>
                 </PerfectScrollbar>
-            </Box>
+            </StyledBox>
             {createPortal(
                 <DragOverlay adjustScale={false}>
                     {activeId

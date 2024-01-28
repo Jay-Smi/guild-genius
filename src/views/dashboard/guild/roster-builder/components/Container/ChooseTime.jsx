@@ -9,9 +9,10 @@ import {
     Popover,
     Select,
     Tooltip,
+    styled,
     useTheme,
 } from "@mui/material";
-import { memo, useContext, useMemo, useState } from "react";
+import { memo, useContext, useMemo, useRef, useState } from "react";
 import { RosterContext } from "../../store/RosterContextProvider";
 import { useStore } from "zustand";
 import dayjs from "dayjs";
@@ -21,6 +22,24 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 import { format, parseISO, set } from "date-fns";
 
 dayjs.extend(customParseFormat);
+
+const StyledIconButton = styled(IconButton)(({ theme }) => ({
+    borderRadius: "5px",
+}));
+
+const StyledAccessTimeIcon = styled(AccessTimeIcon)(({ theme }) => ({
+    width: "20px",
+    color:
+        theme.palette.mode === "dark"
+            ? theme.palette.text.hint
+            : theme.palette.grey[500],
+}));
+
+const StyledBox = styled(Box)(({ theme }) => ({
+    minWidth: 160,
+    display: "flex",
+    flexDirection: "column",
+}));
 
 const ChooseTime = memo(({ id: raidId }) => {
     const theme = useTheme();
@@ -67,6 +86,11 @@ const ChooseTime = memo(({ id: raidId }) => {
     const open = Boolean(anchorEl);
     const id = open ? "choose-time-popover" : undefined;
 
+    const anchorOrigin = useRef({
+        vertical: "bottom",
+        horizontal: "left",
+    });
+
     const handleSelectTime = (time) => {
         const newContainers = containers.map((container) =>
             container.id === raidId
@@ -93,41 +117,20 @@ const ChooseTime = memo(({ id: raidId }) => {
     return (
         <>
             <Tooltip title="Choose Time">
-                <IconButton
-                    onClick={handleClick}
-                    size="small"
-                    sx={{ borderRadius: 1 }}
-                >
-                    <AccessTimeIcon
-                        sx={{
-                            width: "20px",
-                            color:
-                                theme.palette.mode === "dark"
-                                    ? theme.palette.text.hint
-                                    : theme.palette.grey[500],
-                        }}
-                    />
-                </IconButton>
+                <StyledIconButton onClick={handleClick} size="small">
+                    <StyledAccessTimeIcon />
+                </StyledIconButton>
             </Tooltip>
             <Popover
                 id={id}
                 open={open}
                 anchorEl={anchorEl}
                 onClose={handleClose}
-                anchorOrigin={{
-                    vertical: "bottom",
-                    horizontal: "left",
-                }}
+                anchorOrigin={anchorOrigin.current}
             >
-                <Box
-                    sx={{
-                        minWidth: 160,
-                        display: "flex",
-                        flexDirection: "column",
-                    }}
-                >
+                <StyledBox>
                     <StaticTimePicker onAccept={handleSelectTime} />
-                </Box>
+                </StyledBox>
             </Popover>
         </>
     );

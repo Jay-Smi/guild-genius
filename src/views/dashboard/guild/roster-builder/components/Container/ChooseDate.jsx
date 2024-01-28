@@ -9,12 +9,31 @@ import {
     Popover,
     Select,
     Tooltip,
+    styled,
     useTheme,
 } from "@mui/material";
-import { memo, useContext, useMemo, useState } from "react";
+import { memo, useContext, useMemo, useRef, useState } from "react";
 import { RosterContext } from "../../store/RosterContextProvider";
 import { useStore } from "zustand";
 import dayjs from "dayjs";
+
+const StyledIconButton = styled(IconButton)(({ theme }) => ({
+    borderRadius: "5px",
+}));
+
+const StyledEventIcon = styled(EventIcon)(({ theme }) => ({
+    width: "20px",
+    color:
+        theme.palette.mode === "dark"
+            ? theme.palette.text.hint
+            : theme.palette.grey[500],
+}));
+
+const StyledBox = styled(Box)(({ theme }) => ({
+    minWidth: 160,
+    display: "flex",
+    flexDirection: "column",
+}));
 
 const ChooseDate = memo(({ id: raidId }) => {
     const theme = useTheme();
@@ -60,6 +79,11 @@ const ChooseDate = memo(({ id: raidId }) => {
     const dayEnd = dayjs(currentLockout.endDate);
     const days = [dayStart, dayMid, dayEnd];
 
+    const achorOrigin = useRef({
+        vertical: "bottom",
+        horizontal: "left",
+    });
+
     const handleSelectDate = (date) => {
         const newContainers = containers.map((container) =>
             container.id === raidId
@@ -85,39 +109,18 @@ const ChooseDate = memo(({ id: raidId }) => {
     return (
         <>
             <Tooltip title="Choose Date">
-                <IconButton
-                    onClick={handleClick}
-                    size="small"
-                    sx={{ borderRadius: 1 }}
-                >
-                    <EventIcon
-                        sx={{
-                            width: "20px",
-                            color:
-                                theme.palette.mode === "dark"
-                                    ? theme.palette.text.hint
-                                    : theme.palette.grey[500],
-                        }}
-                    />
-                </IconButton>
+                <StyledIconButton onClick={handleClick} size="small">
+                    <StyledEventIcon />
+                </StyledIconButton>
             </Tooltip>
             <Popover
                 id={id}
                 open={open}
                 anchorEl={anchorEl}
                 onClose={handleClose}
-                anchorOrigin={{
-                    vertical: "bottom",
-                    horizontal: "left",
-                }}
+                anchorOrigin={achorOrigin.current}
             >
-                <Box
-                    sx={{
-                        minWidth: 160,
-                        display: "flex",
-                        flexDirection: "column",
-                    }}
-                >
+                <StyledBox>
                     {days.map((day, index) => (
                         <Button
                             key={index}
@@ -128,7 +131,7 @@ const ChooseDate = memo(({ id: raidId }) => {
                             {day.format("ddd MMM D")}
                         </Button>
                     ))}
-                </Box>
+                </StyledBox>
             </Popover>
         </>
     );

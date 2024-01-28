@@ -1,18 +1,19 @@
-import React, { useEffect, memo, forwardRef, useContext } from "react";
+import { useEffect, memo, forwardRef, useContext } from "react";
 import { classNames } from "../../../../../../utils/helpers.js";
 
-import { Handle } from "../Handle.jsx";
 import { Remove } from "../Remove.jsx";
-import {
-    StyledActions,
-    StyledDragHandle,
-    StyledItem,
-    StyledWrapper,
-} from "./Item.styles.jsx";
+import { StyledActions, StyledItem, StyledWrapper } from "./Item.styles.jsx";
 import { RosterContext } from "../../store/RosterContextProvider.jsx";
 import { useStore } from "zustand";
-import { Typography, useTheme } from "@mui/material";
-import { useShallow } from "zustand/react/shallow";
+import { Typography, styled, useTheme } from "@mui/material";
+
+const StyledTypography = styled(Typography)(({ theme }) => ({
+    fontWeight: "800",
+    color:
+        theme.palette.mode === "dark"
+            ? theme.palette.background.dark3
+            : "inherit",
+}));
 
 export const Item = memo(
     forwardRef(
@@ -121,18 +122,9 @@ export const Item = memo(
                         {/* <StyledDragHandle>
                             <Handle />
                         </StyledDragHandle> */}
-                        <Typography
-                            variant="h5"
-                            sx={{
-                                fontWeight: "800",
-                                color:
-                                    theme.palette.mode === "dark"
-                                        ? theme.palette.background.dark3
-                                        : "inherit",
-                            }}
-                        >
+                        <StyledTypography variant="h5">
                             {character.character_name}
-                        </Typography>
+                        </StyledTypography>
                         <StyledActions>
                             {onRemove ? <Remove onClick={onRemove} /> : null}
                         </StyledActions>

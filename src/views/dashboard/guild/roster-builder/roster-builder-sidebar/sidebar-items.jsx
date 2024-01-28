@@ -7,6 +7,7 @@ import {
     InputLabel,
     MenuItem,
     Select,
+    styled,
     useMediaQuery,
     useTheme,
 } from "@mui/material";
@@ -15,6 +16,48 @@ import EditCalendarIcon from "@mui/icons-material/EditCalendar";
 import SettingsIcon from "@mui/icons-material/Settings";
 import SidebarCalendar from "./calendar";
 import RosterSettings from "./settings";
+
+const StyledSettingsIcon = styled(SettingsIcon, {
+    shouldForwardProp: (prop) => prop !== "materialIconSize",
+})(({ theme, materialIconSize }) => ({
+    fontSize: materialIconSize,
+    color:
+        theme.palette.mode === "dark"
+            ? theme.palette.primary[200]
+            : theme.palette.secondary.main,
+}));
+
+const StyledInputLabel = styled(InputLabel)(({ theme }) => ({
+    color:
+        theme.palette.mode === "dark"
+            ? theme.palette.primary[200]
+            : theme.palette.secondary.main,
+}));
+
+const StyledSelect = styled(Select)(({ theme }) => ({
+    width: "80%",
+
+    color:
+        theme.palette.mode === "dark"
+            ? theme.palette.primary[200]
+            : theme.palette.secondary.main,
+    ".MuiOutlinedInput-input": {
+        color:
+            theme.palette.mode === "dark"
+                ? theme.palette.primary[200]
+                : theme.palette.secondary.main,
+    },
+}));
+
+const StyledEditCalendarIcon = styled(EditCalendarIcon, {
+    shouldForwardProp: (prop) => prop !== "materialIconSize",
+})(({ theme, materialIconSize }) => ({
+    fontSize: materialIconSize,
+    color:
+        theme.palette.mode === "dark"
+            ? theme.palette.primary[200]
+            : theme.palette.secondary.main,
+}));
 
 export default function SidebarItems({
     selectedInstance,
@@ -35,17 +78,7 @@ export default function SidebarItems({
         {
             id: 3,
             name: "Controls",
-            icon: (
-                <SettingsIcon
-                    sx={{
-                        fontSize: materialIconSize,
-                        color:
-                            theme.palette.mode === "dark"
-                                ? theme.palette.primary[200]
-                                : theme.palette.secondary.main,
-                    }}
-                />
-            ),
+            icon: <StyledSettingsIcon materialIconSize={materialIconSize} />,
             content: <RosterSettings />,
         },
         {
@@ -64,38 +97,18 @@ export default function SidebarItems({
             ),
             content: (
                 <FormControl fullWidth>
-                    <InputLabel
+                    <StyledInputLabel
                         id="instance-select-label"
                         htmlFor="instance-select"
-                        sx={{
-                            color:
-                                theme.palette.mode === "dark"
-                                    ? theme.palette.primary[200]
-                                    : theme.palette.secondary.main,
-                        }}
                     >
                         Instance
-                    </InputLabel>
-                    <Select
+                    </StyledInputLabel>
+                    <StyledSelect
                         labelId="instance-select-label"
                         id="instance-select"
                         value={selectedInstance}
                         label="Instance"
                         onChange={handleInstanceSelectChange}
-                        sx={{
-                            width: "80%",
-
-                            color:
-                                theme.palette.mode === "dark"
-                                    ? theme.palette.primary[200]
-                                    : theme.palette.secondary.main,
-                            ".MuiOutlinedInput-input": {
-                                color:
-                                    theme.palette.mode === "dark"
-                                        ? theme.palette.primary[200]
-                                        : theme.palette.secondary.main,
-                            },
-                        }}
                         inputProps={{
                             name: "instance",
                             id: "instance-select",
@@ -109,7 +122,7 @@ export default function SidebarItems({
                             Blackfathom Deeps
                         </MenuItem>
                         <MenuItem value="Gnomeregan">Gnomeregan</MenuItem>
-                    </Select>
+                    </StyledSelect>
                 </FormControl>
             ),
         },
@@ -117,15 +130,7 @@ export default function SidebarItems({
             id: 2,
             name: "Lockout",
             icon: (
-                <EditCalendarIcon
-                    sx={{
-                        fontSize: materialIconSize,
-                        color:
-                            theme.palette.mode === "dark"
-                                ? theme.palette.primary[200]
-                                : theme.palette.secondary.main,
-                    }}
-                />
+                <StyledEditCalendarIcon materialIconSize={materialIconSize} />
             ),
             content: (
                 <SidebarCalendar

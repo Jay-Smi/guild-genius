@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Typography, useTheme } from "@mui/material";
+import { Box, Button, Grid, Typography, styled, useTheme } from "@mui/material";
 import { useContext, useMemo, useState } from "react";
 import { RosterContext } from "../../store/RosterContextProvider";
 import { useStore } from "zustand";
@@ -13,6 +13,20 @@ import useCreateGroupCharacters from "../../../../../../hooks/postLockout/useCre
 import useCreateRaidTags from "../../../../../../hooks/postLockout/useCreateRaidTags";
 import { queryClient } from "../../../../../../config";
 import toast from "react-hot-toast";
+
+const StyledAlphaBox = styled(Box)(({ theme }) => ({
+    maxWidth: "300px",
+    display: "flex",
+    justifyContent: "center",
+}));
+
+const StyledCharactersBox = styled(Box)(({ theme }) => ({
+    width: "100%",
+    display: "flex",
+    justifyContent: "center",
+}));
+
+const StyledButton = styled(Button)(({ theme }) => ({ width: "100%" }));
 
 export default function RosterSettings() {
     const theme = useTheme();
@@ -407,22 +421,10 @@ export default function RosterSettings() {
     }
 
     return (
-        <Box
-            sx={{
-                maxWidth: "300px",
-                display: "flex",
-                justifyContent: "center",
-            }}
-        >
+        <StyledAlphaBox>
             <Grid container spacing={1}>
                 <Grid item xs={6}>
-                    <Box
-                        sx={{
-                            width: "100%",
-                            display: "flex",
-                            justifyContent: "center",
-                        }}
-                    >
+                    <StyledCharactersBox>
                         <Typography
                             variant="subtitle1"
                             color={
@@ -433,16 +435,10 @@ export default function RosterSettings() {
                         >
                             Characters: {charactersLength}
                         </Typography>
-                    </Box>
+                    </StyledCharactersBox>
                 </Grid>
                 <Grid item xs={6}>
-                    <Box
-                        sx={{
-                            width: "100%",
-                            display: "flex",
-                            justifyContent: "center",
-                        }}
-                    >
+                    <StyledCharactersBox>
                         <Typography
                             variant="subtitle1"
                             color={
@@ -453,69 +449,53 @@ export default function RosterSettings() {
                         >
                             Raids: {raids.length}
                         </Typography>
-                    </Box>
+                    </StyledCharactersBox>
                 </Grid>
                 <Grid item xs={6}>
-                    <Button
+                    <StyledButton
                         variant="contained"
                         color="primary"
                         onClick={handleAddRaid}
-                        sx={{ width: "100%" }}
                     >
                         Add Raid
-                    </Button>
+                    </StyledButton>
                 </Grid>
                 <Grid item xs={6}>
-                    <Box
-                        sx={{
-                            width: "100%",
-                            display: "flex",
-                            flexDirection: "row-reverse",
-                        }}
-                    >
-                        <Button
+                    <StyledCharactersBox>
+                        <StyledButton
                             variant="contained"
                             color="primary"
                             onClick={() => console.log("clicked")}
-                            sx={{ width: "100%" }}
                         >
                             Import Lockout
-                        </Button>
-                    </Box>
+                        </StyledButton>
+                    </StyledCharactersBox>
                 </Grid>
                 <Grid item xs={12}>
-                    <Button
+                    <StyledButton
                         variant="contained"
                         color="primary"
                         onClick={() => console.log("clicked")}
-                        sx={{ width: "100%" }}
                     >
                         Auto Fill
-                    </Button>
+                    </StyledButton>
                 </Grid>
                 {/* <Grid item xs={6}></Grid> */}
                 <Grid item xs={12}>
-                    <Box
-                        sx={{
-                            width: "100%",
-                            display: "flex",
-                            flexDirection: "row-reverse",
-                        }}
-                    >
-                        <Button
+                    <StyledCharactersBox>
+                        <StyledButton
                             variant="contained"
                             color="secondary"
                             onClick={handleSaveLockouts}
-                            sx={{ width: "100%" }}
                             disabled={submitting}
                         >
                             {selectedLockoutsLength > 2
                                 ? "Save Lockouts"
                                 : "Save Lockout"}
-                        </Button>
-                    </Box>
+                        </StyledButton>
+                    </StyledCharactersBox>
                 </Grid>
             </Grid>
-        </Box>
+        </StyledAlphaBox>
     );
 }

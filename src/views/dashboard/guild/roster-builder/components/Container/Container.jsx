@@ -1,4 +1,11 @@
-import { forwardRef, memo, useContext, useMemo, useState } from "react";
+import {
+    forwardRef,
+    memo,
+    useContext,
+    useEffect,
+    useMemo,
+    useState,
+} from "react";
 import { classNames } from "../../../../../../utils/helpers.js";
 import KeyboardDoubleArrowUpIcon from "@mui/icons-material/KeyboardDoubleArrowUp";
 import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrowDown";
@@ -20,6 +27,7 @@ import {
     Stack,
     Tooltip,
     Typography,
+    styled,
     useTheme,
 } from "@mui/material";
 import { RosterContext } from "../../store/RosterContextProvider.jsx";
@@ -28,6 +36,38 @@ import RaidContainerButtons from "./RaidContainerButtons.jsx";
 import NonCategoryContainerButtons from "./NonCategoryContainerButtons.jsx";
 import RaidTagForm from "./RaidTagForm.jsx";
 import dayjs from "dayjs";
+
+const StyledIconButton = styled(IconButton)(({ theme }) => ({
+    borderRadius: "5px",
+}));
+
+const StyledKeyboardDoubleArrowUpIcon = styled(KeyboardDoubleArrowUpIcon)(
+    ({ theme }) => ({
+        width: "22px",
+        color:
+            theme.palette.mode === "dark"
+                ? theme.palette.text.dark
+                : theme.palette.grey[500],
+    })
+);
+const StyledKeyboardDoubleArrowDownIcon = styled(KeyboardDoubleArrowDownIcon)(
+    ({ theme }) => ({
+        width: "22px",
+        color:
+            theme.palette.mode === "dark"
+                ? theme.palette.text.dark
+                : theme.palette.grey[500],
+    })
+);
+
+const StyledStack = styled(Stack)(({ theme }) => ({
+    padding: "8px",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    width: "100%",
+}));
+
+const StyledBadge = styled(Badge)(({ theme }) => ({ pb: 1 }));
 
 const Container = memo(
     forwardRef(
@@ -43,6 +83,7 @@ const Container = memo(
                 type,
                 overlay,
                 id,
+                dragOverlay,
                 ...props
             },
             ref
@@ -128,6 +169,18 @@ const Container = memo(
 
             let raidsCharacters = null;
             let raidsGroups = null;
+
+            // useEffect(() => {
+            //     if (!dragOverlay) {
+            //         return;
+            //     }
+
+            //     document.body.style.cursor = "grabbing";
+
+            //     return () => {
+            //         document.body.style.cursor = "";
+            //     };
+            // }, [dragOverlay]);
             if (container.type === "raid") {
                 raidsGroups = containers.filter(
                     (c) => c.type === "group" && container.data.includes(c.id)
@@ -327,39 +380,16 @@ const Container = memo(
                                         : "Expand Category"
                                 }
                             >
-                                <IconButton
+                                <StyledIconButton
                                     onClick={toggleOpenContainer}
                                     size="small"
-                                    sx={{ borderRadius: 1 }}
                                 >
                                     {isOpen ? (
-                                        <KeyboardDoubleArrowUpIcon
-                                            sx={{
-                                                width: "22px",
-                                                color:
-                                                    theme.palette.mode ===
-                                                    "dark"
-                                                        ? theme.palette.text
-                                                              .dark
-                                                        : theme.palette
-                                                              .grey[500],
-                                            }}
-                                        />
+                                        <StyledKeyboardDoubleArrowUpIcon />
                                     ) : (
-                                        <KeyboardDoubleArrowDownIcon
-                                            sx={{
-                                                width: "22px",
-                                                color:
-                                                    theme.palette.mode ===
-                                                    "dark"
-                                                        ? theme.palette.text
-                                                              .dark
-                                                        : theme.palette
-                                                              .grey[500],
-                                            }}
-                                        />
+                                        <StyledKeyboardDoubleArrowDownIcon />
                                     )}
-                                </IconButton>
+                                </StyledIconButton>
                             </Tooltip>
                         </ButtonGroup>
                     </Box>
@@ -409,18 +439,12 @@ const Container = memo(
                         </Grid>
                     )}
                     {type === "raid" && raidErrors.length > 0 && (
-                        <Stack
+                        <StyledStack
                             direction="row"
                             spacing={1}
                             divider={
                                 <Divider orientation="vertical" flexItem />
                             }
-                            sx={{
-                                p: 2,
-                                flexWrap: "wrap",
-                                justifyContent: "center",
-                                width: "100%",
-                            }}
                         >
                             {raidErrors.map((error) => {
                                 return (
@@ -432,7 +456,7 @@ const Container = memo(
                                     />
                                 );
                             })}
-                        </Stack>
+                        </StyledStack>
                     )}
                     {isOpen && <ul>{children}</ul>}
 
@@ -440,30 +464,23 @@ const Container = memo(
 
                     {type === "raid" && (
                         <>
-                            <Stack
+                            <StyledStack
                                 direction="row"
                                 spacing={1}
                                 divider={
                                     <Divider orientation="vertical" flexItem />
                                 }
-                                sx={{
-                                    p: 2,
-                                    flexWrap: "wrap",
-                                    justifyContent: "center",
-                                    width: "100%",
-                                }}
                             >
                                 {container?.tags &&
                                     container.tags?.length > 0 &&
                                     container.tags?.map((tag) => {
                                         return (
-                                            <Badge
+                                            <StyledBadge
                                                 key={tag.tag}
                                                 badgeContent={Number(
                                                     tag.amount
                                                 )}
                                                 color="secondary"
-                                                sx={{ pb: 1 }}
                                             >
                                                 <Chip
                                                     label={tag.tag}
@@ -472,10 +489,10 @@ const Container = memo(
                                                         handleRemoveTag(tag.tag)
                                                     }
                                                 />
-                                            </Badge>
+                                            </StyledBadge>
                                         );
                                     })}
-                            </Stack>
+                            </StyledStack>
                             <RaidTagForm
                                 container={container}
                                 tagDialogOpen={tagDialogOpen}

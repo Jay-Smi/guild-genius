@@ -17,7 +17,6 @@ function Day(props) {
             selected={false}
             isSelected={isInSameLockout(day, selectedDay)}
             isHovered={isInSameLockout(day, hoveredDay)}
-            sx={{ fontSize: "1rem" }}
             isInChosenLockout={isInChosenLockout}
         />
     );

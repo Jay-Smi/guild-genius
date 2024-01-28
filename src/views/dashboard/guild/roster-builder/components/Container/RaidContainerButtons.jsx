@@ -1,4 +1,4 @@
-import { Divider, IconButton, Tooltip, useTheme } from "@mui/material";
+import { Divider, IconButton, Tooltip, styled, useTheme } from "@mui/material";
 import SettingsSuggestIcon from "@mui/icons-material/SettingsSuggest";
 import EditAttributesIcon from "@mui/icons-material/EditAttributes";
 import AddToPhotosIcon from "@mui/icons-material/AddToPhotos";
@@ -9,108 +9,65 @@ import { useStore } from "zustand";
 import ChooseDate from "./ChooseDate";
 import ChooseTime from "./ChooseTime";
 
+const StyledIconButton = styled(IconButton)(({ theme }) => ({
+    borderRadius: "5px",
+}));
+
+const StyledAddToPhotosIcon = styled(AddToPhotosIcon)(({ theme }) => ({
+    width: "20px",
+    color:
+        theme.palette.mode === "dark"
+            ? theme.palette.text.hint
+            : theme.palette.grey[500],
+}));
+
+const StyledDivider = styled(Divider)(({ theme }) => ({
+    borderRightWidth: 2,
+    borderColor:
+        theme.palette.mode === "dark"
+            ? theme.palette.text.hint
+            : theme.palette.grey[400],
+    marginRight: "5px",
+    marginLeft: "5px",
+}));
+
+const StyledEditAttributesIcon = styled(EditAttributesIcon)(({ theme }) => ({
+    width: "20px",
+    color:
+        theme.palette.mode === "dark"
+            ? theme.palette.text.hint
+            : theme.palette.grey[500],
+}));
+
 function RaidContainerButtons({ handleAddGroup, handleClickOpenDialog, id }) {
-    const theme = useTheme();
     const rosterStore = useContext(RosterContext);
     const selectedTab = useStore(rosterStore, (state) => state.selectedTab);
     return (
         <>
             <Tooltip title="Add Group">
-                <IconButton
-                    onClick={handleAddGroup}
-                    size="small"
-                    sx={{ borderRadius: 1 }}
-                >
-                    <AddToPhotosIcon
-                        sx={{
-                            width: "20px",
-                            color:
-                                theme.palette.mode === "dark"
-                                    ? theme.palette.text.hint
-                                    : theme.palette.grey[500],
-                        }}
-                    />
-                </IconButton>
+                <StyledIconButton onClick={handleAddGroup} size="small">
+                    <StyledAddToPhotosIcon />
+                </StyledIconButton>
             </Tooltip>
-            <Divider
-                orientation="vertical"
-                flexItem
-                sx={{
-                    borderRightWidth: 2,
-                    borderColor:
-                        theme.palette.mode === "dark"
-                            ? theme.palette.text.hint
-                            : theme.palette.grey[400],
-                    marginRight: 1,
-                    marginLeft: 1,
-                }}
-            />
+            <StyledDivider orientation="vertical" flexItem />
             {/*///////////////////////////////////////////////////*/}
             {selectedTab !== 0 && (
                 <>
                     <ChooseDate id={id} />
 
-                    <Divider
-                        orientation="vertical"
-                        flexItem
-                        sx={{
-                            borderRightWidth: 2,
-                            borderColor:
-                                theme.palette.mode === "dark"
-                                    ? theme.palette.text.hint
-                                    : theme.palette.grey[400],
-                            marginRight: 1,
-                            marginLeft: 1,
-                        }}
-                    />
+                    <StyledDivider orientation="vertical" flexItem />
                     {/*///////////////////////////////////////////////////*/}
                     <ChooseTime id={id} />
-                    <Divider
-                        orientation="vertical"
-                        flexItem
-                        sx={{
-                            borderRightWidth: 2,
-                            borderColor:
-                                theme.palette.mode === "dark"
-                                    ? theme.palette.text.hint
-                                    : theme.palette.grey[400],
-                            marginRight: 1,
-                            marginLeft: 1,
-                        }}
-                    />
+                    <StyledDivider orientation="vertical" flexItem />
                 </>
             )}
             {/*///////////////////////////////////////////////////*/}
             <Tooltip title="Edit Tags">
-                <IconButton
-                    onClick={handleClickOpenDialog}
-                    size="small"
-                    sx={{ borderRadius: 1 }}
-                >
-                    <EditAttributesIcon
-                        sx={{
-                            width: "20px",
-                            color:
-                                theme.palette.mode === "dark"
-                                    ? theme.palette.text.hint
-                                    : theme.palette.grey[500],
-                        }}
-                    />
-                </IconButton>
+                <StyledIconButton onClick={handleClickOpenDialog} size="small">
+                    <StyledEditAttributesIcon />
+                </StyledIconButton>
             </Tooltip>
-            <Divider
-                orientation="vertical"
-                flexItem
-                sx={{
-                    borderRightWidth: 2,
-                    borderColor:
-                        theme.palette.mode === "dark"
-                            ? theme.palette.text.hint
-                            : theme.palette.grey[400],
-                    marginRight: 1,
-                    marginLeft: 1,
-                }}
-            />
+            <StyledDivider orientation="vertical" flexItem />
         </>
     );
 }

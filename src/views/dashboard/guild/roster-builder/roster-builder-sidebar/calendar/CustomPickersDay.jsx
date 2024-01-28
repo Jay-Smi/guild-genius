@@ -16,7 +16,7 @@ const CustomPickersDay = styled(PickersDay, {
 
     return {
         borderRadius: 0,
-
+        fontSize: "1rem",
         ...(isInChosenLockout && {
             backgroundColor: theme.palette.success.main,
             "&:hover, &:focus": {

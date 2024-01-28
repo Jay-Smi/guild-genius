@@ -29,7 +29,7 @@ import {
     isTank,
 } from "../../../../../utils/wowHelpers";
 const DndProvider = memo(() => {
-    console.log("DndProvider Mount");
+    console.log("DndProvider");
     const rosterStore = useContext(RosterContext);
     const activeId = useStore(rosterStore, (state) => state.activeId);
     const selectedTab = useStore(rosterStore, (state) => state.selectedTab);
@@ -466,10 +466,7 @@ const DndProvider = memo(() => {
                     (item) => item !== id
                 );
 
-                modifiedContainers = cloneAndUpdateContainers(
-                    modifiedContainers,
-                    parentContainer
-                );
+                modifiedContainers = (modifiedContainers, parentContainer);
             }
 
             const newContainers = modifiedContainers.filter(
@@ -480,19 +477,16 @@ const DndProvider = memo(() => {
         },
         [containers, setContainers, getActualContainer]
     );
-    const measuring = useMemo(
-        () => ({
-            droppable: {
-                strategy: MeasuringStrategy.Always,
-            },
-        }),
-        []
-    );
+    const measuring = useRef({
+        droppable: {
+            strategy: MeasuringStrategy.Always,
+        },
+    });
     return (
         <DndContext
             sensors={sensors}
             collisionDetection={collisionDetectionStrategy}
-            measuring={measuring}
+            measuring={measuring.current}
             onDragStart={handleDragStart}
             onDragOver={handleDragOver}
             onDragEnd={handleDragEnd}

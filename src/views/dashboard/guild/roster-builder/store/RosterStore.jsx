@@ -128,14 +128,14 @@ const createRosterStore = ({
                         }));
                     },
                     setContainers: (containers) => {
-                        const newTabsContainers = {};
-                        Object.keys(get().tabsContainers).forEach((tab) => {
-                            newTabsContainers[tab] = containers;
-                        });
+                        // const newTabsContainers = {};
+                        // Object.keys(get().tabsContainers).forEach((tab) => {
+                        //     newTabsContainers[tab] = containers;
+                        // });
                         set((state) => ({
                             ...state,
                             containers: containers,
-                            tabsContainers: newTabsContainers,
+                            // tabsContainers: newTabsContainers,
                         }));
                     },
 
