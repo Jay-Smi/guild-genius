@@ -11,12 +11,12 @@ import {
     Tooltip,
     useTheme,
 } from "@mui/material";
-import { useContext, useMemo, useState } from "react";
+import { memo, useContext, useMemo, useState } from "react";
 import { RosterContext } from "../../store/RosterContextProvider";
 import { useStore } from "zustand";
 import dayjs from "dayjs";
 
-function ChooseDate({ id: raidId }) {
+const ChooseDate = memo(({ id: raidId }) => {
     const theme = useTheme();
     const [anchorEl, setAnchorEl] = useState(null);
     const rosterStore = useContext(RosterContext);
@@ -132,6 +132,6 @@ function ChooseDate({ id: raidId }) {
             </Popover>
         </>
     );
-}
-
+});
+ChooseDate.displayName = "ChooseDate";
 export default ChooseDate;

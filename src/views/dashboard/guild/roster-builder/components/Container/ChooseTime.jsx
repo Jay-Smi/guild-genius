@@ -11,7 +11,7 @@ import {
     Tooltip,
     useTheme,
 } from "@mui/material";
-import { useContext, useMemo, useState } from "react";
+import { memo, useContext, useMemo, useState } from "react";
 import { RosterContext } from "../../store/RosterContextProvider";
 import { useStore } from "zustand";
 import dayjs from "dayjs";
@@ -22,7 +22,7 @@ import { format, parseISO, set } from "date-fns";
 
 dayjs.extend(customParseFormat);
 
-function ChooseTime({ id: raidId }) {
+const ChooseTime = memo(({ id: raidId }) => {
     const theme = useTheme();
     const defaultTime = new Date();
     defaultTime.setHours(20);
@@ -131,6 +131,6 @@ function ChooseTime({ id: raidId }) {
             </Popover>
         </>
     );
-}
-
+});
+ChooseTime.displayName = "ChooseTime";
 export default ChooseTime;

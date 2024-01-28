@@ -3,7 +3,7 @@ import {
     SortableContext,
     rectSortingStrategy as strategy,
 } from "@dnd-kit/sortable";
-import { useCallback, useContext, useMemo } from "react";
+import { memo, useCallback, useContext, useMemo } from "react";
 import { createPortal } from "react-dom";
 import Container from "../components/Container/Container";
 import DroppableContainer from "../components/DroppableContainer";
@@ -21,7 +21,7 @@ import {
     isTank,
 } from "../../../../../utils/wowHelpers";
 
-export default function RosterBuilderActual({ handleRemove, containers }) {
+const RosterBuilderActual = memo(({ handleRemove, containers }) => {
     console.log("RosterBuilder Actual Mount");
     const rosterStore = useContext(RosterContext);
 
@@ -373,4 +373,7 @@ export default function RosterBuilderActual({ handleRemove, containers }) {
             </Container>
         );
     }
-}
+});
+
+RosterBuilderActual.displayName = "RosterBuilderActual";
+export default RosterBuilderActual;

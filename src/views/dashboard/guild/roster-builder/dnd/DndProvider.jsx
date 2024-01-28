@@ -9,7 +9,14 @@ import {
     useSensor,
     useSensors,
 } from "@dnd-kit/core";
-import { useCallback, useContext, useMemo, useState } from "react";
+import {
+    memo,
+    useCallback,
+    useContext,
+    useMemo,
+    useRef,
+    useState,
+} from "react";
 import { RosterContext } from "../store/RosterContextProvider";
 import { useStore } from "zustand";
 import { coordinateGetter } from "../../../../../utils/helpers";
@@ -21,7 +28,7 @@ import {
     isRanged,
     isTank,
 } from "../../../../../utils/wowHelpers";
-function DndProvider({ children }) {
+const DndProvider = memo(() => {
     console.log("DndProvider Mount");
     const rosterStore = useContext(RosterContext);
     const activeId = useStore(rosterStore, (state) => state.activeId);
@@ -70,7 +77,7 @@ function DndProvider({ children }) {
 
     const [clonedItems, setClonedItems] = useState(null);
     const activeContainer = activeId ? getActualContainer(activeId) : null;
-    console.log("activeContainer", activeContainer);
+
     const sensors = useSensors(
         useSensor(MouseSensor),
         useSensor(TouchSensor),
@@ -118,7 +125,7 @@ function DndProvider({ children }) {
             }
 
             if (activeContainer.type === "character") {
-                return rectIntersection({
+                return closestCorners({
                     ...args,
                     droppableContainers: args.droppableContainers.filter(
                         (container) => {
@@ -497,6 +504,7 @@ function DndProvider({ children }) {
             />
         </DndContext>
     );
-}
+});
 
+DndProvider.displayName = "DndProvider";
 export default DndProvider;

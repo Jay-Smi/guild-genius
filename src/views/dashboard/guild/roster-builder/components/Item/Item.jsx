@@ -12,6 +12,7 @@ import {
 import { RosterContext } from "../../store/RosterContextProvider.jsx";
 import { useStore } from "zustand";
 import { Typography, useTheme } from "@mui/material";
+import { useShallow } from "zustand/react/shallow";
 
 export const Item = memo(
     forwardRef(
