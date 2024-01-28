@@ -109,6 +109,38 @@ const Container = forwardRef(
         });
         const [tagForm, setTagForm] = useState(tagFormInitialState);
 
+        let raidsCharacters = null;
+        let raidsGroups = null;
+        if (container.type === "raid") {
+            raidsGroups = containers.filter(
+                (c) => c.type === "group" && container.data.includes(c.id)
+            );
+            raidsCharacters = raidsGroups
+                .map((group) => {
+                    return containers
+                        .filter(
+                            (c) =>
+                                c.type === "character" &&
+                                group.data.includes(c.id)
+                        )
+                        .flat();
+                })
+                .flat();
+        }
+
+        const raidContainsDuplicatePlayer = raidsCharacters?.some(
+            (character) => {
+                return (
+                    raidsCharacters.filter(
+                        (c) => c.player_id === character.player_id
+                    ).length > 1
+                );
+            }
+        );
+
+        const raidErrors = [];
+        if (raidContainsDuplicatePlayer) raidErrors.push("Duplicate Player");
+
         const handleToggleChecked = (tag) => {
             setTagForm((prevState) => ({
                 ...prevState,
@@ -347,6 +379,30 @@ const Container = forwardRef(
                             </Typography>
                         </Grid>
                     </Grid>
+                )}
+                {type === "raid" && raidErrors.length > 0 && (
+                    <Stack
+                        direction="row"
+                        spacing={1}
+                        divider={<Divider orientation="vertical" flexItem />}
+                        sx={{
+                            p: 2,
+                            flexWrap: "wrap",
+                            justifyContent: "center",
+                            width: "100%",
+                        }}
+                    >
+                        {raidErrors.map((error) => {
+                            return (
+                                <Chip
+                                    key={error}
+                                    label={error}
+                                    size="small"
+                                    color="error"
+                                />
+                            );
+                        })}
+                    </Stack>
                 )}
                 {isOpen && <ul>{children}</ul>}
 

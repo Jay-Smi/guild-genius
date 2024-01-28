@@ -2,30 +2,24 @@ import { useSortable } from "@dnd-kit/sortable";
 import { useEffect, useState } from "react";
 import { Item } from "./Item/Item";
 
-function useMountStatus() {
-    const [isMounted, setIsMounted] = useState(false);
+// function useMountStatus() {
+//     const [isMounted, setIsMounted] = useState(false);
 
-    useEffect(() => {
-        const timeout = setTimeout(() => setIsMounted(true), 500);
+//     useEffect(() => {
+//         const timeout = setTimeout(() => setIsMounted(true), 500);
 
-        return () => clearTimeout(timeout);
-    }, []);
+//         return () => clearTimeout(timeout);
+//     }, []);
 
-    return isMounted;
-}
+//     return isMounted;
+// }
 
 function SortableItem({
-    disabled,
     id,
     index,
     renderItem,
-    style,
-    containerId,
-    getIndex,
     characterId,
     activeCharacterId,
-
-    activePlayer,
 }) {
     const {
         setNodeRef,
@@ -41,8 +35,8 @@ function SortableItem({
         id,
     });
 
-    const mounted = useMountStatus();
-    const mountedWhileDragging = isDragging && !mounted;
+    // const mounted = useMountStatus();
+    // const mountedWhileDragging = isDragging && !mounted;
 
     return (
         <Item
@@ -54,7 +48,7 @@ function SortableItem({
             index={index}
             transition={transition}
             transform={transform}
-            fadeIn={mountedWhileDragging}
+            // fadeIn={mountedWhileDragging}
             listeners={listeners}
             renderItem={renderItem}
             characterId={characterId}

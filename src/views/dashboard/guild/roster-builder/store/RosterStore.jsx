@@ -22,6 +22,7 @@ const createRosterStore = ({
                     chosenLockouts: [{ type: "all" }],
                     hasAlteredTabContainer: false,
                     hasAcknowledgedAlteredTabContainer: false,
+                    activeId: null,
                     selectedTab: 0,
                     selectedInstance: "",
                     categories,
@@ -65,6 +66,21 @@ const createRosterStore = ({
                             data: [initialIds[0]],
                         },
                     ],
+
+                    getContainer: (id, tab) => {
+                        if (tab) {
+                            return get().tabsContainers[tab].find(
+                                (container) => container.id === id
+                            );
+                        }
+                        return get().containers.find(
+                            (container) => container.id === id
+                        );
+                    },
+
+                    setActiveId: (activeId) => {
+                        set((state) => ({ ...state, activeId }));
+                    },
 
                     setSelectedInstance: (selectedInstance) => {
                         set((state) => ({ ...state, selectedInstance }));

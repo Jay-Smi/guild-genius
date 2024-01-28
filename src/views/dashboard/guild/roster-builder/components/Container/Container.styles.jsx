@@ -10,13 +10,14 @@ export const StyledRaid = styled.div`
     outline: none;
     resize: horizontal;
     min-width: 330px;
+    max-width: 1140px;
     height: "auto";
     min-height: ${(props) => (props.isopen ? "100px" : 0)};
     border-radius: 12px;
     background-color: ${(props) => {
         return props.theme.palette.mode === "dark"
             ? props.theme.palette.background.dark2
-            : props.theme.palette.grey[50];
+            : props.theme.palette.grey[100];
     }};
     /* border: 1px solid
         ${(props) => {
@@ -63,7 +64,7 @@ export const StyledRaid = styled.div`
         background-color: ${(props) => {
             return props.theme.palette.mode === "dark"
                 ? props.theme.palette.background.dark2
-                : props.theme.palette.grey[50];
+                : props.theme.palette.grey[100];
         }};
         border-bottom-left-radius: 12px;
         border-bottom-right-radius: 12px;
@@ -91,7 +92,7 @@ export const StyledGroup = styled.div`
     background-color: ${(props) => {
         return props.theme.palette.mode === "dark"
             ? props.theme.palette.background.dark1
-            : props.theme.palette.grey[50];
+            : props.theme.palette.grey[300];
     }};
     box-shadow: ${(props) => {
         return props.theme.palette.mode === "dark"
@@ -135,7 +136,7 @@ export const StyledGroup = styled.div`
         background-color: ${(props) => {
             return props.theme.palette.mode === "dark"
                 ? props.theme.palette.background.dark1
-                : props.theme.palette.paper;
+                : props.theme.palette.grey[300];
         }};
         border-bottom-left-radius: 12px;
         border-bottom-right-radius: 12px;
@@ -161,7 +162,7 @@ export const StyledCategory = styled.div`
     background-color: ${(props) => {
         return props.theme.palette.mode === "dark"
             ? props.theme.palette.background.dark2
-            : props.theme.palette.grey[50];
+            : props.theme.palette.grey[100];
     }};
     /* border: 1px solid
         ${(props) => {

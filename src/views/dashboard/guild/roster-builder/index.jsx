@@ -27,6 +27,8 @@ import RosterContextProvider from "./store/RosterContextProvider";
 import AlteredTabAlert from "./components/AlteredTabAlert";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { DndContext } from "@dnd-kit/core";
+import DndProvider from "./dnd/DndProvider";
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
 
@@ -194,8 +196,9 @@ export default function RosterBuilder() {
                                     : " 2px 3px 10px 1px rgba(0, 0, 0, 0.155)",
                         }}
                     />
-                    <RosterBuilderActual />
+                    <DndProvider />
                 </Box>
+
                 <RosterBuilderSidebar />
                 <AlteredTabAlert />
             </LocalizationProvider>

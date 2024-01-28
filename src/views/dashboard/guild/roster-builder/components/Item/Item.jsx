@@ -52,6 +52,7 @@ export const Item = memo(
             const isActivePlayer =
                 activeCharacter &&
                 character.player_id === activeCharacter.player_id;
+
             useEffect(() => {
                 if (!dragOverlay) {
                     return;
