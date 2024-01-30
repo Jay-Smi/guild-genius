@@ -22,6 +22,7 @@ import { getLockoutStartAndEndDates } from "../../../../../utils/wowHelpers";
 import dayjs from "dayjs";
 import { useStore } from "zustand";
 import { RosterContext } from "../store/RosterContextProvider";
+import toast from "react-hot-toast";
 
 const StyledStack = styled(Stack, {
     shouldForwardProp: (prop) => prop !== "matchUpLg",
@@ -146,14 +147,15 @@ const RosterBuilderSidebar = () => {
 
     function handleDeleteLockout(lockout) {
         const newLockouts = chosenLockouts.filter((prevLockout) => {
-            return !isEqual(
-                parseISO(prevLockout.startDate),
-                parseISO(lockout.startDate)
-            );
+            return prevLockout.id !== lockout.id;
+            // return !isEqual(
+            //     parseISO(prevLockout.startDate),
+            //     parseISO(lockout.startDate)
+            // );
         });
-        if (chosenLockouts[selectedTab].id === lockout.id) {
-            setSelectedTab(0);
-        }
+
+        setSelectedTab(0);
+
         removeTabContainer(lockout.id);
         setChosenLockouts(newLockouts);
     }
@@ -170,6 +172,7 @@ const RosterBuilderSidebar = () => {
             return dayjs(lockout.startDate).isSame(dayjs(startDate));
         });
         if (alreadyAdded) {
+            toast.error("Lockout already added");
             return;
         }
 

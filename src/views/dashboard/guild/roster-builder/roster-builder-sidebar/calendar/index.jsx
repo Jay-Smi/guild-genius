@@ -80,7 +80,9 @@ export default function SidebarCalendar({
                                     )}
                                 </StyledTypography>
                                 <IconButton
-                                    onClick={() => handleDeleteLockout(lockout)}
+                                    onClick={() => {
+                                        handleDeleteLockout(lockout);
+                                    }}
                                 >
                                     <DeleteIcon />
                                 </IconButton>

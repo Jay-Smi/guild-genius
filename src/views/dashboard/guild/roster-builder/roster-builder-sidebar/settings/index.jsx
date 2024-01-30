@@ -232,11 +232,11 @@ export default function RosterSettings() {
 
     function remapRaidAndGroupIds(tabKey) {
         const newGroups = [];
-        const newRaids = tabsContainers[tabKey]
+        const newRaids = Object.values(tabsContainers[tabKey])
             .filter((container) => container.type === "raid")
             .map((raid) => {
                 const newRaidId = crypto.randomUUID();
-                tabsContainers[tabKey]
+                Object.values(tabsContainers[tabKey])
                     .filter(
                         (container) =>
                             container.type === "group" &&
@@ -244,6 +244,7 @@ export default function RosterSettings() {
                     )
                     .forEach((group) => {
                         const newGroupId = crypto.randomUUID();
+
                         newGroups.push({
                             ...group,
                             id: newGroupId,
@@ -252,7 +253,7 @@ export default function RosterSettings() {
                 return {
                     ...raid,
                     id: newRaidId,
-                    data: newGroups.map((group) => group.newId),
+                    data: newGroups.map((group) => group.id),
                 };
             });
 
@@ -289,14 +290,16 @@ export default function RosterSettings() {
         });
 
         const groups = newGroups.map((group) => {
+            const raid = newRaids.find((container) =>
+                container.data?.includes(group.id)
+            );
+
             const newGroup = {
                 id: group.id,
                 name: group.name,
                 guild_id: guildId,
                 guild_instance_lockout_id,
-                raid_id: newRaids.find((container) =>
-                    container.data?.includes(group.id)
-                ),
+                raid_id: raid.id,
             };
 
             return newGroup;
@@ -343,9 +346,9 @@ export default function RosterSettings() {
     function AnyRaidHasNoTime() {
         const tabRaidsWithNoTime = {};
         Object.keys(tabsContainers).forEach((lockoutId) => {
-            const raidContainers = tabsContainers[lockoutId].filter(
-                (container) => container.type === "raid"
-            );
+            const raidContainers = Object.values(
+                tabsContainers[lockoutId]
+            ).filter((container) => container.type === "raid");
             const raidsWithNoTime = raidContainers.filter((raid) => !raid.time);
 
             if (raidsWithNoTime.length !== 0) {
@@ -362,9 +365,9 @@ export default function RosterSettings() {
     function AnyRaidHasNoDate() {
         const tabRaidsWithNoDate = {};
         Object.keys(tabsContainers).forEach((lockoutId) => {
-            const raidContainers = tabsContainers[lockoutId].filter(
-                (container) => container.type === "raid"
-            );
+            const raidContainers = Object.values(
+                tabsContainers[lockoutId]
+            ).filter((container) => container.type === "raid");
             const raidsWithNoDate = raidContainers.filter((raid) => !raid.date);
 
             if (raidsWithNoDate.length !== 0) {
@@ -464,7 +467,7 @@ export default function RosterSettings() {
                         <StyledButton
                             variant="contained"
                             color="primary"
-                            onClick={() => console.log("clicked")}
+                            onClick={() => console.log("Sorry not ready yet")}
                         >
                             Import Lockout
                         </StyledButton>
@@ -474,7 +477,7 @@ export default function RosterSettings() {
                     <StyledButton
                         variant="contained"
                         color="primary"
-                        onClick={() => console.log("clicked")}
+                        onClick={() => console.log("Sorry not ready yet")}
                     >
                         Auto Fill
                     </StyledButton>

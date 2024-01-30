@@ -130,8 +130,12 @@ const createRosterStore = ({
                         }));
                     },
                     removeTabContainer: (tab) => {
-                        const newTabsContainers = { ...get().tabsContainers };
+                        const newTabsContainers = {
+                            ...get().tabsContainers,
+                            [tab]: null,
+                        };
                         delete newTabsContainers[tab];
+
                         set((state) => ({
                             ...state,
                             tabsContainers: newTabsContainers,

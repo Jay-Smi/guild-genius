@@ -23,10 +23,14 @@ import {
     AccordionDetails,
     AccordionSummary,
     Container,
+    Divider,
     Grid,
     Typography,
+    useTheme,
 } from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+
+import RaidHeader from "./raid-header";
+import Raid from "./raid";
 
 function GuildRaids() {
     //user, profile, characters, players, guild, currentGuildInstanceLockout
@@ -73,7 +77,7 @@ function GuildRaids() {
     } = useAllGuildsGroupCharacters(mainGuildId);
     const { raids, raidsError, isLoadingRaids } =
         useAllGuildsRaids(mainGuildId);
-
+    const theme = useTheme();
     const isLoadingAny =
         isLoadingLockouts ||
         isLoadingGroups ||
@@ -84,22 +88,30 @@ function GuildRaids() {
 
     const [value, setValue] = useState(0);
 
-    if (isLoadingAny) return <Loader />;
+    const userCharacterIds = characters.map((character) => character.id);
 
-    const selectedLockout = allGuildInstanceLockouts[value];
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
-
+    if (isLoadingAny) return <Loader />;
+    const selectedLockout = allGuildInstanceLockouts[value];
     return (
-        <Container>
-            <Box
+        <Grid container>
+            <Grid item xs={0} sm={0} md={1} lg={2} xl={3} />
+            <Grid
+                item
+                xs={12}
+                sm={12}
+                md={10}
+                lg={8}
+                xl={6}
                 sx={{
-                    flexGrow: 1,
-                    // maxWidth: { xs: 320, sm: 480, md: 600, lg: 800, xl: 1000 },
-                    width: "100%",
                     bgcolor: "background.paper",
                     borderRadius: borderRadius,
+                    boxShadow:
+                        theme.palette.mode === "dark"
+                            ? "4px 5px 5px 2px rgba(0, 0, 0, 0.459)"
+                            : " 2px 3px 10px 1px rgba(0, 0, 0, 0.155)",
                 }}
             >
                 <Tabs
@@ -131,114 +143,35 @@ function GuildRaids() {
                         );
                     })}
                 </Tabs>
-            </Box>
-            {raids
-                .filter(
-                    (raid) =>
-                        raid.guild_instance_lockout_id === selectedLockout.id
-                )
-                .map((raid) => {
-                    return (
-                        <Accordion
-                            key={raid.id}
-                            defaultExpanded
-                            sx={{ borderRadius: borderRadius / 2, p: 1 }}
-                        >
-                            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                                <Typography variant="h4">
-                                    {format(parseISO(raid.date), "MMM dd")}
-                                </Typography>
-                                <Typography variant="h4">
-                                    {raid.name}
-                                </Typography>
-                            </AccordionSummary>
-                            <AccordionDetails>
-                                <Grid container>
-                                    {groups
-                                        .filter(
-                                            (group) => group.raid_id === raid.id
-                                        )
-                                        .map((group) => {
-                                            return (
-                                                <Grid
-                                                    item
-                                                    key={group.id}
-                                                    lg={6}
-                                                    md={6}
-                                                    sm={6}
-                                                    xs={12}
-                                                >
-                                                    <Container
-                                                        sx={{
-                                                            display: "flex",
-                                                            flexDirection:
-                                                                "column",
-                                                            alignItems:
-                                                                "center",
-                                                        }}
-                                                    >
-                                                        <Typography variant="h5">
-                                                            {group.name}
-                                                        </Typography>
-                                                        {guildGroupCharacters
-                                                            .filter(
-                                                                (
-                                                                    guildGroupCharacter
-                                                                ) =>
-                                                                    guildGroupCharacter.group_id ===
-                                                                    group.id
-                                                            )
-                                                            .map(
-                                                                (
-                                                                    guildGroupCharacter
-                                                                ) => {
-                                                                    return (
-                                                                        <div
-                                                                            key={
-                                                                                guildGroupCharacter.id
-                                                                            }
-                                                                        >
-                                                                            {guildCharacters
-                                                                                ?.filter(
-                                                                                    (
-                                                                                        guildCharacter
-                                                                                    ) =>
-                                                                                        guildCharacter.id ===
-                                                                                        guildGroupCharacter.character_id
-                                                                                )
-                                                                                .map(
-                                                                                    (
-                                                                                        guildCharacter
-                                                                                    ) => {
-                                                                                        return (
-                                                                                            <div
-                                                                                                key={
-                                                                                                    guildCharacter.id
-                                                                                                }
-                                                                                            >
-                                                                                                <Typography variant="h6">
-                                                                                                    {
-                                                                                                        guildCharacter.character_name
-                                                                                                    }
-                                                                                                </Typography>
-                                                                                            </div>
-                                                                                        );
-                                                                                    }
-                                                                                )}
-                                                                        </div>
-                                                                    );
-                                                                }
-                                                            )}
-                                                    </Container>
-                                                </Grid>
-                                            );
-                                        })}
-                                </Grid>
-                            </AccordionDetails>
-                        </Accordion>
-                    );
-                })}
-        </Container>
+            </Grid>
+            <Grid item xs={0} sm={0} md={1} lg={2} xl={3} />
+            <Grid item xs={0} sm={0} md={1} lg={2} xl={3} />
+            <Grid item xs={12} sm={12} md={10} lg={8} xl={6}>
+                {raids
+                    .filter(
+                        (raid) =>
+                            raid.guild_instance_lockout_id ===
+                            selectedLockout.id
+                    )
+                    .map((raid) => {
+                        const raidsGroups = groups.filter(
+                            (group) => group.raid_id === raid.id
+                        );
+
+                        return (
+                            <Raid
+                                key={raid.id}
+                                borderRadius={borderRadius}
+                                raidsGroups={raidsGroups}
+                                raid={raid}
+                                guildCharacters={guildCharacters}
+                                guildGroupCharacters={guildGroupCharacters}
+                                userCharacterIds={userCharacterIds}
+                            />
+                        );
+                    })}
+            </Grid>
+        </Grid>
     );
 }
 
