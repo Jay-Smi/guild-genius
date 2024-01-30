@@ -85,15 +85,20 @@ const ChooseDate = memo(({ id: raidId }) => {
     });
 
     const handleSelectDate = (date) => {
-        const newContainers = containers.map((container) =>
-            container.id === raidId
-                ? {
-                      ...container,
-                      data: [...container.data],
-                      date: date,
-                  }
-                : { ...container, data: container.data && [...container.data] }
-        );
+        // const newContainers = containers.map((container) =>
+        //     container.id === raidId
+        //         ? {
+        //               ...container,
+        //               data: [...container.data],
+        //               date: date,
+        //           }
+        //         : { ...container, data: container.data && [...container.data] }
+        // );
+
+        const newContainers = {
+            ...containers,
+            [raidId]: { ...containers[raidId], date: date },
+        };
         setContainers(newContainers);
         handleClose();
     };

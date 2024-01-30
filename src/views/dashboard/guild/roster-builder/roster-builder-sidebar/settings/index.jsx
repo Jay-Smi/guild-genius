@@ -41,7 +41,9 @@ export default function RosterSettings() {
         (state) => state.chosenLockouts.length
     );
     const raids = useStore(rosterStore, (state) =>
-        state.containers.filter((container) => container.type === "raid")
+        Object.values(state.containers).filter(
+            (container) => container.type === "raid"
+        )
     );
     const storeContainers = useStore(rosterStore, (state) => state.containers);
     const setStoreContainers = useStore(
@@ -380,44 +382,41 @@ export default function RosterSettings() {
         const newRaidId = crypto.randomUUID();
         const newGroup1Id = crypto.randomUUID();
         const newGroup2Id = crypto.randomUUID();
-        const raidsLength = containers.filter(
+        const raidsLength = Object.values(containers).filter(
             (container) => container.type === "raid"
         ).length;
-        const newContainers = [
-            ...containers,
-            {
-                id: newRaidId,
-                type: "raid",
-                data: [newGroup1Id, newGroup2Id],
-                name: `Raid ${raidsLength + 1}`,
-            },
-            {
-                id: newGroup1Id,
-                type: "group",
-                data: [],
-                name: "Group 1",
-            },
-            {
-                id: newGroup2Id,
-                type: "group",
-                data: [],
-                name: "Group 2",
-            },
-        ];
 
-        const raidsContainer = newContainers.find(
-            (container) => container.id === "raidsContainer"
-        );
-        const newRaidsContainer = {
-            ...raidsContainer,
-            data: [...raidsContainer.data, newRaidId],
+        const newContainers = { ...containers };
+
+        newContainers[newRaidId] = {
+            id: newRaidId,
+            type: "raid",
+            data: [newGroup1Id, newGroup2Id],
+            name: `Raid ${raidsLength + 1}`,
         };
 
-        const updatedContainers = newContainers.map((container) =>
-            container.id === "raidsContainer" ? newRaidsContainer : container
-        );
+        newContainers[newGroup1Id] = {
+            id: newGroup1Id,
+            type: "group",
+            data: [],
+            name: "Group 1",
+        };
 
-        setContainers(updatedContainers);
+        newContainers[newGroup2Id] = {
+            id: newGroup2Id,
+            type: "group",
+            data: [],
+            name: "Group 2",
+        };
+
+        const updatedRaidsContainer = {
+            ...newContainers.raidsContainer,
+            data: [...newContainers.raidsContainer.data, newRaidId],
+        };
+
+        newContainers.raidsContainer = updatedRaidsContainer;
+
+        setContainers(newContainers);
     }
 
     return (

@@ -15,6 +15,52 @@ const createRosterStore = ({
     players,
     characterTags,
 }) => {
+    const categoriesObject = categories.reduce((acc, category) => {
+        acc[category.id] = category;
+        return acc;
+    }, {});
+
+    const charactersObject = characters.reduce((acc, character) => {
+        acc[character.id] = character;
+        return acc;
+    }, {});
+
+    const containersObject = [
+        ...Object.values(categoriesObject),
+        ...Object.values(charactersObject),
+        {
+            id: initialIds[0],
+            type: "raid",
+            data: [initialIds[1], initialIds[2]],
+            name: "Raid 1",
+        },
+        {
+            id: initialIds[1],
+            type: "group",
+            data: [],
+            name: "Group 1",
+        },
+        {
+            id: initialIds[2],
+            type: "group",
+            data: [],
+            name: "Group 2",
+        },
+        {
+            id: "categoriesContainer",
+            type: "container",
+            data: Object.keys(categoriesObject),
+        },
+        {
+            id: "raidsContainer",
+            type: "container",
+            data: [initialIds[0]],
+        },
+    ].reduce((acc, container) => {
+        acc[container.id] = container;
+        return acc;
+    }, {});
+
     return createStore(
         persist(
             (set, get) => {
@@ -27,55 +73,19 @@ const createRosterStore = ({
                     selectedInstance: "",
                     categories,
                     characters,
-                    players,
+
                     characterTags,
                     tags: [
                         ...new Set(characterTags.map((tag) => tag.tag_name)),
                     ],
                     tabsContainers: {},
-                    containers: [
-                        ...categories,
-                        ...characters,
-                        {
-                            id: initialIds[0],
-                            type: "raid",
-                            data: [initialIds[1], initialIds[2]],
-                            name: "Raid 1",
-                        },
-                        {
-                            id: initialIds[1],
-                            type: "group",
-                            data: [],
-                            name: "Group 1",
-                        },
-                        {
-                            id: initialIds[2],
-                            type: "group",
-                            data: [],
-                            name: "Group 2",
-                        },
-
-                        {
-                            id: "categoriesContainer",
-                            type: "container",
-                            data: categories.map((category) => category.id),
-                        },
-                        {
-                            id: "raidsContainer",
-                            type: "container",
-                            data: [initialIds[0]],
-                        },
-                    ],
+                    containers: containersObject,
 
                     getContainer: (id, tab) => {
                         if (tab) {
-                            return get().tabsContainers[tab].find(
-                                (container) => container.id === id
-                            );
+                            return get().tabsContainers[tab][id];
                         }
-                        return get().containers.find(
-                            (container) => container.id === id
-                        );
+                        return get().containers[id];
                     },
 
                     setActiveId: (activeId) => {
@@ -103,7 +113,7 @@ const createRosterStore = ({
                             ...state,
                             tabsContainers: {
                                 ...state.tabsContainers,
-                                [tab]: [...get().containers],
+                                [tab]: get().containers,
                             },
                         })),
                     setTabContainer: (tab, container) => {
@@ -134,7 +144,7 @@ const createRosterStore = ({
                         // });
                         set((state) => ({
                             ...state,
-                            containers: containers,
+                            containers: { ...containers },
                             // tabsContainers: newTabsContainers,
                         }));
                     },
@@ -151,7 +161,7 @@ const createRosterStore = ({
                     addContainer: (container) =>
                         set((state) => ({
                             ...state,
-                            containers: [...state.containers, container],
+                            containers: { ...state.containers, container },
                         })),
                 };
             },

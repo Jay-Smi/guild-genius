@@ -1,4 +1,4 @@
-import { useEffect, memo, forwardRef, useContext } from "react";
+import { useEffect, memo, forwardRef, useContext, useCallback } from "react";
 import { classNames } from "../../../../../../utils/helpers.js";
 
 import { Remove } from "../Remove.jsx";
@@ -44,13 +44,32 @@ export const Item = memo(
         ) => {
             const theme = useTheme();
             const rosterStore = useContext(RosterContext);
-            const character = useStore(rosterStore, (state) =>
-                state.getCharacter(characterId)
-            );
-            const activeCharacter = useStore(rosterStore, (state) =>
-                state.getCharacter(activeCharacterId)
+
+            const selectedTab = useStore(
+                rosterStore,
+                (state) => state.selectedTab
             );
 
+            const chosenLockouts = useStore(
+                rosterStore,
+                (state) => state.chosenLockouts
+            );
+
+            const getContainer = useStore(
+                rosterStore,
+                (state) => state.getContainer
+            );
+            const getActualContainer = useCallback(
+                (id) => {
+                    return selectedTab === 0
+                        ? getContainer(id)
+                        : getContainer(id, chosenLockouts[selectedTab].id);
+                },
+                [getContainer, selectedTab, chosenLockouts]
+            );
+
+            const character = getActualContainer(characterId);
+            const activeCharacter = getActualContainer(activeCharacterId);
             const isActivePlayer =
                 activeCharacter &&
                 character.player_id === activeCharacter.player_id;

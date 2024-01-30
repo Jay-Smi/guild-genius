@@ -92,15 +92,10 @@ const ChooseTime = memo(({ id: raidId }) => {
     });
 
     const handleSelectTime = (time) => {
-        const newContainers = containers.map((container) =>
-            container.id === raidId
-                ? {
-                      ...container,
-                      data: [...container.data],
-                      time: format(time, "h:mm a"),
-                  }
-                : { ...container, data: container.data && [...container.data] }
-        );
+        const newContainers = {
+            ...containers,
+            [raidId]: { ...containers[raidId], time: format(time, "h:mm a") },
+        };
         setContainers(newContainers);
 
         handleClose();

@@ -146,13 +146,8 @@ const Container = memo(
                 ]
             );
 
-            const container = containers.find(
-                (container) => container.id === id
-            );
-            const categories = useStore(
-                rosterStore,
-                (state) => state.categories
-            );
+            const container = containers[id];
+
             const tagsArray = [...tags, "Tanks", "Healers", "Melee", "Ranged"];
             const [popperAnchor, setPopperAnchor] = useState(null);
             const anchorOpen = Boolean(popperAnchor);
@@ -170,24 +165,24 @@ const Container = memo(
             let raidsCharacters = null;
             let raidsGroups = null;
 
-            // useEffect(() => {
-            //     if (!dragOverlay) {
-            //         return;
-            //     }
+            useEffect(() => {
+                if (!dragOverlay) {
+                    return;
+                }
 
-            //     document.body.style.cursor = "grabbing";
+                document.body.style.cursor = "grabbing";
 
-            //     return () => {
-            //         document.body.style.cursor = "";
-            //     };
-            // }, [dragOverlay]);
+                return () => {
+                    document.body.style.cursor = "";
+                };
+            }, [dragOverlay]);
             if (container.type === "raid") {
-                raidsGroups = containers.filter(
+                raidsGroups = Object.values(containers).filter(
                     (c) => c.type === "group" && container.data.includes(c.id)
                 );
                 raidsCharacters = raidsGroups
                     .map((group) => {
-                        return containers
+                        return Object.values(containers)
                             .filter(
                                 (c) =>
                                     c.type === "character" &&
@@ -243,33 +238,31 @@ const Container = memo(
             }
 
             function handleSaveTagForm() {
-                const newContainers = containers.map((container) =>
-                    container.id === id
-                        ? {
-                              ...container,
-                              tags: Object.keys(tagForm)
-                                  .filter((tag) => tagForm[tag].checked)
-                                  .map((tag) => ({
-                                      tag: tag,
-                                      amount: tagForm[tag].amount || null,
-                                  })),
-                          }
-                        : container
-                );
+                const newContainers = {
+                    ...containers,
+                    [id]: {
+                        ...container,
+                        tags: Object.keys(tagForm)
+                            .filter((tag) => tagForm[tag].checked)
+                            .map((tag) => ({
+                                tag: tag,
+                                amount: tagForm[tag].amount || null,
+                            })),
+                    },
+                };
 
                 setContainers(newContainers);
                 handleCloseDialog();
             }
 
             function handleRemoveTag(tag) {
-                const newContainers = containers.map((container) =>
-                    container.id === id
-                        ? {
-                              ...container,
-                              tags: container.tags.filter((t) => t.tag !== tag),
-                          }
-                        : container
-                );
+                const newContainers = {
+                    ...containers,
+                    [id]: {
+                        ...container,
+                        tags: container.tags.filter((t) => t.tag !== tag),
+                    },
+                };
 
                 setContainers(newContainers);
             }
@@ -287,27 +280,20 @@ const Container = memo(
             function handleAddGroup() {
                 const groupId = crypto.randomUUID();
 
-                // Create a new array with the added group
-                const newContainers = containers.map((container) =>
-                    container.id === id
-                        ? {
-                              ...container,
-                              data: [...container.data, groupId],
-                          }
-                        : container
-                );
+                const newContainers = {
+                    ...containers,
+                    [id]: {
+                        ...container,
+                        data: [...container.data, groupId],
+                    },
+                    [groupId]: {
+                        id: groupId,
+                        type: "group",
+                        name: `Group ${container.data.length + 1}`,
+                        data: [],
+                    },
+                };
 
-                const groupsLength = newContainers.find((c) =>
-                    c.data?.includes(groupId)
-                ).data.length;
-
-                newContainers.push({
-                    id: groupId,
-                    type: "group",
-                    name: `Group ${groupsLength}`,
-                    data: [],
-                });
-                // Update state with the modified newContainers array
                 setContainers(newContainers);
             }
 
