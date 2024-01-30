@@ -94,8 +94,10 @@ function RaidGroup({
                                                     : "F9"
                                             }`,
                                             borderRight: isUserCharacter
-                                                ? `10px solid ${theme.palette.success.main}`
+                                                ? `10px solid ${theme.palette.success.dark}`
                                                 : "10px solid transparent",
+                                            borderLeft:
+                                                "10px solid transparent",
                                         }}
                                     >
                                         <Typography

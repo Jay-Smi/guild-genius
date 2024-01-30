@@ -31,6 +31,7 @@ import {
 
 import RaidHeader from "./raid-header";
 import Raid from "./raid";
+import PerfectScrollbar from "react-perfect-scrollbar";
 
 function GuildRaids() {
     //user, profile, characters, players, guild, currentGuildInstanceLockout
@@ -96,7 +97,7 @@ function GuildRaids() {
     if (isLoadingAny) return <Loader />;
     const selectedLockout = allGuildInstanceLockouts[value];
     return (
-        <Grid container>
+        <Grid container sx={{ overflow: "hidden" }}>
             <Grid item xs={0} sm={0} md={1} lg={2} xl={3} />
             <Grid
                 item
@@ -146,30 +147,44 @@ function GuildRaids() {
             </Grid>
             <Grid item xs={0} sm={0} md={1} lg={2} xl={3} />
             <Grid item xs={0} sm={0} md={1} lg={2} xl={3} />
-            <Grid item xs={12} sm={12} md={10} lg={8} xl={6}>
-                {raids
-                    .filter(
-                        (raid) =>
-                            raid.guild_instance_lockout_id ===
-                            selectedLockout.id
-                    )
-                    .map((raid) => {
-                        const raidsGroups = groups.filter(
-                            (group) => group.raid_id === raid.id
-                        );
 
-                        return (
-                            <Raid
-                                key={raid.id}
-                                borderRadius={borderRadius}
-                                raidsGroups={raidsGroups}
-                                raid={raid}
-                                guildCharacters={guildCharacters}
-                                guildGroupCharacters={guildGroupCharacters}
-                                userCharacterIds={userCharacterIds}
-                            />
-                        );
-                    })}
+            <Grid item xs={12} sm={12} md={10} lg={8} xl={6}>
+                <Box sx={{ overflow: "hidden", height: "calc(100vh - 180px)" }}>
+                    <PerfectScrollbar
+                        component="div"
+                        style={{
+                            paddingLeft: "16px",
+                            paddingRight: "16px",
+                            paddingBottom: "100px",
+                        }}
+                    >
+                        {raids
+                            .filter(
+                                (raid) =>
+                                    raid.guild_instance_lockout_id ===
+                                    selectedLockout.id
+                            )
+                            .map((raid) => {
+                                const raidsGroups = groups.filter(
+                                    (group) => group.raid_id === raid.id
+                                );
+
+                                return (
+                                    <Raid
+                                        key={raid.id}
+                                        borderRadius={borderRadius}
+                                        raidsGroups={raidsGroups}
+                                        raid={raid}
+                                        guildCharacters={guildCharacters}
+                                        guildGroupCharacters={
+                                            guildGroupCharacters
+                                        }
+                                        userCharacterIds={userCharacterIds}
+                                    />
+                                );
+                            })}
+                    </PerfectScrollbar>
+                </Box>
             </Grid>
         </Grid>
     );
