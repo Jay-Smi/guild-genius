@@ -40,8 +40,8 @@ function Raid({
         <>
             <Divider
                 sx={{
-                    mt: 1,
-                    mb: 1,
+                    mt: 2,
+                    mb: 2,
                     borderBottomWidth: "2px",
                     borderColor:
                         theme.palette.mode === "dark"

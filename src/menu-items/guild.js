@@ -36,10 +36,10 @@ const guild = {
             breadcrumbs: false,
         },
         {
-            id: "characters",
-            title: "Characters",
+            id: "roster",
+            title: "Roster",
             type: "item",
-            url: "/guild/characters",
+            url: "/guild/roster",
             icon: icons.IconDashboard,
             breadcrumbs: false,
         },
@@ -51,14 +51,30 @@ const guild = {
             icon: icons.IconDashboard,
             breadcrumbs: false,
         },
-        {
-            id: "guild-settings",
-            title: "Guild Settings",
-            type: "item",
-            url: "/guild/guild-settings",
-            icon: icons.IconDashboard,
-            breadcrumbs: false,
-        },
+
+        // {
+        //     id: "guild-management",
+        //     title: "Guild Management",
+        //     type: "collapse",
+        //     icon: icons.IconDashboard,
+
+        //     children: [
+        //         {
+        //             id: "guild-roster-management",
+        //             title: "Members",
+        //             type: "item",
+        //             url: "/my-characters/overview",
+        //             breadcrumbs: false,
+        //         },
+        //         {
+        //             id: "my-characters-create",
+        //             title: "Create",
+        //             type: "item",
+        //             url: "/my-characters/create",
+        //             breadcrumbs: false,
+        //         },
+        //     ],
+        // },
     ],
 };
 

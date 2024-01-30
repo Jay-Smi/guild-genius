@@ -24,6 +24,10 @@ const GuildDashboard = Loadable(
 const DashboardRosterBuilder = Loadable(
     lazy(() => import("../views/dashboard/guild/roster-builder"))
 );
+
+const GuildRoster = Loadable(
+    lazy(() => import("../views/dashboard/guild/roster"))
+);
 const MyCharactersOverview = Loadable(
     lazy(() => import("../views/dashboard/my-characters/MyCharactersOverview"))
 );
@@ -88,8 +92,8 @@ const MainRoutes = {
                     element: <DashboardDefault />,
                 },
                 {
-                    path: "characters",
-                    element: <DashboardDefault />,
+                    path: "roster",
+                    element: <GuildRoster />,
                 },
                 {
                     path: "roster-builder",

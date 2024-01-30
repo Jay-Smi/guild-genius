@@ -191,3 +191,49 @@ function GuildRaids() {
 }
 
 export default GuildRaids;
+
+const headCells = [
+    {
+        id: "player-name",
+        numeric: false,
+        disablePadding: false,
+        label: "Player Name",
+    },
+    {
+        id: "character-name",
+        numeric: false,
+        disablePadding: false,
+        label: "Character Name",
+    },
+    {
+        id: "class",
+        numeric: false,
+        disablePadding: false,
+        label: "Class",
+    },
+    {
+        id: "spec",
+        numeric: false,
+        disablePadding: false,
+        label: "Spec",
+    },
+    {
+        id: "guild-rank",
+        numeric: false,
+        disablePadding: false,
+        label: "Guild Rank",
+    },
+
+    {
+        id: "discord-name",
+        numeric: false,
+        disablePadding: false,
+        label: "Discord Name",
+    },
+    {
+        id: "tags",
+        numeric: false,
+        disablePadding: false,
+        label: "Tags",
+    },
+];

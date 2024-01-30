@@ -34,11 +34,7 @@ dayjs.extend(isSameOrAfter);
 
 export default function RosterBuilder() {
     const theme = useTheme();
-
-    // const [chosenLockouts, setChosenLockouts] = useState([{ type: "all" }]);
     const matchUpLg = useMediaQuery(theme.breakpoints.up("lg"));
-
-    /* Queries */
     const user = useStore((state) => state.session.user);
     const userId = user.id;
     const discordName = user.user_metadata.name;
