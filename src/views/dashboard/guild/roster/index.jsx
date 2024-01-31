@@ -6,76 +6,18 @@ import useAllGuildsPlayers from "../../../../hooks/player/useAllGuildsPlayers";
 import useAllGuildCharacterTags from "../../../../hooks/character/useAllGuildCharacterTags";
 import Loader from "../../../../components/Loader";
 import { useMemo, useState } from "react";
-import {
-    Box,
-    Checkbox,
-    FormControlLabel,
-    IconButton,
-    Paper,
-    Switch,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TablePagination,
-    TableRow,
-    TableSortLabel,
-    Toolbar,
-    Tooltip,
-    Typography,
-    alpha,
-    useThemeProps,
-} from "@mui/material";
-import { visuallyHidden } from "@mui/utils";
+import { set } from "date-fns";
+import { allClasses, allClassesArray } from "../../../../utils/wowHelpers";
+import useCreateGuildCharacter from "../../../../hooks/character/useCreateGuildCharacter";
+import useUpdateGuildCharacter from "../../../../hooks/character/useUpdateGuildCharacter";
+import useDeleteGuildCharacter from "../../../../hooks/character/useDeleteGuildCharacter";
+import { Box, Button, IconButton, Tooltip } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import FilterListIcon from "@mui/icons-material/FilterList";
-
-const headCells = [
-    {
-        id: "playername",
-        numeric: false,
-        disablePadding: false,
-        label: "Player Name",
-    },
-    {
-        id: "character-name",
-        numeric: false,
-        disablePadding: false,
-        label: "Character Name",
-    },
-    {
-        id: "class",
-        numeric: false,
-        disablePadding: true,
-        label: "Class",
-    },
-    {
-        id: "spec",
-        numeric: false,
-        disablePadding: true,
-        label: "Spec",
-    },
-    {
-        id: "guild-rank",
-        numeric: false,
-        disablePadding: true,
-        label: "Guild Rank",
-    },
-
-    {
-        id: "discord-name",
-        numeric: false,
-        disablePadding: true,
-        label: "Discord Name",
-    },
-    {
-        id: "tags",
-        numeric: false,
-        disablePadding: true,
-        label: "Tags",
-    },
-];
+import {
+    MaterialReactTable,
+    useMaterialReactTable,
+} from "material-react-table";
 
 function GuildRoster() {
     const theme = useTheme();
@@ -93,11 +35,10 @@ function GuildRoster() {
         (character) => character.id === mainCharacterId
     );
     const mainGuildId = mainCharacter?.guild_id;
-    const { guildCharacters, isLoadingCharacters, errorCharacters } =
+    const { guildCharacters, isLoadingCharacters } =
         useAllGuildsCharacters(mainGuildId);
-    const { guildPlayers, isLoadingPlayers, errorPlayers } =
-        useAllGuildsPlayers(mainGuildId);
-    const { guildCharacterTags, isLoadingCharacterTags, errorCharacterTags } =
+    const { guildPlayers, isLoadingPlayers } = useAllGuildsPlayers(mainGuildId);
+    const { guildCharacterTags, isLoadingCharacterTags } =
         useAllGuildCharacterTags(mainGuildId);
 
     const isLoadingAny =
@@ -107,10 +48,8 @@ function GuildRoster() {
         !guildCharacters ||
         !guildPlayers ||
         !guildCharacterTags;
-
     if (isLoadingAny) return <Loader />;
-
-    const updatedCharacters = guildCharacters.map((character) => {
+    const updatedCharacters = guildCharacters?.map((character) => {
         const player = guildPlayers.find(
             (player) => player.id === character.player_id
         );
@@ -118,337 +57,318 @@ function GuildRoster() {
             .filter((tag) => tag.character_id === character.id)
             .map((tag) => tag.tag_name);
         return {
-            ...character,
-            playerName: player.player_name,
+            player_name: player.player_name,
+            character_name: character.character_name,
+            class: character.class,
+            spec: character.spec,
+            guild_rank: character.guild_rank,
+            discord_name: character.discord_name,
             tags,
+            character_id: character.id,
+            player_id: player.id,
+            guild_id: player.guild_id,
+            profile_id: player.profile_id,
         };
     });
 
-    return <CharacterTable characters={updatedCharacters} />;
+    return (
+        <CharacterTable
+            initialCharacters={updatedCharacters}
+            isLoadingAny={isLoadingAny}
+            tags={guildCharacterTags}
+        />
+    );
 }
 
 export default GuildRoster;
 
-function DataTableHead(props) {
-    const {
-        onSelectAllClick,
-        order,
-        orderBy,
-        numSelected,
-        rowCount,
-        onRequestSort,
-    } = props;
-
-    const createSortHandler = (property) => (event) => {
-        onRequestSort(event, property);
-    };
-    return (
-        <TableHead>
-            <TableRow>
-                <TableCell padding="checkbox">
-                    <Checkbox
-                        color="primary"
-                        indeterminate={
-                            numSelected > 0 && numSelected < rowCount
-                        }
-                        checked={rowCount > 0 && numSelected === rowCount}
-                        onChange={onSelectAllClick}
-                        inputProps={{
-                            "aria-label": "select all characters",
-                        }}
-                    />
-                </TableCell>
-                {headCells.map((headCell) => (
-                    <TableCell
-                        key={headCell.id}
-                        align={headCell.numeric ? "right" : "left"}
-                        padding={headCell.disablePadding ? "none" : "normal"}
-                        sortDirection={orderBy === headCell.id ? order : false}
-                    >
-                        <TableSortLabel
-                            active={orderBy === headCell.id}
-                            direction={orderBy === headCell.id ? order : "asc"}
-                            onClick={createSortHandler(headCell.id)}
-                        >
-                            {headCell.label}
-                            {orderBy === headCell.id ? (
-                                <Box component="span" sx={visuallyHidden}>
-                                    {order === "desc"
-                                        ? "sorted descending"
-                                        : "sorted ascending"}
-                                </Box>
-                            ) : null}
-                        </TableSortLabel>
-                    </TableCell>
-                ))}
-            </TableRow>
-        </TableHead>
+function CharacterTable({ initialCharacters, isLoadingAny, tags }) {
+    const [validationErrors, setValidationErrors] = useState({});
+    const characters = useMemo(
+        () => initialCharacters || [],
+        [initialCharacters]
     );
-}
 
-function descendingComparator(a, b, orderBy) {
-    if (b[orderBy] < a[orderBy]) {
-        return -1;
-    }
-    if (b[orderBy] > a[orderBy]) {
-        return 1;
-    }
-    return 0;
-}
+    const columns = useMemo(
+        () => [
+            {
+                accessorKey: "player_name",
+                header: "Player Name",
+                muiEditTextFieldProps: {
+                    required: true,
+                    error: !!validationErrors?.playerName,
+                    helperText: validationErrors?.playerName,
+                    onFocus: () =>
+                        setValidationErrors({
+                            ...validationErrors,
+                            playerName: undefined,
+                        }),
+                },
+            },
+            {
+                accessorKey: "character_name",
+                header: "Character Name",
+                muiEditTextFieldProps: {
+                    required: true,
+                    error: !!validationErrors?.characterName,
+                    helperText: validationErrors?.characterName,
+                    onFocus: () =>
+                        setValidationErrors({
+                            ...validationErrors,
+                            characterName: undefined,
+                        }),
+                },
+            },
+            {
+                accessorKey: "class",
+                header: "Class",
+                editVariant: "select",
+                editSelectOptions: allClassesArray,
+                muiEditTextFieldProps: {
+                    required: true,
+                    error: !!validationErrors?.class,
+                    helperText: validationErrors?.class,
+                    onFocus: () =>
+                        setValidationErrors({
+                            ...validationErrors,
+                            class: undefined,
+                        }),
+                },
+                size: 80,
+            },
+            {
+                accessorKey: "spec",
+                header: "Spec",
+                enableEditing: true,
+                size: 80,
+            },
+            {
+                accessorKey: "guild_rank",
+                header: "Guild Rank",
+                enableEditing: true,
+                size: 80,
+            },
+            {
+                accessorKey: "discord_name",
+                header: "Discord Name",
+                enableEditing: true,
+                size: 80,
+            },
+            {
+                accessorKey: "tags",
+                header: "Tags",
+                enableEditing: true,
+                size: 80,
+            },
+            {
+                accessorKey: "character_id",
+                header: "Character ID",
+                enableEditing: false,
+                visibleInShowHideMenu: false,
+            },
+            {
+                accessorKey: "player_id",
+                header: "Player ID",
+                enableEditing: false,
+                visibleInShowHideMenu: false,
+            },
+            {
+                accessorKey: "guild_id",
+                header: "Guild ID",
+                enableEditing: false,
+                visibleInShowHideMenu: false,
+            },
+            {
+                accessorKey: "profile_id",
+                header: "Profile ID",
+                enableEditing: false,
+                visibleInShowHideMenu: false,
+            },
+        ],
+        [validationErrors]
+    );
 
-function getComparator(order, orderBy) {
-    return order === "desc"
-        ? (a, b) => descendingComparator(a, b, orderBy)
-        : (a, b) => -descendingComparator(a, b, orderBy);
-}
+    //call CREATE hook
+    const { mutateAsync: createCharacter, isPending: isCreatingCharacter } =
+        useCreateGuildCharacter();
 
-function stableSort(array, comparator) {
-    const stabilizedThis = array.map((el, index) => [el, index]);
-    stabilizedThis.sort((a, b) => {
-        const order = comparator(a[0], b[0]);
-        if (order !== 0) {
-            return order;
+    //call UPDATE hook
+    const { mutateAsync: updateCharacter, isPending: isUpdatingCharacter } =
+        useUpdateGuildCharacter();
+
+    //call DELETE hook
+    const { mutateAsync: deleteCharacter, isPending: isDeletingCharacter } =
+        useDeleteGuildCharacter();
+
+    //CREATE action
+    const handleCreateCharacter = async ({ values, table }) => {
+        const newValiationErrors = validateCharacter(values);
+        if (Object.values(newValiationErrors).some((error) => error)) {
+            setValidationErrors(newValiationErrors);
+            return;
         }
-        return a[1] - b[1];
-    });
-    return stabilizedThis.map((el) => el[0]);
-}
+        setValidationErrors({});
+        await createCharacter(values);
+        table.setCreatingRow(null);
+    };
 
-function TableToolbar(props) {
-    const theme = useTheme();
-    const { numSelected } = props;
+    //UPDATE action
+    const handleSaveCharacter = async ({ values, table }) => {
+        const newValiationErrors = validateCharacter(values);
+        if (Object.values(newValiationErrors).some((error) => error)) {
+            setValidationErrors(newValiationErrors);
+            return;
+        }
+        setValidationErrors({});
 
-    return (
-        <Toolbar
-            sx={{
-                pl: { sm: 2 },
-                pr: { xs: 1, sm: 1 },
-                ...(numSelected > 0 && {
-                    bgcolor: (theme) =>
-                        alpha(
-                            theme.palette.primary.main,
-                            theme.palette.action.activatedOpacity
-                        ),
-                }),
-            }}
-        >
-            {numSelected > 0 ? (
-                <Typography
-                    sx={{ flex: "1 1 100%" }}
-                    color="inherit"
-                    variant="subtitle1"
-                    component="div"
-                >
-                    {numSelected} selected
-                </Typography>
-            ) : (
-                <Typography
-                    sx={{
-                        flex: "1 1 100%",
-                        color: theme.palette.text.title,
-                        fontSize: "1.25rem",
-                    }}
-                    variant="h6"
-                    id="tableTitle"
-                    component="div"
-                >
-                    Characters
-                </Typography>
-            )}
+        const {
+            player_name,
+            character_name,
+            class: charClass,
+            spec,
+            guild_rank,
+            discord_name,
+            tags,
+            character_id,
+            player_id,
+            guild_id,
+            profile_id,
+        } = values;
 
-            {numSelected > 0 ? (
+        const character = {
+            id: character_id,
+            character_name,
+            discord_name,
+            class: charClass,
+            spec,
+            player_id,
+            guild_id,
+            guild_rank,
+        };
+
+        const player = {
+            id: player_id,
+            player_name,
+            profile_id,
+            discord_name,
+            guild_id,
+        };
+
+        const tagArray = tags?.length
+            ? tags.split(",").map((tag) => tag.trim())
+            : [];
+        const charactersTags = characters.filter(
+            (char) => char.id === character_id
+        );
+        const tagsToDelete = charactersTags
+            .filter((tag) => !tagArray.includes(tag.tag_name))
+            .map((tag) => tag.id);
+        const newTags = tagArray
+            ?.filter((tag) => {
+                return !charactersTags.some((t) => t.tag_name === tag);
+            })
+            .map((tag) => ({
+                tag_name: tag,
+                character_id,
+                guild_id,
+            }));
+        console.log("tagsToDelete", tagsToDelete);
+        console.log("newTags", newTags);
+        console.log("character", character);
+        console.log("player", player);
+        // await updateCharacter(character);
+        // table.setEditingRow(false);
+    };
+
+    //DELETE action
+    const handleDeleteCharacter = (row) => {
+        if (window.confirm("Are you sure you want to delete this character?")) {
+            deleteCharacter(row.original.id);
+        }
+    };
+
+    const table = useMaterialReactTable({
+        columns,
+        data: characters,
+        createDisplayMode: "row",
+        editDisplayMode: "row",
+        enableEditing: true,
+        getRowId: (row) => row.id,
+        muiTableContainerProps: {
+            sx: {
+                minHeight: "500px",
+            },
+        },
+        onCreatingRowCancel: () => setValidationErrors({}),
+        onCreatingRowSave: handleCreateCharacter,
+        onEditingRowCancel: () => setValidationErrors({}),
+        onEditingRowSave: handleSaveCharacter,
+        renderRowActions: ({ row, table }) => (
+            <Box sx={{ display: "flex", gap: "1rem" }}>
+                <Tooltip title="Edit">
+                    <IconButton
+                        aria-label="edit"
+                        onClick={() => table.setEditingRow(row)}
+                    >
+                        <EditIcon />
+                    </IconButton>
+                </Tooltip>
                 <Tooltip title="Delete">
-                    <IconButton>
+                    <IconButton
+                        aria-label="delete"
+                        onClick={() => handleDeleteCharacter(row)}
+                    >
                         <DeleteIcon />
                     </IconButton>
                 </Tooltip>
-            ) : (
-                <Tooltip title="Filter list">
-                    <IconButton>
-                        <FilterListIcon />
-                    </IconButton>
-                </Tooltip>
-            )}
-        </Toolbar>
-    );
+            </Box>
+        ),
+        renderTopToolbarCustomActions: ({ table }) => (
+            <Button
+                variant="container"
+                onClick={() => table.setCreatingRow(true)}
+            >
+                Create Character
+            </Button>
+        ),
+        state: {
+            isLoading: isLoadingAny,
+            isSaving:
+                isCreatingCharacter ||
+                isUpdatingCharacter ||
+                isDeletingCharacter,
+            showProgressBar: isLoadingAny,
+            // columnVisibility: {
+            //     character_id: false,
+            //     player_id: false,
+            //     guild_id: false,
+            //     profile_id: false,
+            // },
+        },
+    });
+
+    return <MaterialReactTable table={table} />;
 }
 
-function CharacterTable({ characters }) {
-    const [order, setOrder] = useState("asc");
-    const [orderBy, setOrderBy] = useState("character-name");
-    const [selected, setSelected] = useState([]);
-    const [page, setPage] = useState(0);
-    const [dense, setDense] = useState(false);
-    const [rowsPerPage, setRowsPerPage] = useState(25);
+const validateRequired = (value) => !!value?.length;
 
-    const handleRequestSort = (event, property) => {
-        const isAsc = orderBy === property && order === "asc";
-        setOrder(isAsc ? "desc" : "asc");
-        setOrderBy(property);
+function validateCharacter(character) {
+    return {
+        characterName: !validateRequired(character.character_name)
+            ? "Character Name is required"
+            : "",
+        playerName: !validateRequired(character.player_name)
+            ? "Player Name is required"
+            : "",
+        characterClass: !validateRequired(character.class)
+            ? "Class is required"
+            : "",
+        spec: !validateRequired(character.spec) ? "Spec is required" : "",
+        guildRank: !validateRequired(character.guild_rank)
+            ? "Guild Rank is required"
+            : "",
+        discordName: !validateRequired(character.discord_name)
+            ? "Discord Name is required"
+            : "",
     };
-
-    const handleSelectAllClick = (event) => {
-        if (event.target.checked) {
-            const newSelected = characters.map((n) => n.id);
-            setSelected(newSelected);
-            return;
-        }
-        setSelected([]);
-    };
-
-    const handleClick = (event, id) => {
-        const selectedIndex = selected.indexOf(id);
-        let newSelected = [];
-
-        if (selectedIndex === -1) {
-            newSelected = newSelected.concat(selected, id);
-        } else if (selectedIndex === 0) {
-            newSelected = newSelected.concat(selected.slice(1));
-        } else if (selectedIndex === selected.length - 1) {
-            newSelected = newSelected.concat(selected.slice(0, -1));
-        } else if (selectedIndex > 0) {
-            newSelected = newSelected.concat(
-                selected.slice(0, selectedIndex),
-                selected.slice(selectedIndex + 1)
-            );
-        }
-        setSelected(newSelected);
-    };
-
-    const handleChangePage = (event, newPage) => {
-        setPage(newPage);
-    };
-
-    const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
-        setPage(0);
-    };
-
-    const handleChangeDense = (event) => {
-        setDense(event.target.checked);
-    };
-
-    const isSelected = (id) => selected.indexOf(id) !== -1;
-
-    // Avoid a layout jump when reaching the last page with empty rows.
-    const emptyRows =
-        page > 0
-            ? Math.max(0, (1 + page) * rowsPerPage - characters.length)
-            : 0;
-
-    const visibleRows = useMemo(
-        () =>
-            stableSort(characters, getComparator(order, orderBy)).slice(
-                page * rowsPerPage,
-                page * rowsPerPage + rowsPerPage
-            ),
-        [order, orderBy, page, rowsPerPage, characters]
-    );
-
-    return (
-        <Box sx={{ width: "100%" }}>
-            <Paper sx={{ width: "100%", mb: 2 }}>
-                <TableToolbar numSelected={selected.length} />
-                <TableContainer>
-                    <Table
-                        sx={{ minWidth: 750 }}
-                        aria-labelledby="tableTitle"
-                        size={dense ? "small" : "medium"}
-                    >
-                        <DataTableHead
-                            numSelected={selected.length}
-                            order={order}
-                            orderBy={orderBy}
-                            onSelectAllClick={handleSelectAllClick}
-                            onRequestSort={handleRequestSort}
-                            rowCount={characters.length}
-                        />
-                        <TableBody>
-                            {visibleRows.map((character, index) => {
-                                const isItemSelected = isSelected(character.id);
-                                const labelId = `enhanced-table-checkbox-${index}`;
-
-                                return (
-                                    <TableRow
-                                        hover
-                                        onClick={(event) =>
-                                            handleClick(event, character.id)
-                                        }
-                                        role="checkbox"
-                                        aria-checked={isItemSelected}
-                                        tabIndex={-1}
-                                        key={character.id}
-                                        selected={isItemSelected}
-                                        sx={{ cursor: "pointer" }}
-                                    >
-                                        <TableCell padding="checkbox">
-                                            <Checkbox
-                                                color="primary"
-                                                checked={isItemSelected}
-                                                inputProps={{
-                                                    "aria-labelledby": labelId,
-                                                }}
-                                            />
-                                        </TableCell>
-                                        <TableCell
-                                            component="th"
-                                            id={labelId}
-                                            align="left"
-                                            scope="row"
-                                            padding="none"
-                                            sx={{ pl: 2 }}
-                                        >
-                                            {character.playerName}
-                                        </TableCell>
-                                        <TableCell align="left">
-                                            {character.character_name}
-                                        </TableCell>
-                                        <TableCell align="left">
-                                            {character.class}
-                                        </TableCell>
-                                        <TableCell align="right">
-                                            {character.spec}
-                                        </TableCell>
-                                        <TableCell align="right">
-                                            {character.guild_rank}
-                                        </TableCell>
-                                        <TableCell align="right">
-                                            {character.discord_name}
-                                        </TableCell>
-                                        <TableCell align="right">
-                                            {character.tags.join(", ")}
-                                        </TableCell>
-                                    </TableRow>
-                                );
-                            })}
-                            {emptyRows > 0 && (
-                                <TableRow
-                                    style={{
-                                        height: (dense ? 33 : 53) * emptyRows,
-                                    }}
-                                >
-                                    <TableCell colSpan={6} />
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-                <TablePagination
-                    rowsPerPageOptions={[25, 50, 100]}
-                    component="div"
-                    count={characters.length}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                />
-            </Paper>
-            <FormControlLabel
-                control={
-                    <Switch checked={dense} onChange={handleChangeDense} />
-                }
-                label="Dense padding"
-            />
-        </Box>
-    );
 }

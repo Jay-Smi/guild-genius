@@ -38,7 +38,7 @@ export function useAllGuildsCharacters(guildId) {
         isLoadingCharacters,
         errorCharacters,
     } = useQuery({
-        queryKey: ["characters", guildId],
+        queryKey: ["guild-characters"],
         queryFn: () => getAllGuildsCharacters(guildId),
     });
 

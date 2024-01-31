@@ -40,6 +40,18 @@ export function getLockoutStartAndEndDates(date) {
     };
 }
 
+export const allClassesArray = [
+    "Druid",
+    "Hunter",
+    "Mage",
+    "Paladin",
+    "Priest",
+    "Rogue",
+    "Shaman",
+    "Warlock",
+    "Warrior",
+];
+
 export function allClasses() {
     return [
         "Druid",
@@ -53,6 +65,37 @@ export function allClasses() {
         "Warrior",
     ];
 }
+
+export const allSpecsArray = [
+    "Balance",
+    "Feral",
+    "Guardian",
+    "Restoration",
+    "Beastmaster",
+    "Marksman",
+    "Survival",
+    "Arcane",
+    "Fire",
+    "Frost",
+    "Holy",
+    "Protection",
+    "Retribution",
+    "Discipline",
+    "Holy",
+    "Shadow",
+    "Assassination",
+    "Combat",
+    "Sublety",
+    "Elemental",
+    "Enhancement",
+    "Restoration",
+    "Affliction",
+    "Demonology",
+    "Destruction",
+    "Arms",
+    "Fury",
+    "Protection",
+];
 
 export function allSpecs() {
     return {
