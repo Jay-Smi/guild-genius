@@ -6,19 +6,21 @@ export default function useCreateGuildCharacter() {
     return useMutation({
         mutationFn: (formData) => insertCharacter(formData),
         onMutate: (newCharacterInfo) => {
-            queryClient.setQueryData("guild-characters", (oldCharacters) => [
+            queryClient.setQueryData(["guild-characters"], (oldCharacters) => [
                 ...oldCharacters,
                 { ...newCharacterInfo },
             ]);
         },
         onSettled: () => {
             queryClient.invalidateQueries({ queryKey: ["guild-characters"] });
+            queryClient.invalidateQueries({ queryKey: ["user-characters"] });
         },
     });
 }
 
 async function insertCharacter(formData) {
     const {
+        id,
         character_name,
         class: playerClass,
         spec,
@@ -29,6 +31,7 @@ async function insertCharacter(formData) {
     } = formData;
     const { data, error } = await supabase.from("characters").insert([
         {
+            id,
             character_name,
             class: playerClass,
             spec,

@@ -7,7 +7,7 @@ export default function useAllGuildCharacterTags(guildId) {
         isLoading: isLoadingCharacterTags,
         error: errorCharacterTags,
     } = useQuery({
-        queryKey: ["character_tags", guildId],
+        queryKey: ["guild-character-tags"],
         queryFn: () => getAllGuildsCharacterTags(guildId),
     });
 

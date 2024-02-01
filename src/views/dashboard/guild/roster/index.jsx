@@ -18,6 +18,10 @@ import {
     MaterialReactTable,
     useMaterialReactTable,
 } from "material-react-table";
+import useCreateGuildPlayer from "../../../../hooks/player/useCreateGuildPlayer";
+import useCreateGuildCharacterTags from "../../../../hooks/character/useCreateGuildCharacterTags";
+import useDeleteGuildPlayer from "../../../../hooks/player/useDeleteGuildPlayer";
+import useDeleteGuildCharacterTags from "../../../../hooks/character/useDeleteGuildCharacterTags";
 
 function GuildRoster() {
     const theme = useTheme();
@@ -56,6 +60,10 @@ function GuildRoster() {
         const tags = guildCharacterTags
             .filter((tag) => tag.character_id === character.id)
             .map((tag) => tag.tag_name);
+        const tagString = tags.join(", ");
+        const tagObjs = guildCharacterTags.filter(
+            (tag) => tag.character_id === character.id
+        );
         return {
             player_name: player.player_name,
             character_name: character.character_name,
@@ -63,11 +71,12 @@ function GuildRoster() {
             spec: character.spec,
             guild_rank: character.guild_rank,
             discord_name: character.discord_name,
-            tags,
+            tags: tagString,
             character_id: character.id,
             player_id: player.id,
             guild_id: player.guild_id,
             profile_id: player.profile_id,
+            tagObjs,
         };
     });
 
@@ -140,24 +149,63 @@ function CharacterTable({ initialCharacters, isLoadingAny, tags }) {
                 accessorKey: "spec",
                 header: "Spec",
                 enableEditing: true,
+                muiEditTextFieldProps: {
+                    required: true,
+                    error: !!validationErrors?.spec,
+                    helperText: validationErrors?.spec,
+                    onFocus: () =>
+                        setValidationErrors({
+                            ...validationErrors,
+                            spec: undefined,
+                        }),
+                },
                 size: 80,
             },
             {
                 accessorKey: "guild_rank",
                 header: "Guild Rank",
                 enableEditing: true,
+                muiEditTextFieldProps: {
+                    required: true,
+                    error: !!validationErrors?.guild_rank,
+                    helperText: validationErrors?.guild_rank,
+                    onFocus: () =>
+                        setValidationErrors({
+                            ...validationErrors,
+                            guild_rank: undefined,
+                        }),
+                },
                 size: 80,
             },
             {
                 accessorKey: "discord_name",
                 header: "Discord Name",
                 enableEditing: true,
+                muiEditTextFieldProps: {
+                    error: !!validationErrors?.discord_name,
+                    helperText: validationErrors?.discord_name,
+                    onFocus: () =>
+                        setValidationErrors({
+                            ...validationErrors,
+                            discord_name: undefined,
+                        }),
+                },
                 size: 80,
             },
             {
                 accessorKey: "tags",
                 header: "Tags",
                 enableEditing: true,
+                muiEditTextFieldProps: {
+                    required: false,
+                    error: !!validationErrors?.discord_name,
+                    helperText: validationErrors?.discord_name,
+                    onFocus: () =>
+                        setValidationErrors({
+                            ...validationErrors,
+                            discord_name: undefined,
+                        }),
+                },
                 size: 80,
             },
             {
@@ -191,6 +239,10 @@ function CharacterTable({ initialCharacters, isLoadingAny, tags }) {
     //call CREATE hook
     const { mutateAsync: createCharacter, isPending: isCreatingCharacter } =
         useCreateGuildCharacter();
+    const { mutateAsync: createPlayer, isPending: isCreatingPlayer } =
+        useCreateGuildPlayer();
+    const { mutateAsync: createTags, isPending: isCreatingTags } =
+        useCreateGuildCharacterTags();
 
     //call UPDATE hook
     const { mutateAsync: updateCharacter, isPending: isUpdatingCharacter } =
@@ -199,27 +251,18 @@ function CharacterTable({ initialCharacters, isLoadingAny, tags }) {
     //call DELETE hook
     const { mutateAsync: deleteCharacter, isPending: isDeletingCharacter } =
         useDeleteGuildCharacter();
+    const { mutateAsync: deletePlayer, isPending: isDeletingPlayer } =
+        useDeleteGuildPlayer();
+    const { mutateAsync: deleteTags, isPending: isDeletingTags } =
+        useDeleteGuildCharacterTags();
 
     //CREATE action
-    const handleCreateCharacter = async ({ values, table }) => {
+    const handleCreateCharacter = async ({ values, table, row }) => {
         const newValiationErrors = validateCharacter(values);
         if (Object.values(newValiationErrors).some((error) => error)) {
             setValidationErrors(newValiationErrors);
             return;
         }
-        setValidationErrors({});
-        await createCharacter(values);
-        table.setCreatingRow(null);
-    };
-
-    //UPDATE action
-    const handleSaveCharacter = async ({ values, table }) => {
-        const newValiationErrors = validateCharacter(values);
-        if (Object.values(newValiationErrors).some((error) => error)) {
-            setValidationErrors(newValiationErrors);
-            return;
-        }
-        setValidationErrors({});
 
         const {
             player_name,
@@ -229,61 +272,184 @@ function CharacterTable({ initialCharacters, isLoadingAny, tags }) {
             guild_rank,
             discord_name,
             tags,
-            character_id,
-            player_id,
-            guild_id,
-            profile_id,
         } = values;
 
+        function getMatchingPlayer(player_name) {
+            return (
+                characters.find((char) => char.player_name === player_name) ||
+                null
+            );
+        }
+
+        const characterId = crypto.randomUUID();
+
+        const existingPlayer = getMatchingPlayer(player_name);
+
+        const playerId = existingPlayer
+            ? existingPlayer.player_id
+            : crypto.randomUUID();
+
+        const guildId = characters[0].guild_id;
+
+        const profileId = existingPlayer
+            ? existingPlayer.profile_id
+                ? existingPlayer.profile_id
+                : null
+            : null;
+
+        const character = {
+            id: characterId,
+            character_name,
+            discord_name,
+            class: charClass,
+            spec,
+            player_id: playerId,
+            guild_id: guildId,
+            guild_rank,
+        };
+
+        const player = {
+            id: playerId,
+            player_name,
+            profile_id: profileId,
+            discord_name,
+            guild_id: guildId,
+        };
+
+        const tagArray = tags?.length
+            ? tags.split(",").map((tag) => tag.trim())
+            : [];
+
+        const newTags = tagArray?.map((tag) => ({
+            tag_name: tag,
+            character_id: characterId,
+            guild_id: guildId,
+        }));
+
+        setValidationErrors({});
+        existingPlayer
+            ? await createCharacter(character, {
+                  onSuccess: async () =>
+                      tagArray.length ? await createTags(newTags) : null,
+              })
+            : await createPlayer(player, {
+                  onSuccess: async () =>
+                      await createCharacter(character, {
+                          onSuccess: async () =>
+                              tagArray.length
+                                  ? await createTags(newTags)
+                                  : null,
+                      }),
+              });
+
+        table.setCreatingRow(null);
+    };
+
+    //UPDATE action
+    const handleSaveCharacter = async ({ values, table, row }) => {
+        const newValiationErrors = validateCharacter(values);
+        if (Object.values(newValiationErrors).some((error) => error)) {
+            setValidationErrors(newValiationErrors);
+            return;
+        }
+        setValidationErrors({});
+        const { character_id, player_id, guild_id, profile_id } = row.original;
+
+        const {
+            player_name,
+            character_name,
+            class: charClass,
+            spec,
+            guild_rank,
+            discord_name,
+            tags,
+        } = values;
+
+        const newPlayerId = player_id || crypto.randomUUID();
         const character = {
             id: character_id,
             character_name,
             discord_name,
             class: charClass,
             spec,
-            player_id,
+            player_id: player_id || newPlayerId,
             guild_id,
             guild_rank,
         };
 
         const player = {
-            id: player_id,
+            id: player_id || newPlayerId,
             player_name,
             profile_id,
             discord_name,
             guild_id,
         };
 
-        const tagArray = tags?.length
-            ? tags.split(",").map((tag) => tag.trim())
-            : [];
-        const charactersTags = characters.filter(
-            (char) => char.id === character_id
-        );
-        const tagsToDelete = charactersTags
-            .filter((tag) => !tagArray.includes(tag.tag_name))
+        const tagArray =
+            tags === "" ? [] : tags.split(",").map((tag) => tag.trim());
+        const charactersTags = characters
+            .filter((char) => char.character_id === character_id)[0]
+            .tags?.split(",")
+            .map((tag) => tag.trim());
+        const charactersTagObjs = characters.filter(
+            (char) => char.character_id === character_id
+        )[0].tagObjs;
+
+        const tagsToDelete = charactersTagObjs
+            ?.filter((tag) => !tagArray.includes(tag.tag_name))
             .map((tag) => tag.id);
+
         const newTags = tagArray
             ?.filter((tag) => {
-                return !charactersTags.some((t) => t.tag_name === tag);
+                return !charactersTags?.some((t) => t === tag);
             })
             .map((tag) => ({
                 tag_name: tag,
                 character_id,
                 guild_id,
             }));
-        console.log("tagsToDelete", tagsToDelete);
-        console.log("newTags", newTags);
-        console.log("character", character);
-        console.log("player", player);
-        // await updateCharacter(character);
-        // table.setEditingRow(false);
+
+        // console.log("tagArray", tagArray);
+        // console.log("charactersTags", charactersTags);
+        // console.log("newTags", newTags);
+
+        // console.log("charactersTags", charactersTags);
+        // console.log("charactersTagObjs", charactersTagObjs);
+        await updateCharacter(character, {
+            onSuccess: async () => {
+                if (tagsToDelete.length) {
+                    console.log("tagsToDelete", tagsToDelete);
+                    await deleteTags(tagsToDelete);
+                }
+                if (newTags.length) {
+                    console.log("newTags", newTags);
+                    await createTags(newTags);
+                }
+            },
+        });
+        table.setEditingRow(false);
     };
 
     //DELETE action
     const handleDeleteCharacter = (row) => {
+        const character = characters.find(
+            (char) =>
+                char.player_name === row.original.player_name &&
+                char.character_name === row.original.character_name
+        );
+        const player = characters.find(
+            (char) => char.player_name === row.original.player_name
+        );
+        const allPlayerCharacters = characters.filter(
+            (char) => char.player_id === player.player_id
+        );
+
         if (window.confirm("Are you sure you want to delete this character?")) {
-            deleteCharacter(row.original.id);
+            if (allPlayerCharacters.length === 1) {
+                deletePlayer(player.player_id);
+            } else {
+                deleteCharacter(character.character_id);
+            }
         }
     };
 
@@ -338,12 +504,12 @@ function CharacterTable({ initialCharacters, isLoadingAny, tags }) {
                 isUpdatingCharacter ||
                 isDeletingCharacter,
             showProgressBar: isLoadingAny,
-            // columnVisibility: {
-            //     character_id: false,
-            //     player_id: false,
-            //     guild_id: false,
-            //     profile_id: false,
-            // },
+            columnVisibility: {
+                character_id: false,
+                player_id: false,
+                guild_id: false,
+                profile_id: false,
+            },
         },
     });
 

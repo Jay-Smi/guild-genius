@@ -21,7 +21,7 @@ export function useCharactersByDiscordName(discordName) {
         isLoading: isLoadingCharacters,
         error: errorCharacters,
     } = useQuery({
-        queryKey: ["characters", discordName],
+        queryKey: ["user-characters"],
         queryFn: () => getCharactersByDiscordName(discordName),
     });
 
