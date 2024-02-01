@@ -22,6 +22,8 @@ import useCreateGuildPlayer from "../../../../hooks/player/useCreateGuildPlayer"
 import useCreateGuildCharacterTags from "../../../../hooks/character/useCreateGuildCharacterTags";
 import useDeleteGuildPlayer from "../../../../hooks/player/useDeleteGuildPlayer";
 import useDeleteGuildCharacterTags from "../../../../hooks/character/useDeleteGuildCharacterTags";
+import { mkConfig, generateCsv, download } from "export-to-csv";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
 
 function GuildRoster() {
     const theme = useTheme();
@@ -91,12 +93,34 @@ function GuildRoster() {
 
 export default GuildRoster;
 
+const csvConfig = mkConfig({
+    fieldSeparator: ",",
+    decimalSeparator: ".",
+    useKeysAsHeaders: true,
+});
+
 function CharacterTable({ initialCharacters, isLoadingAny, tags }) {
     const [validationErrors, setValidationErrors] = useState({});
     const characters = useMemo(
         () => initialCharacters || [],
         [initialCharacters]
     );
+    const handleExportData = () => {
+        const strippedCharacters = characters.map((char) => {
+            const {
+                character_id,
+                player_id,
+                guild_id,
+                profile_id,
+                tagObjs,
+                ...strippedChar
+            } = char;
+            return strippedChar;
+        });
+
+        const csv = generateCsv(csvConfig)(strippedCharacters);
+        download(csvConfig)(csv);
+    };
 
     const columns = useMemo(
         () => [
@@ -459,12 +483,35 @@ function CharacterTable({ initialCharacters, isLoadingAny, tags }) {
         createDisplayMode: "row",
         editDisplayMode: "row",
         enableEditing: true,
+        enableStickyHeader: true,
         getRowId: (row) => row.id,
         muiTableContainerProps: {
             sx: {
                 minHeight: "500px",
+                maxHeight: "calc(100vh - 250px)",
             },
         },
+        muiTablePaperProps: ({ table }) => ({
+            sx: {
+                "& ::-webkit-scrollbar-track": {
+                    backgroundColor: "transparent",
+                },
+                "& ::-webkit-scrollbar": {
+                    right: 0,
+                    width: "12px",
+                    height: "12px",
+                },
+                "& ::-webkit-scrollbar-thumb": {
+                    backgroundColor: "#999",
+                    borderRadius: "8px",
+                    width: "12px",
+                    height: "12px",
+                },
+            },
+            style: {
+                zIndex: table.getState().isFullScreen ? 100000 : undefined,
+            },
+        }),
         onCreatingRowCancel: () => setValidationErrors({}),
         onCreatingRowSave: handleCreateCharacter,
         onEditingRowCancel: () => setValidationErrors({}),
@@ -490,12 +537,28 @@ function CharacterTable({ initialCharacters, isLoadingAny, tags }) {
             </Box>
         ),
         renderTopToolbarCustomActions: ({ table }) => (
-            <Button
-                variant="container"
-                onClick={() => table.setCreatingRow(true)}
+            <Box
+                sx={{
+                    display: "flex",
+                    gap: "16px",
+                    padding: "8px",
+                    flexWrap: "wrap",
+                }}
             >
-                Create Character
-            </Button>
+                <Button
+                    variant="contained"
+                    onClick={() => table.setCreatingRow(true)}
+                >
+                    Create Character
+                </Button>
+                <Button
+                    variant="outlined"
+                    onClick={handleExportData}
+                    startIcon={<FileDownloadIcon />}
+                >
+                    Export to CSV
+                </Button>
+            </Box>
         ),
         state: {
             isLoading: isLoadingAny,
@@ -504,6 +567,8 @@ function CharacterTable({ initialCharacters, isLoadingAny, tags }) {
                 isUpdatingCharacter ||
                 isDeletingCharacter,
             showProgressBar: isLoadingAny,
+        },
+        initialState: {
             columnVisibility: {
                 character_id: false,
                 player_id: false,
