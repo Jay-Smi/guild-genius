@@ -30,6 +30,7 @@ const StyledButton = styled(Button)(({ theme }) => ({ width: "100%" }));
 
 export default function RosterSettings() {
     const theme = useTheme();
+
     const [submitting, setSubmitting] = useState(false);
     const rosterStore = useContext(RosterContext);
     const charactersLength = useStore(
@@ -92,6 +93,16 @@ export default function RosterSettings() {
 
     const { guild } = useGuild(players[0].guild_id, somePlayerisInGuild);
     const guildId = guild[0].id;
+    const highestRank = characters.reduce((minCharacter, currentCharacter) => {
+        if (
+            minCharacter === null ||
+            currentCharacter.guild_rank < minCharacter.guild_rank
+        ) {
+            return currentCharacter;
+        } else {
+            return minCharacter;
+        }
+    }, null).guild_rank;
 
     const mutateGuildInstanceLockouts = useCreateGuildInstanceLockouts();
     const mutateRaids = useCreateRaids();
@@ -489,7 +500,7 @@ export default function RosterSettings() {
                             variant="contained"
                             color="secondary"
                             onClick={handleSaveLockouts}
-                            disabled={submitting}
+                            disabled={submitting || highestRank > 5}
                         >
                             {selectedLockoutsLength > 2
                                 ? "Save Lockouts"

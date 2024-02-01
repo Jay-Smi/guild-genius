@@ -13,6 +13,56 @@ const directions = [
     KeyboardCode.Left,
 ];
 
+export function convertRankToString(rankInt) {
+    let rank = "";
+    switch (rankInt) {
+        case 0:
+            rank = "Guild Master";
+            break;
+        case 5:
+            rank = "Officer";
+            break;
+        case 10:
+            rank = "Member";
+            break;
+        case 15:
+            rank = "Trial";
+            break;
+        case -1:
+            rank = "Admin";
+            break;
+        default:
+            rank = "No Rank";
+            break;
+    }
+    return rank;
+}
+
+export function convertRankToInt(rankString) {
+    let rank = 0;
+    switch (rankString) {
+        case "Guild Master":
+            rank = 0;
+            break;
+        case "Officer":
+            rank = 5;
+            break;
+        case "Member":
+            rank = 10;
+            break;
+        case "Trial":
+            rank = 15;
+            break;
+        case "Admin":
+            rank = -1;
+            break;
+        default:
+            rank = 15;
+            break;
+    }
+    return rank;
+}
+
 export const coordinateGetter = (
     event,
     { context: { active, droppableRects, droppableContainers, collisionRect } }

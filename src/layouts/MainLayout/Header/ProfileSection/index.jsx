@@ -48,6 +48,7 @@ import {
 import { signOut } from "../../../../services/auth/apiDiscord";
 import useUserInfo from "../../../../hooks/useUserInfo";
 import useGuild from "../../../../hooks/useGuild";
+import { convertRankToString } from "../../../../utils/helpers";
 
 // ==============================|| PROFILE MENU ||============================== //
 
@@ -68,7 +69,18 @@ const ProfileSection = () => {
     const mainCharacter = characters.find(
         (character) => character.id === mainPlayer.main_character
     );
-    const guildRank = mainCharacter?.guild_rank || characters[0]?.guild_rank;
+    const highestRank = characters.reduce((minCharacter, currentCharacter) => {
+        if (
+            minCharacter === null ||
+            currentCharacter.guild_rank < minCharacter.guild_rank
+        ) {
+            return currentCharacter;
+        } else {
+            return minCharacter;
+        }
+    }, null);
+
+    const guildRank = convertRankToString(highestRank.guild_rank);
 
     const theme = useTheme();
     const borderRadius = useStore((state) => state.borderRadius);
@@ -80,10 +92,8 @@ const ProfileSection = () => {
     const [notification, setNotification] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(-1);
     const [open, setOpen] = useState(false);
-    /**
-     * anchorRef is used on different componets and specifying one type leads to other components throwing an error
-     * */
     const anchorRef = useRef(null);
+
     const handleLogout = async () => {
         signOut();
     };
@@ -261,11 +271,8 @@ const ProfileSection = () => {
                                                 </Typography>
                                             </Stack>
                                             <Typography variant="subtitle2">
-                                                {guildRank
-                                                    ?.charAt(0)
-                                                    .toUpperCase() +
-                                                    guildRank?.slice(1)}{" "}
-                                                of {guild[0]?.guild_name}
+                                                {guildRank} of{" "}
+                                                {guild[0]?.guild_name}
                                             </Typography>
                                         </Stack>
                                         <OutlinedInput

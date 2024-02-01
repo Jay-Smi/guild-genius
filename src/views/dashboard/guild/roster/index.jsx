@@ -11,7 +11,13 @@ import { allClasses, allClassesArray } from "../../../../utils/wowHelpers";
 import useCreateGuildCharacter from "../../../../hooks/character/useCreateGuildCharacter";
 import useUpdateGuildCharacter from "../../../../hooks/character/useUpdateGuildCharacter";
 import useDeleteGuildCharacter from "../../../../hooks/character/useDeleteGuildCharacter";
-import { Box, Button, IconButton, Tooltip } from "@mui/material";
+import {
+    Box,
+    Button,
+    IconButton,
+    Tooltip,
+    tableSortLabelClasses,
+} from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {
@@ -24,6 +30,10 @@ import useDeleteGuildPlayer from "../../../../hooks/player/useDeleteGuildPlayer"
 import useDeleteGuildCharacterTags from "../../../../hooks/character/useDeleteGuildCharacterTags";
 import { mkConfig, generateCsv, download } from "export-to-csv";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import {
+    convertRankToInt,
+    convertRankToString,
+} from "../../../../utils/helpers";
 
 function GuildRoster() {
     const theme = useTheme();
@@ -47,6 +57,17 @@ function GuildRoster() {
     const { guildCharacterTags, isLoadingCharacterTags } =
         useAllGuildCharacterTags(mainGuildId);
 
+    const highestRank = characters.reduce((minCharacter, currentCharacter) => {
+        if (
+            minCharacter === null ||
+            currentCharacter.guild_rank < minCharacter.guild_rank
+        ) {
+            return currentCharacter;
+        } else {
+            return minCharacter;
+        }
+    }, null).guild_rank;
+
     const isLoadingAny =
         isLoadingCharacters ||
         isLoadingPlayers ||
@@ -66,12 +87,14 @@ function GuildRoster() {
         const tagObjs = guildCharacterTags.filter(
             (tag) => tag.character_id === character.id
         );
+        const rank = convertRankToString(character.guild_rank);
         return {
             player_name: player.player_name,
             character_name: character.character_name,
             class: character.class,
             spec: character.spec,
-            guild_rank: character.guild_rank,
+            guild_rank: rank,
+            rank_int: character.guild_rank,
             discord_name: character.discord_name,
             tags: tagString,
             character_id: character.id,
@@ -86,7 +109,7 @@ function GuildRoster() {
         <CharacterTable
             initialCharacters={updatedCharacters}
             isLoadingAny={isLoadingAny}
-            tags={guildCharacterTags}
+            userRank={highestRank}
         />
     );
 }
@@ -99,28 +122,14 @@ const csvConfig = mkConfig({
     useKeysAsHeaders: true,
 });
 
-function CharacterTable({ initialCharacters, isLoadingAny, tags }) {
+function CharacterTable({ initialCharacters, isLoadingAny, userRank }) {
     const [validationErrors, setValidationErrors] = useState({});
-    const characters = useMemo(
-        () => initialCharacters || [],
-        [initialCharacters]
-    );
-    const handleExportData = () => {
-        const strippedCharacters = characters.map((char) => {
-            const {
-                character_id,
-                player_id,
-                guild_id,
-                profile_id,
-                tagObjs,
-                ...strippedChar
-            } = char;
-            return strippedChar;
-        });
-
-        const csv = generateCsv(csvConfig)(strippedCharacters);
-        download(csvConfig)(csv);
-    };
+    // const characters = useMemo(
+    //     () => initialCharacters || [],
+    //     [initialCharacters]
+    // );
+    const [characters, setCharacters] = useState(initialCharacters);
+    const [creatingRow, setCreatingRow] = useState(false);
 
     const columns = useMemo(
         () => [
@@ -141,16 +150,43 @@ function CharacterTable({ initialCharacters, isLoadingAny, tags }) {
             {
                 accessorKey: "character_name",
                 header: "Character Name",
-                muiEditTextFieldProps: {
+                muiEditTextFieldProps: ({ table, row }) => ({
                     required: true,
                     error: !!validationErrors?.characterName,
                     helperText: validationErrors?.characterName,
-                    onFocus: () =>
+                    onFocus: () => {
+                        const playerName = row.getValue("player_name");
+                        const discordName = row.getValue("discord_name");
+                        if (!discordName && playerName) {
+                            const matchingPlayer = characters.find(
+                                (char) => char.player_name === playerName
+                            );
+                            if (matchingPlayer) {
+                                // const tableState = table.getState();
+                                console.log(table.getState());
+                                // table.setState((oldState) => {
+                                //     console.log(oldState);
+                                //     return {
+                                //         ...oldState,
+                                //         creatingRow: {
+                                //             ...oldState.creatingRow,
+                                //             _valuesCache: {
+                                //                 ...oldState.creatingRow
+                                //                     ._valuesCache,
+                                //                 discord_name:
+                                //                     matchingPlayer.discord_name,
+                                //             },
+                                //         },
+                                //     };
+                                // });
+                            }
+                        }
                         setValidationErrors({
                             ...validationErrors,
                             characterName: undefined,
-                        }),
-                },
+                        });
+                    },
+                }),
             },
             {
                 accessorKey: "class",
@@ -188,6 +224,13 @@ function CharacterTable({ initialCharacters, isLoadingAny, tags }) {
             {
                 accessorKey: "guild_rank",
                 header: "Guild Rank",
+                editVariant: "select",
+                editSelectOptions: [
+                    "Trial",
+                    "Member",
+                    "Officer",
+                    "Guild Master",
+                ],
                 enableEditing: true,
                 muiEditTextFieldProps: {
                     required: true,
@@ -231,30 +274,6 @@ function CharacterTable({ initialCharacters, isLoadingAny, tags }) {
                         }),
                 },
                 size: 80,
-            },
-            {
-                accessorKey: "character_id",
-                header: "Character ID",
-                enableEditing: false,
-                visibleInShowHideMenu: false,
-            },
-            {
-                accessorKey: "player_id",
-                header: "Player ID",
-                enableEditing: false,
-                visibleInShowHideMenu: false,
-            },
-            {
-                accessorKey: "guild_id",
-                header: "Guild ID",
-                enableEditing: false,
-                visibleInShowHideMenu: false,
-            },
-            {
-                accessorKey: "profile_id",
-                header: "Profile ID",
-                enableEditing: false,
-                visibleInShowHideMenu: false,
             },
         ],
         [validationErrors]
@@ -320,7 +339,7 @@ function CharacterTable({ initialCharacters, isLoadingAny, tags }) {
                 ? existingPlayer.profile_id
                 : null
             : null;
-
+        const rank = convertRankToInt(guild_rank);
         const character = {
             id: characterId,
             character_name,
@@ -329,7 +348,7 @@ function CharacterTable({ initialCharacters, isLoadingAny, tags }) {
             spec,
             player_id: playerId,
             guild_id: guildId,
-            guild_rank,
+            guild_rank: rank,
         };
 
         const player = {
@@ -377,7 +396,15 @@ function CharacterTable({ initialCharacters, isLoadingAny, tags }) {
             return;
         }
         setValidationErrors({});
-        const { character_id, player_id, guild_id, profile_id } = row.original;
+
+        const matchingCharacter = characters.find(
+            (char) =>
+                char.player_name === row.original.player_name &&
+                char.character_name === row.original.character_name
+        );
+
+        const { character_id, player_id, guild_id, profile_id } =
+            matchingCharacter;
 
         const {
             player_name,
@@ -390,6 +417,8 @@ function CharacterTable({ initialCharacters, isLoadingAny, tags }) {
         } = values;
 
         const newPlayerId = player_id || crypto.randomUUID();
+        const rank = convertRankToInt(guild_rank);
+
         const character = {
             id: character_id,
             character_name,
@@ -398,7 +427,7 @@ function CharacterTable({ initialCharacters, isLoadingAny, tags }) {
             spec,
             player_id: player_id || newPlayerId,
             guild_id,
-            guild_rank,
+            guild_rank: rank,
         };
 
         const player = {
@@ -477,18 +506,35 @@ function CharacterTable({ initialCharacters, isLoadingAny, tags }) {
         }
     };
 
+    //EXPORT action
+    const handleExportData = () => {
+        const strippedCharacters = characters.map((char) => {
+            const {
+                character_id,
+                player_id,
+                guild_id,
+                profile_id,
+                tagObjs,
+                ...strippedChar
+            } = char;
+            return strippedChar;
+        });
+
+        const csv = generateCsv(csvConfig)(strippedCharacters);
+        download(csvConfig)(csv);
+    };
+
     const table = useMaterialReactTable({
         columns,
         data: characters,
         createDisplayMode: "row",
         editDisplayMode: "row",
-        enableEditing: true,
+        enableEditing: userRank < 6 ? true : false,
         enableStickyHeader: true,
         getRowId: (row) => row.id,
         muiTableContainerProps: {
             sx: {
-                minHeight: "500px",
-                maxHeight: "calc(100vh - 250px)",
+                height: "calc(100vh - 260px)",
             },
         },
         muiTablePaperProps: ({ table }) => ({
@@ -536,30 +582,31 @@ function CharacterTable({ initialCharacters, isLoadingAny, tags }) {
                 </Tooltip>
             </Box>
         ),
-        renderTopToolbarCustomActions: ({ table }) => (
-            <Box
-                sx={{
-                    display: "flex",
-                    gap: "16px",
-                    padding: "8px",
-                    flexWrap: "wrap",
-                }}
-            >
-                <Button
-                    variant="contained"
-                    onClick={() => table.setCreatingRow(true)}
+        renderTopToolbarCustomActions: ({ table }) =>
+            userRank < 6 ? (
+                <Box
+                    sx={{
+                        display: "flex",
+                        gap: "16px",
+                        padding: "8px",
+                        flexWrap: "wrap",
+                    }}
                 >
-                    Create Character
-                </Button>
-                <Button
-                    variant="outlined"
-                    onClick={handleExportData}
-                    startIcon={<FileDownloadIcon />}
-                >
-                    Export to CSV
-                </Button>
-            </Box>
-        ),
+                    <Button
+                        variant="contained"
+                        onClick={() => table.setCreatingRow(true)}
+                    >
+                        Create Character
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        onClick={handleExportData}
+                        startIcon={<FileDownloadIcon />}
+                    >
+                        Export to CSV
+                    </Button>
+                </Box>
+            ) : null,
         state: {
             isLoading: isLoadingAny,
             isSaving:
@@ -567,15 +614,16 @@ function CharacterTable({ initialCharacters, isLoadingAny, tags }) {
                 isUpdatingCharacter ||
                 isDeletingCharacter,
             showProgressBar: isLoadingAny,
+            creatingRow,
         },
-        initialState: {
-            columnVisibility: {
-                character_id: false,
-                player_id: false,
-                guild_id: false,
-                profile_id: false,
-            },
-        },
+        // initialState: {
+        //     columnVisibility: {
+        //         character_id: false,
+        //         player_id: false,
+        //         guild_id: false,
+        //         profile_id: false,
+        //     },
+        // },
     });
 
     return <MaterialReactTable table={table} />;
