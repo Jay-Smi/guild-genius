@@ -15,6 +15,7 @@ export default function useUpdateGuildCharacter() {
         },
         onSettled: () => {
             queryClient.invalidateQueries({ queryKey: ["guild-characters"] });
+            queryClient.invalidateQueries({ queryKey: ["user-characters"] });
         },
     });
 }

@@ -2,6 +2,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import listPlugin from "@fullcalendar/list";
 import { useStore } from "../../../../store";
 import useUserInfo from "../../../../hooks/useUserInfo";
 import useGuild from "../../../../hooks/useGuild";
@@ -51,11 +52,16 @@ export default function Calendar() {
     });
     return (
         <FullCalendar
-            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+            plugins={[
+                dayGridPlugin,
+                timeGridPlugin,
+                interactionPlugin,
+                listPlugin,
+            ]}
             headerToolbar={{
                 left: "prev,next today",
                 center: "title",
-                right: "dayGridMonth,timeGridWeek,timeGridDay",
+                right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek",
             }}
             editable={true}
             selectable={true}

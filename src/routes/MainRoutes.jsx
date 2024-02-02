@@ -88,7 +88,7 @@ const MainRoutes = {
             children: [
                 {
                     path: "dashboard",
-                    element: <GuildDashboard />,
+                    element: <DashboardDefault />,
                 },
                 {
                     path: "raids",

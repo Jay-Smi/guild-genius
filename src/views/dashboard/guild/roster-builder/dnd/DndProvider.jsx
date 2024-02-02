@@ -267,52 +267,27 @@ const DndProvider = memo(() => {
                         overContainer.type === "raid" ||
                         overContainer.type === "group"
                     ) {
+                        const overRaid =
+                            overContainer.type === "raid"
+                                ? overContainer
+                                : overParent;
+
                         const updatedContainers = { ...containers };
                         updatedContainers[activeParent.id] = {
-                            ...containers[activeParent.id],
-                            data: containers[activeParent.id].data.filter(
-                                (item) => item !== active.id
-                            ),
+                            ...updatedContainers[activeParent.id],
+                            data: updatedContainers[
+                                activeParent.id
+                            ].data.filter((item) => item !== active.id),
                         };
-                        updatedContainers[overContainer.id] = {
-                            ...containers[overContainer.id],
+                        updatedContainers[overRaid.id] = {
+                            ...updatedContainers[overRaid.id],
                             data: [
-                                ...containers[overContainer.id].data,
+                                ...updatedContainers[overRaid.id].data,
                                 active.id,
                             ],
                         };
 
                         setContainers(updatedContainers);
-                        // const newContainers = containers.map((container) => {
-                        //     const raidParent =
-                        //         overContainer.type === "group"
-                        //             ? overParent
-                        //             : overContainer;
-                        //     if (
-                        //         container.id ===
-                        //         findParent(activeContainer.id).id
-                        //     ) {
-                        //         return {
-                        //             ...container,
-                        //             data: container.data.filter(
-                        //                 (item) => item !== active.id
-                        //             ),
-                        //         };
-                        //     }
-                        //     if (container.id === raidParent.id) {
-                        //         return {
-                        //             ...container,
-                        //             data: [...container.data, active.id],
-                        //         };
-                        //     }
-                        //     if (container.id === active.id) {
-                        //         return {
-                        //             ...container,
-                        //         };
-                        //     }
-                        //     return container;
-                        // });
-                        // setContainers(newContainers);
                     }
                 }
 
@@ -342,34 +317,6 @@ const DndProvider = memo(() => {
                         };
 
                         setContainers(updatedContainers);
-
-                        // const overParentContainer =
-                        //     overContainer.type === "character"
-                        //         ? overParent
-                        //         : overContainer;
-                        // const newContainers = containers.map((container) => {
-                        //     if (container.id === findParent(active.id).id) {
-                        //         return {
-                        //             ...container,
-                        //             data: container.data.filter(
-                        //                 (item) => item !== active.id
-                        //             ),
-                        //         };
-                        //     }
-                        //     if (container.id === overParentContainer.id) {
-                        //         return {
-                        //             ...container,
-                        //             data: [...container.data, active.id],
-                        //         };
-                        //     }
-                        //     if (container.id === active.id) {
-                        //         return {
-                        //             ...container,
-                        //         };
-                        //     }
-                        //     return container;
-                        // });
-                        // setContainers(newContainers);
                     }
                 }
             }
