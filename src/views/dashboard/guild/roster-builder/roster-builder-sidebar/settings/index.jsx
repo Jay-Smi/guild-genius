@@ -177,27 +177,32 @@ export default function RosterSettings() {
                                     },
                                 }
                             );
-                        },
-                    });
-                    groupsPromise = mutateGroups.mutate(readyToMutate.groups, {
-                        onSuccess: () => {
-                            queryClient.invalidateQueries([
-                                "guilds-groups",
-                                guildId,
-                            ]);
-                            groupCharactersPromise =
-                                mutateGroupCharacters.mutate(
-                                    readyToMutate.group_characters,
-                                    {
-                                        onSuccess: () => {
-                                            queryClient.invalidateQueries([
-                                                "guilds-groups-characters",
-                                                guildId,
-                                            ]);
-                                            setSubmitting(false);
-                                        },
-                                    }
-                                );
+                            groupsPromise = mutateGroups.mutate(
+                                readyToMutate.groups,
+                                {
+                                    onSuccess: () => {
+                                        queryClient.invalidateQueries([
+                                            "guilds-groups",
+                                            guildId,
+                                        ]);
+                                        groupCharactersPromise =
+                                            mutateGroupCharacters.mutate(
+                                                readyToMutate.group_characters,
+                                                {
+                                                    onSuccess: () => {
+                                                        queryClient.invalidateQueries(
+                                                            [
+                                                                "guilds-groups-characters",
+                                                                guildId,
+                                                            ]
+                                                        );
+                                                        setSubmitting(false);
+                                                    },
+                                                }
+                                            );
+                                    },
+                                }
+                            );
                         },
                     });
                 },

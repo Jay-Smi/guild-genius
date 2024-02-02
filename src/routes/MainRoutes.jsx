@@ -11,10 +11,9 @@ const MainLayout = Loadable(lazy(() => import("../layouts/MainLayout")));
 const NavigationScroll = Loadable(
     lazy(() => import("../layouts/NavigationScroll"))
 );
-const { authGuardLoader } = lazy(() => import("./AuthGuard"));
 
 // dashboard routing
-const { queryClient } = lazy(() => import("../config"));
+
 const DashboardDefault = Loadable(
     lazy(() => import("../views/dashboard/default"))
 );
@@ -25,6 +24,10 @@ const DashboardRosterBuilder = Loadable(
     lazy(() => import("../views/dashboard/guild/roster-builder"))
 );
 
+const DashboardCalendar = Loadable(
+    lazy(() => import("../views/dashboard/guild/calendar"))
+);
+
 const GuildRoster = Loadable(
     lazy(() => import("../views/dashboard/guild/roster"))
 );
@@ -33,6 +36,10 @@ const MyCharactersOverview = Loadable(
 );
 const DashboardRaids = Loadable(
     lazy(() => import("../views/dashboard/guild/raids"))
+);
+
+const MyAvailability = Loadable(
+    lazy(() => import("../views/dashboard/my-availability"))
 );
 
 // utilities routing
@@ -89,7 +96,7 @@ const MainRoutes = {
                 },
                 {
                     path: "calendar",
-                    element: <DashboardDefault />,
+                    element: <DashboardCalendar />,
                 },
                 {
                     path: "roster",
@@ -107,7 +114,6 @@ const MainRoutes = {
         },
         {
             path: "my-characters",
-
             children: [
                 {
                     path: "overview",
@@ -118,6 +124,10 @@ const MainRoutes = {
                     element: <MyCharactersCreate />,
                 },
             ],
+        },
+        {
+            path: "my-availability",
+            element: <MyAvailability />,
         },
         {
             path: "utils",
@@ -177,53 +187,3 @@ const MainRoutes = {
 };
 
 export default MainRoutes;
-
-// {
-//             path: "utils",
-//             children: [
-//                 {
-//                     path: "util-typography",
-//                     element: <UtilsTypography />,
-//                 },
-//             ],
-//         },
-//         {
-//             path: "utils",
-//             children: [
-//                 {
-//                     path: "util-color",
-//                     element: <UtilsColor />,
-//                 },
-//             ],
-//         },
-//         {
-//             path: "utils",
-//             children: [
-//                 {
-//                     path: "util-shadow",
-//                     element: <UtilsShadow />,
-//                 },
-//             ],
-//         },
-//         {
-//             path: "icons",
-//             children: [
-//                 {
-//                     path: "tabler-icons",
-//                     element: <UtilsTablerIcons />,
-//                 },
-//             ],
-//         },
-//         {
-//             path: "icons",
-//             children: [
-//                 {
-//                     path: "material-icons",
-//                     element: <UtilsMaterialIcons />,
-//                 },
-//             ],
-//         },
-//     {
-//     path: "sample-page",
-//     element: <SamplePage />,
-// },

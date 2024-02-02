@@ -31,6 +31,14 @@ const characters = {
                 },
             ],
         },
+        {
+            id: "my-availability",
+            title: "My Availability",
+            type: "item",
+            url: "/my-availability",
+            icon: icons.IconDashboard,
+            breadcrumbs: false,
+        },
     ],
 };
 
