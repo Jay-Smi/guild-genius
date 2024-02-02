@@ -12,8 +12,8 @@ export default function useCreateGuildCharacter() {
             ]);
         },
         onSettled: () => {
-            queryClient.invalidateQueries({ queryKey: ["guild-characters"] });
-            queryClient.invalidateQueries({ queryKey: ["user-characters"] });
+            queryClient.invalidateQueries(["guild-characters"]);
+            queryClient.invalidateQueries(["user-characters"]);
         },
     });
 }

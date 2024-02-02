@@ -14,7 +14,8 @@ export default function useDeleteGuildCharacter() {
             });
         },
         onSettled: () => {
-            queryClient.invalidateQueries({ queryKey: ["guild-characters"] });
+            queryClient.invalidateQueries(["guild-characters"]);
+            queryClient.invalidateQueries(["user-characters"]);
         },
     });
 }

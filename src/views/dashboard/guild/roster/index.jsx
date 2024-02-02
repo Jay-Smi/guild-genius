@@ -1,4 +1,3 @@
-import { useTheme } from "@emotion/react";
 import { useStore } from "../../../../store";
 import useUserInfo from "../../../../hooks/useUserInfo";
 import { useAllGuildsCharacters } from "../../../../hooks/character/useCharacters";
@@ -6,18 +5,12 @@ import useAllGuildsPlayers from "../../../../hooks/player/useAllGuildsPlayers";
 import useAllGuildCharacterTags from "../../../../hooks/character/useAllGuildCharacterTags";
 import Loader from "../../../../components/Loader";
 import { useMemo, useState } from "react";
-import { set } from "date-fns";
-import { allClasses, allClassesArray } from "../../../../utils/wowHelpers";
+
+import { allClassesArray } from "../../../../utils/wowHelpers";
 import useCreateGuildCharacter from "../../../../hooks/character/useCreateGuildCharacter";
 import useUpdateGuildCharacter from "../../../../hooks/character/useUpdateGuildCharacter";
 import useDeleteGuildCharacter from "../../../../hooks/character/useDeleteGuildCharacter";
-import {
-    Box,
-    Button,
-    IconButton,
-    Tooltip,
-    tableSortLabelClasses,
-} from "@mui/material";
+import { Box, Button, IconButton, Tooltip } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {
@@ -36,16 +29,10 @@ import {
 } from "../../../../utils/helpers";
 
 function GuildRoster() {
-    const theme = useTheme();
-    const [disablePadding, setDisablePadding] = useState(false);
-
     const user = useStore((state) => state.session.user);
     const userId = user.id;
     const discordName = user.user_metadata.name;
-    const { profile, characters, players, isLoading, error } = useUserInfo(
-        userId,
-        discordName
-    );
+    const { characters, players } = useUserInfo(userId, discordName);
     const mainCharacterId = players[0].main_character || characters[0]?.id;
     const mainCharacter = characters.find(
         (character) => character.id === mainCharacterId
@@ -124,12 +111,10 @@ const csvConfig = mkConfig({
 
 function CharacterTable({ initialCharacters, isLoadingAny, userRank }) {
     const [validationErrors, setValidationErrors] = useState({});
-    // const characters = useMemo(
-    //     () => initialCharacters || [],
-    //     [initialCharacters]
-    // );
-    const [characters, setCharacters] = useState(initialCharacters);
-    const [creatingRow, setCreatingRow] = useState(false);
+    const characters = useMemo(
+        () => initialCharacters || [],
+        [initialCharacters]
+    );
 
     const columns = useMemo(
         () => [
@@ -225,12 +210,45 @@ function CharacterTable({ initialCharacters, isLoadingAny, userRank }) {
                 accessorKey: "guild_rank",
                 header: "Guild Rank",
                 editVariant: "select",
-                editSelectOptions: [
-                    "Trial",
-                    "Member",
-                    "Officer",
-                    "Guild Master",
-                ],
+
+                editSelectOptions: () => {
+                    const possibleRanks = [
+                        { string: "Trial", int: 15 },
+                        { string: "Member", int: 10 },
+                        { string: "Officer", int: 5 },
+                        { string: "Guild Master", int: 0 },
+                        { string: "Admin", int: -1 },
+                    ];
+                    const rankArray = [];
+
+                    if (userRank === -1) {
+                        for (let i = 0; i < possibleRanks.length; i++) {
+                            rankArray.push(possibleRanks[i].string);
+                        }
+                    } else if (userRank === 0) {
+                        for (let i = 0; i < possibleRanks.length; i++) {
+                            if (
+                                possibleRanks[i].int === 0 ||
+                                possibleRanks[i].int === 5 ||
+                                possibleRanks[i].int === 10 ||
+                                possibleRanks[i].int === 15
+                            ) {
+                                rankArray.push(possibleRanks[i].string);
+                            }
+                        }
+                    } else if (userRank === 5) {
+                        for (let i = 0; i < possibleRanks.length; i++) {
+                            if (
+                                possibleRanks[i].int === 10 ||
+                                possibleRanks[i].int === 15
+                            ) {
+                                rankArray.push(possibleRanks[i].string);
+                            }
+                        }
+                    }
+
+                    return rankArray;
+                },
                 enableEditing: true,
                 muiEditTextFieldProps: {
                     required: true,
@@ -276,7 +294,7 @@ function CharacterTable({ initialCharacters, isLoadingAny, userRank }) {
                 size: 80,
             },
         ],
-        [validationErrors]
+        [validationErrors, characters, userRank]
     );
 
     //call CREATE hook
@@ -300,7 +318,7 @@ function CharacterTable({ initialCharacters, isLoadingAny, userRank }) {
         useDeleteGuildCharacterTags();
 
     //CREATE action
-    const handleCreateCharacter = async ({ values, table, row }) => {
+    const handleCreateCharacter = async ({ values, table }) => {
         const newValiationErrors = validateCharacter(values);
         if (Object.values(newValiationErrors).some((error) => error)) {
             setValidationErrors(newValiationErrors);
@@ -523,13 +541,36 @@ function CharacterTable({ initialCharacters, isLoadingAny, userRank }) {
         const csv = generateCsv(csvConfig)(strippedCharacters);
         download(csvConfig)(csv);
     };
-
+    // enableEditing: userRank < 6 ? true : false,
     const table = useMaterialReactTable({
         columns,
         data: characters,
         createDisplayMode: "row",
         editDisplayMode: "row",
-        enableEditing: userRank < 6 ? true : false,
+        enableEditing:
+            userRank <= 5
+                ? (row) => {
+                      const allCells = row.getAllCells();
+                      const rankCell = allCells
+                          .find((cell) => cell.column.id === "guild_rank")
+                          .getValue();
+                      const rankInt = convertRankToInt(rankCell);
+                      switch (userRank) {
+                          case -1:
+                              return true;
+                          case 0:
+                              return rankInt >= 0;
+                          case 5:
+                              return rankInt > 5;
+                          case 10:
+                              return false;
+                          case 15:
+                              return false;
+                          default:
+                              return false;
+                      }
+                  }
+                : false,
         enableStickyHeader: true,
         getRowId: (row) => row.id,
         muiTableContainerProps: {
@@ -612,9 +653,12 @@ function CharacterTable({ initialCharacters, isLoadingAny, userRank }) {
             isSaving:
                 isCreatingCharacter ||
                 isUpdatingCharacter ||
-                isDeletingCharacter,
+                isDeletingCharacter ||
+                isCreatingPlayer ||
+                isDeletingPlayer ||
+                isCreatingTags ||
+                isDeletingTags,
             showProgressBar: isLoadingAny,
-            creatingRow,
         },
         // initialState: {
         //     columnVisibility: {
