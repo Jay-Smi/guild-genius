@@ -4,30 +4,22 @@ import { queryClient } from "../../config";
 
 export default function useCreateCharacter() {
     return useMutation({
-        mutationFn: (formData) => insertCharacter(formData),
+        mutationFn: (character) => insertCharacter(character),
+        onMutate: (character) => {
+            queryClient.setQueryData(["user-characters"], (old) => [
+                ...old,
+                character,
+            ]);
+        },
+        onSettled: () => {
+            queryClient.invalidateQueries({ queryKey: ["user-characters"] });
+        },
     });
 }
 
-async function insertCharacter(formData) {
-    const {
-        character_name,
-        class: playerClass,
-        spec,
-        player_id,
-        guild_id,
-        discord_name,
-        guild_rank,
-    } = formData;
-    const { data, error } = await supabase.from("characters").insert([
-        {
-            character_name,
-            class: playerClass,
-            spec,
-            player_id,
-            guild_id,
-            discord_name,
-            guild_rank,
-        },
-    ]);
+async function insertCharacter(character) {
+    const { data, error } = await supabase
+        .from("characters")
+        .insert([character]);
     return { data, error };
 }

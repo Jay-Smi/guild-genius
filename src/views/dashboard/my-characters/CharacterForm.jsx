@@ -37,26 +37,52 @@ function CharacterForm({ ...others }) {
         userId,
         discordName
     );
-    const somePlayerisInGuild =
-        players?.some((player) => player.guild_id !== null) || false;
-
-    const { guild, isLoadingGuild } = useGuild(
-        players[0].guild_id,
-        somePlayerisInGuild
+    const activePlayer = players?.find(
+        (player) => player.id === profile[0].active_player_id
     );
-    const mainPlayer =
-        players.find((player) => player.id === profile[0].main_player) ||
-        players[0];
-    const characterMutation = useCreateCharacter();
+
+    const { guild, isLoadingGuild } = useGuild(activePlayer?.guild_id);
+
+    const { mutate: createCharacter } = useCreateCharacter();
     const navigate = useNavigate();
-    const guildId = guild ? guild[0]?.id : null;
+
     async function handleSubmit(
         values,
         { setErrors, setStatus, setSubmitting }
     ) {
+        let gId = null;
+        let rank = null;
+
+        const activePlayerInGuild = !!activePlayer.guild_id;
+
+        if (activePlayerInGuild && checked) {
+            gId = activePlayer.guild_id;
+            const guildToUse = guild.find(
+                (g) => g.id === activePlayer.guild_id
+            );
+
+            const isGM = guildToUse.user_id === userId;
+
+            if (isGM) {
+                rank = 0;
+            } else {
+                rank = 15;
+            }
+        }
+
+        const newCharacter = {
+            character_name: values.character_name,
+            class: values.class,
+            spec: values.spec,
+            player_id: activePlayer.id,
+            guild_id: gId,
+            discord_name: activePlayer.discord_name,
+            guild_rank: rank,
+        };
+
         try {
-            await characterMutation.mutateAsync(values);
-            queryClient.invalidateQueries(["characters", discordName]);
+            await createCharacter(newCharacter);
+
             navigate("/my-characters/overview");
             if (scriptedRef.current) {
                 setStatus({ success: true });
@@ -79,11 +105,6 @@ function CharacterForm({ ...others }) {
                 character_name: "",
                 class: "",
                 spec: "",
-                player_id: mainPlayer.id,
-                discord_name: discordName,
-                guild_id: guildId || null,
-                guild_rank: "member",
-                submit: null,
             }}
             validationSchema={Yup.object().shape({
                 character_name: Yup.string()

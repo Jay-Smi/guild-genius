@@ -47,17 +47,16 @@ function GuildRoster() {
     const { guildCharacterTags, isLoadingCharacterTags } =
         useAllGuildCharacterTags(mainGuildId);
 
-    const highestRank =
-        characters.reduce((minCharacter, currentCharacter) => {
-            if (
-                minCharacter === null ||
-                currentCharacter.guild_rank < minCharacter.guild_rank
-            ) {
-                return currentCharacter;
-            } else {
-                return minCharacter;
-            }
-        }, null)?.guild_rank || 15;
+    const highestRank = characters.reduce((minCharacter, currentCharacter) => {
+        if (
+            minCharacter === null ||
+            currentCharacter.guild_rank < minCharacter.guild_rank
+        ) {
+            return currentCharacter;
+        } else {
+            return minCharacter;
+        }
+    }, null)?.guild_rank;
 
     const isLoadingAny =
         isLoadingCharacters ||
