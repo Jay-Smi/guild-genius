@@ -70,7 +70,7 @@ export function usePlayersByDiscordName(discordName) {
         isLoading: isLoadingPlayers,
         error: playerError,
     } = useQuery({
-        queryKey: ["players", discordName],
+        queryKey: ["players"],
         queryFn: () => getPlayersByDiscordName(discordName),
     });
 
@@ -81,28 +81,21 @@ export function usePlayersByDiscordName(discordName) {
     };
 }
 
-async function insertPlayer(displayName, discordName, profileId) {
-    const { data, error } = await supabase
-        .from("players")
-        .insert([
-            {
-                player_name: displayName,
-                discord_name: discordName,
-                profile_id: profileId,
-            },
-        ])
-        .select();
+async function insertPlayer(player) {
+    const { data, error } = await supabase.from("players").insert([player]);
+
     if (error) throw error;
     return data;
 }
 
-export function useInsertPlayer(displayName, discordName, profileId) {
-    const mutation = useMutation({
-        mutationFn: () => insertPlayer(displayName, discordName, profileId),
-        onSuccess: (data) => {
-            queryClient.invalidateQueries("players");
+export function useInsertPlayer() {
+    return useMutation({
+        mutationFn: (player) => insertPlayer(player),
+        onMutate: (newPlayer) => {
+            queryClient.setQueryData(["players"], (old) => [...old, newPlayer]);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries(["players"]);
         },
     });
-
-    return mutation;
 }

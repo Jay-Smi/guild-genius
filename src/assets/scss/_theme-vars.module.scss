@@ -88,6 +88,10 @@ $wowShaman: #0070dd;
 $wowWarlock: #8788ee;
 $wowWarrior: #c69b6d;
 
+//wow faction colors
+$wowAlliance: #4d7dcb;
+$wowHorde: #c41e3a;
+
 // ==============================|| JAVASCRIPT ||============================== //
 
 :export {
@@ -150,6 +154,10 @@ $wowWarrior: #c69b6d;
     wowShaman: $wowShaman;
     wowWarlock: $wowWarlock;
     wowWarrior: $wowWarrior;
+
+    //wow faction colors
+    wowAlliance: $wowAlliance;
+    wowHorde: $wowHorde;
 
     // ==============================|| DARK THEME VARIANTS ||============================== //
 

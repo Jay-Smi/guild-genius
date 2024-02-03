@@ -48,12 +48,11 @@ function GuildRaids() {
         userId,
         discordName
     );
-
-    const mainCharacterId = players[0].main_character || characters[0]?.id;
-    const mainCharacter = characters.find(
-        (character) => character.id === mainCharacterId
+    const activePlayer = players.find(
+        (player) => player.id === profile[0].active_player_id
     );
-    const mainGuildId = mainCharacter?.guild_id;
+
+    const mainGuildId = activePlayer?.guild_id;
     const { guild, isLoadingGuild, errorGuild } = useGuild(mainGuildId);
     const today = new Date();
     const { startDate, endDate } = getLockoutStartAndEndDates(today);
@@ -94,6 +93,8 @@ function GuildRaids() {
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
+    if (!mainGuildId)
+        return <Typography>Join a guild to see the raids</Typography>;
     if (isLoadingAny) return <Loader />;
     const selectedLockout = allGuildInstanceLockouts[value];
     return (

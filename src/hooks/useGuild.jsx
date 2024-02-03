@@ -5,15 +5,15 @@ import { usePlayersByDiscordName } from "./usePlayers";
 import supabase from "../services/supabase";
 import { useStore } from "../store";
 
-export default function useGuild(guildId, enabled = false) {
+export default function useGuild(guildId) {
     const {
         data: guild,
         isLoadingGuild,
         errorGuild,
     } = useQuery({
-        queryKey: ["guild", guildId],
+        queryKey: ["guild"],
         queryFn: () => getGuildById(guildId),
-        enabled: enabled,
+        enabled: !!guildId,
     });
 
     return {

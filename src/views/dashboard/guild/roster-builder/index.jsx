@@ -11,7 +11,14 @@ import { isEqual, parseISO } from "date-fns";
 import dayjs from "dayjs";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
-import { Box, Divider, Paper, useMediaQuery, useTheme } from "@mui/material";
+import {
+    Box,
+    Divider,
+    Paper,
+    Typography,
+    useMediaQuery,
+    useTheme,
+} from "@mui/material";
 import RosterBuilderSidebar from "./roster-builder-sidebar";
 import LockoutTabs from "./lockout-tabs/LockoutTabs";
 import SidebarItems from "./roster-builder-sidebar/sidebar-items";
@@ -42,11 +49,11 @@ export default function RosterBuilder() {
         userId,
         discordName
     );
-    const mainCharacterId = players[0].main_character || characters[0]?.id;
-    const mainCharacter = characters.find(
-        (character) => character.id === mainCharacterId
+    const activePlayer = players.find(
+        (player) => player.id === profile[0].active_player_id
     );
-    const mainGuildId = mainCharacter?.guild_id;
+
+    const mainGuildId = activePlayer?.guild_id;
     const { guildCharacters, isLoadingCharacters, errorCharacters } =
         useAllGuildsCharacters(mainGuildId);
     const { guildPlayers, isLoadingPlayers, errorPlayers } =
@@ -72,6 +79,8 @@ export default function RosterBuilder() {
 
     let categories = [];
     let modifiedCharacters = null;
+    if (!mainGuildId)
+        return <Typography>Join a guild to use the roster builder</Typography>;
     if (!isLoadingAny) {
         const extractedCharacterTags = guildCharacterTags.map((tag) => {
             return tag.tag_name;

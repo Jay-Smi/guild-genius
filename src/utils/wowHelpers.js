@@ -40,6 +40,17 @@ export function getLockoutStartAndEndDates(date) {
     };
 }
 
+export const allSODRealms = [
+    { name: "Crusader Strike", id: "crusader-strike" },
+    { name: "Chaos Bolt", id: "chaos-bolt" },
+    { name: "Lava Lash", id: "lava-lash" },
+    { name: "Living Flame", id: "living-flame" },
+    { name: "Lone Wolf", id: "lone-wolf" },
+    { name: "Penance", id: "penance" },
+    { name: "Shadowstrike", id: "shadowstrike" },
+    { name: "Wild Growth", id: "wild-growth" },
+];
+
 export const allClassesArray = [
     "Druid",
     "Hunter",

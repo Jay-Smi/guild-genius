@@ -2,7 +2,7 @@ import guild from "./guild";
 import pages from "./pages";
 import utilities from "./utilities";
 import other from "./other";
-import characters from "./characters";
+import characters from "./myself";
 
 // ==============================|| MENU ITEMS ||============================== //
 //, pages, utilities, other

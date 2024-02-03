@@ -5,9 +5,17 @@ import { IconDashboard } from "@tabler/icons-react";
 const icons = { IconDashboard };
 
 const characters = {
-    id: "my-characters-group",
+    id: "myself",
     type: "group",
     children: [
+        {
+            id: "my-availability",
+            title: "My Availability",
+            type: "item",
+            url: "/my-availability",
+            icon: icons.IconDashboard,
+            breadcrumbs: false,
+        },
         {
             id: "my-characters",
             title: "My Characters",
@@ -32,12 +40,27 @@ const characters = {
             ],
         },
         {
-            id: "my-availability",
-            title: "My Availability",
-            type: "item",
-            url: "/my-availability",
+            id: "my-guilds",
+            title: "My Guilds",
+            type: "collapse",
             icon: icons.IconDashboard,
-            breadcrumbs: false,
+
+            children: [
+                {
+                    id: "my-guilds-overview",
+                    title: "Overview",
+                    type: "item",
+                    url: "/my-guilds/overview",
+                    breadcrumbs: false,
+                },
+                {
+                    id: "my-guilds-create",
+                    title: "Create",
+                    type: "item",
+                    url: "/my-guilds/create",
+                    breadcrumbs: false,
+                },
+            ],
         },
     ],
 };

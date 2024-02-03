@@ -6,15 +6,12 @@ import { styled, useTheme } from "@mui/material/styles";
 import {
     Avatar,
     Box,
-    Button,
     ButtonBase,
-    Container,
     Drawer,
     Grid,
     Link,
     Menu,
     MenuItem,
-    Modal,
     Tooltip,
     Typography,
 } from "@mui/material";
@@ -27,10 +24,6 @@ import SkeletonEarningCard from "../../../components/cards/Skeleton/EarningCard"
 import EarningIcon from "../../../assets/images/icons/earning.svg";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-import GetAppTwoToneIcon from "@mui/icons-material/GetAppOutlined";
-import FileCopyTwoToneIcon from "@mui/icons-material/FileCopyOutlined";
-import PictureAsPdfTwoToneIcon from "@mui/icons-material/PictureAsPdfOutlined";
-import ArchiveTwoToneIcon from "@mui/icons-material/ArchiveOutlined";
 import AnimateButton from "../../../components/extended/AnimateButton";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import EditIcon from "@mui/icons-material/Edit";
@@ -41,7 +34,6 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { useStore } from "../../../store";
 import useDeleteCharacter from "../../../hooks/useDeleteCharacter";
-import { queryClient } from "../../../config";
 
 const IFrameWrapper = styled("iframe")(({ theme }) => ({
     height: "calc(100vh - 210px)",

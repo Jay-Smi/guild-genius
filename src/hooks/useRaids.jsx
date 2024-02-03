@@ -9,6 +9,7 @@ export function useAllGuildsRaids(guildId) {
     } = useQuery({
         queryKey: ["guilds-raids", guildId],
         queryFn: () => getAllGuildsRaids(guildId),
+        enabled: !!guildId,
     });
 
     return {

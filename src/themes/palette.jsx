@@ -119,6 +119,8 @@ export default function themePalette(theme) {
             shaman: theme.colors?.wowShaman,
             warlock: theme.colors?.wowWarlock,
             warrior: theme.colors?.wowWarrior,
+            Alliance: theme.colors?.wowAlliance,
+            Horde: theme.colors?.wowHorde,
         },
     };
 }

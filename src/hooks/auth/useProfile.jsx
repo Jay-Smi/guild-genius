@@ -18,7 +18,7 @@ export default function useProfile(userId) {
         isLoading,
         error,
     } = useQuery({
-        queryKey: ["profile", userId],
+        queryKey: ["profile"],
         queryFn: () => getProfileByUserId(userId),
     });
 
@@ -29,20 +29,19 @@ export default function useProfile(userId) {
     };
 }
 
-async function insertProfileByUserId(userId, displayName, discordName) {
-    const insert = await supabase.from("profiles").insert({
-        user_id: userId,
-        display_name: displayName,
-        discord_name: discordName,
-    });
+async function insertProfileByUserId(newProfile) {
+    const insert = await supabase.from("profiles").insert([newProfile]);
 
     return insert;
 }
 
-export function useInsertProfile(userId, displayName, discordName) {
+export function useInsertProfile() {
     const profileMutation = useMutation({
-        mutationFn: () =>
-            insertProfileByUserId(userId, displayName, discordName),
+        mutationFn: (newProfile) => insertProfileByUserId(newProfile),
+        onMutate: (newProfile) => {
+            queryClient.setQueryData(["profile"], () => [newProfile]);
+        },
+        onSettled: () => queryClient.invalidateQueries(["profile"]),
     });
     return profileMutation;
 }

@@ -40,6 +40,7 @@ export function useAllGuildsCharacters(guildId) {
     } = useQuery({
         queryKey: ["guild-characters"],
         queryFn: () => getAllGuildsCharacters(guildId),
+        enabled: !!guildId,
     });
 
     return {

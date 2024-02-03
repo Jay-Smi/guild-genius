@@ -61,7 +61,10 @@ const ProfileSection = () => {
     const somePlayerisInGuild =
         players?.some((player) => player.guild_id !== null) || false;
 
-    const { guild } = useGuild(players[0].guild_id, somePlayerisInGuild);
+    const { guild, isLoadingGuild } = useGuild(
+        players[0].guild_id,
+        somePlayerisInGuild
+    );
     const avatarURL = user.user_metadata.avatar_url;
     const mainPlayer =
         players.find((player) => player.id === profile[0].main_player) ||
@@ -80,7 +83,7 @@ const ProfileSection = () => {
         }
     }, null);
 
-    const guildRank = convertRankToString(highestRank.guild_rank);
+    const guildRank = convertRankToString(highestRank?.guild_rank);
 
     const theme = useTheme();
     const borderRadius = useStore((state) => state.borderRadius);
@@ -271,8 +274,9 @@ const ProfileSection = () => {
                                                 </Typography>
                                             </Stack>
                                             <Typography variant="subtitle2">
-                                                {guildRank} of{" "}
-                                                {guild[0]?.guild_name}
+                                                {guild
+                                                    ? `${guildRank} of ${guild[0]?.guild_name}`
+                                                    : "No Guild"}
                                             </Typography>
                                         </Stack>
                                         <OutlinedInput

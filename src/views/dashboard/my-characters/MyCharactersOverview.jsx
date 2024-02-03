@@ -25,14 +25,6 @@ function MyCharactersOverview() {
                 </Grid>
             ))}
         </Grid>
-        // <div>
-        //     {characters?.map((character) => (
-        //         <div key={character.id}>
-        //             <p> Awesome custom character component!!!</p>
-        //             <div>{character.character_name}</div>
-        //         </div>
-        //     ))}
-        // </div>
     );
 }
 

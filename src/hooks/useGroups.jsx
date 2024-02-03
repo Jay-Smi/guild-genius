@@ -9,6 +9,7 @@ export function useAllGuildsGroups(guildId) {
     } = useQuery({
         queryKey: ["guilds-groups", guildId],
         queryFn: () => getAllGuildsGroups(guildId),
+        enabled: !!guildId,
     });
 
     return {
@@ -35,6 +36,7 @@ export function useAllGuildsGroupCharacters(guildId) {
     } = useQuery({
         queryKey: ["guilds-groups-characters", guildId],
         queryFn: () => getAllGuildsGroupCharacters(guildId),
+        enabled: !!guildId,
     });
 
     return {

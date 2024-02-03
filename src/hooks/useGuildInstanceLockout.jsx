@@ -9,6 +9,7 @@ export function useGuildInstanceLockout(startDate, guildId) {
     } = useQuery({
         queryKey: ["guild-instance-lockout", startDate, guildId],
         queryFn: () => getLockoutByStartDate(startDate, guildId),
+        enabled: !!guildId,
     });
 
     return {
@@ -36,6 +37,7 @@ export function useAllGuildInstanceLockouts(guildId) {
     } = useQuery({
         queryKey: ["guild-instance-lockouts", guildId],
         queryFn: () => getAllLockouts(guildId),
+        enabled: !!guildId,
     });
 
     return {

@@ -9,6 +9,7 @@ import useGuild from "../../../../hooks/useGuild";
 import { useAllGuildsRaids } from "../../../../hooks/useRaids";
 import { useAllGuildInstanceLockouts } from "../../../../hooks/useGuildInstanceLockout";
 import Loader from "../../../../components/Loader";
+import { Typography } from "@mui/material";
 
 export default function Calendar() {
     const user = useStore((state) => state.session.user);
@@ -19,11 +20,11 @@ export default function Calendar() {
         userId,
         discordName
     );
-    const mainCharacterId = players[0].main_character || characters[0]?.id;
-    const mainCharacter = characters.find(
-        (character) => character.id === mainCharacterId
+    const activePlayer = players.find(
+        (player) => player.id === profile[0].active_player_id
     );
-    const mainGuildId = mainCharacter?.guild_id;
+
+    const mainGuildId = activePlayer?.guild_id;
     const { guild, isLoadingGuild, errorGuild } = useGuild(mainGuildId);
     const {
         lockouts: allGuildInstanceLockouts,
@@ -40,6 +41,8 @@ export default function Calendar() {
         !raids ||
         !allGuildInstanceLockouts ||
         !guild;
+    if (!isLoading && !mainGuildId)
+        return <Typography>Join a guild to see the calendar</Typography>;
     if (anyLoading) return <Loader />;
     const events = raids.map((raid) => {
         const raidLockout = allGuildInstanceLockouts.find(

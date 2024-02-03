@@ -6,21 +6,21 @@ import { useSession } from "../hooks/auth/useSession";
 import { useQuery } from "@tanstack/react-query";
 import { useStore } from "../store";
 
-const sessionQuery = () => ({
-    queryKey: ["session"],
-    queryFn: async () => supabase.auth.getSession(),
-});
+// const sessionQuery = () => ({
+//     queryKey: ["session"],
+//     queryFn: async () => supabase.auth.getSession(),
+// });
 
-export const authGuardLoader =
-    (queryClient) =>
-    async ({ params }) => {
-        const query = sessionQuery();
+// export const authGuardLoader =
+//     (queryClient) =>
+//     async ({ params }) => {
+//         const query = sessionQuery();
 
-        return (
-            queryClient.getQueryData(query.queryKey) ??
-            (await queryClient.fetchQuery(query))
-        );
-    };
+//         return (
+//             queryClient.getQueryData(query.queryKey) ??
+//             (await queryClient.fetchQuery(query))
+//         );
+//     };
 
 const AuthGuard = ({ children }) => {
     const session = useStore((state) => state.session);

@@ -9,6 +9,7 @@ export default function useAllGuildCharacterTags(guildId) {
     } = useQuery({
         queryKey: ["guild-character-tags"],
         queryFn: () => getAllGuildsCharacterTags(guildId),
+        enabled: !!guildId,
     });
 
     return {

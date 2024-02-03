@@ -9,6 +9,7 @@ export default function useAllGuildsPlayers(guildId) {
     } = useQuery({
         queryKey: ["guild-players"],
         queryFn: () => getAllGuildsPlayers(guildId),
+        enabled: !!guildId,
     });
 
     return {

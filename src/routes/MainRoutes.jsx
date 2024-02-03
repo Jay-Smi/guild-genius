@@ -1,18 +1,16 @@
 import { lazy } from "react";
+import { Navigate } from "react-router-dom";
 
 // project imports
-
 import Loadable from "../components/Loadable";
-import { Navigate } from "react-router-dom";
-import MyCharactersCreate from "../views/dashboard/my-characters/MyCharactersCreate";
 
-//main routing
+//main
 const MainLayout = Loadable(lazy(() => import("../layouts/MainLayout")));
 const NavigationScroll = Loadable(
     lazy(() => import("../layouts/NavigationScroll"))
 );
 
-// dashboard routing
+// GUILD
 
 const DashboardDefault = Loadable(
     lazy(() => import("../views/dashboard/default"))
@@ -31,18 +29,37 @@ const DashboardCalendar = Loadable(
 const GuildRoster = Loadable(
     lazy(() => import("../views/dashboard/guild/roster"))
 );
-const MyCharactersOverview = Loadable(
-    lazy(() => import("../views/dashboard/my-characters/MyCharactersOverview"))
-);
+
 const DashboardRaids = Loadable(
     lazy(() => import("../views/dashboard/guild/raids"))
 );
+
+//my AVAILABILITY
 
 const MyAvailability = Loadable(
     lazy(() => import("../views/dashboard/my-availability"))
 );
 
-// utilities routing
+// my CHARACTERS
+const MyCharactersOverview = Loadable(
+    lazy(() => import("../views/dashboard/my-characters/MyCharactersOverview"))
+);
+
+const MyCharactersCreate = Loadable(
+    lazy(() => import("../views/dashboard/my-characters/MyCharactersCreate"))
+);
+
+// my GUILDS
+
+const MyGuildsOverview = Loadable(
+    lazy(() => import("../views/dashboard/my-guilds/overview"))
+);
+
+const MyGuildsCreate = Loadable(
+    lazy(() => import("../views/dashboard/my-guilds/create"))
+);
+
+// utilities
 const UtilsTypography = Loadable(
     lazy(() => import("../views/utilities/Typography"))
 );
@@ -55,7 +72,7 @@ const UtilsTablerIcons = Loadable(
     lazy(() => import("../views/utilities/TablerIcons"))
 );
 
-// sample page routing
+// sample page
 const SamplePage = Loadable(lazy(() => import("../views/sample-page")));
 
 //Authentication
@@ -128,6 +145,19 @@ const MainRoutes = {
         {
             path: "my-availability",
             element: <MyAvailability />,
+        },
+        {
+            path: "my-guilds",
+            children: [
+                {
+                    path: "overview",
+                    element: <MyGuildsOverview />,
+                },
+                {
+                    path: "create",
+                    element: <MyGuildsCreate />,
+                },
+            ],
         },
         {
             path: "utils",

@@ -10,7 +10,7 @@ import { allClassesArray } from "../../../../utils/wowHelpers";
 import useCreateGuildCharacter from "../../../../hooks/character/useCreateGuildCharacter";
 import useUpdateGuildCharacter from "../../../../hooks/character/useUpdateGuildCharacter";
 import useDeleteGuildCharacter from "../../../../hooks/character/useDeleteGuildCharacter";
-import { Box, Button, IconButton, Tooltip } from "@mui/material";
+import { Box, Button, IconButton, Tooltip, Typography } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {
@@ -32,28 +32,32 @@ function GuildRoster() {
     const user = useStore((state) => state.session.user);
     const userId = user.id;
     const discordName = user.user_metadata.name;
-    const { characters, players } = useUserInfo(userId, discordName);
-    const mainCharacterId = players[0].main_character || characters[0]?.id;
-    const mainCharacter = characters.find(
-        (character) => character.id === mainCharacterId
+    const { characters, players, profile, isLoading } = useUserInfo(
+        userId,
+        discordName
     );
-    const mainGuildId = mainCharacter?.guild_id;
+    const activePlayer = players.find(
+        (player) => player.id === profile[0].active_player_id
+    );
+
+    const mainGuildId = activePlayer?.guild_id;
     const { guildCharacters, isLoadingCharacters } =
         useAllGuildsCharacters(mainGuildId);
     const { guildPlayers, isLoadingPlayers } = useAllGuildsPlayers(mainGuildId);
     const { guildCharacterTags, isLoadingCharacterTags } =
         useAllGuildCharacterTags(mainGuildId);
 
-    const highestRank = characters.reduce((minCharacter, currentCharacter) => {
-        if (
-            minCharacter === null ||
-            currentCharacter.guild_rank < minCharacter.guild_rank
-        ) {
-            return currentCharacter;
-        } else {
-            return minCharacter;
-        }
-    }, null).guild_rank;
+    const highestRank =
+        characters.reduce((minCharacter, currentCharacter) => {
+            if (
+                minCharacter === null ||
+                currentCharacter.guild_rank < minCharacter.guild_rank
+            ) {
+                return currentCharacter;
+            } else {
+                return minCharacter;
+            }
+        }, null)?.guild_rank || 15;
 
     const isLoadingAny =
         isLoadingCharacters ||
@@ -62,7 +66,11 @@ function GuildRoster() {
         !guildCharacters ||
         !guildPlayers ||
         !guildCharacterTags;
+    if (isLoading) return <Loader />;
+    if (!mainGuildId)
+        return <Typography>Join a guild to see the roster</Typography>;
     if (isLoadingAny) return <Loader />;
+
     const updatedCharacters = guildCharacters?.map((character) => {
         const player = guildPlayers.find(
             (player) => player.id === character.player_id

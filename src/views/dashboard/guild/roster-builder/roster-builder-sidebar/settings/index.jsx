@@ -93,16 +93,17 @@ export default function RosterSettings() {
 
     const { guild } = useGuild(players[0].guild_id, somePlayerisInGuild);
     const guildId = guild[0].id;
-    const highestRank = characters.reduce((minCharacter, currentCharacter) => {
-        if (
-            minCharacter === null ||
-            currentCharacter.guild_rank < minCharacter.guild_rank
-        ) {
-            return currentCharacter;
-        } else {
-            return minCharacter;
-        }
-    }, null).guild_rank;
+    const highestRank =
+        characters.reduce((minCharacter, currentCharacter) => {
+            if (
+                minCharacter === null ||
+                currentCharacter.guild_rank < minCharacter.guild_rank
+            ) {
+                return currentCharacter;
+            } else {
+                return minCharacter;
+            }
+        }, null)?.guild_rank || 15;
 
     const mutateGuildInstanceLockouts = useCreateGuildInstanceLockouts();
     const mutateRaids = useCreateRaids();

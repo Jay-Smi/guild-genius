@@ -1,4 +1,4 @@
-import { Box, useTheme } from "@mui/material";
+import { Box, Typography, useTheme } from "@mui/material";
 import Calendar from "./calendar";
 import Loader from "../../../components/Loader";
 import { useStore } from "../../../store";
@@ -15,17 +15,24 @@ export default function Availability() {
     const userId = user.id;
     const discordName = user.user_metadata.name;
 
-    const { players, isLoading, error } = useUserInfo(userId, discordName);
-    const playerId = players[0].id;
+    const { players, profile, isLoading, error } = useUserInfo(
+        userId,
+        discordName
+    );
+    const activePlayer = players.find(
+        (player) => player.id === profile[0].active_player_id
+    );
+    const playerId = activePlayer.id;
     const { data: playerAvailability, isLoading: isLoadingPlayerAvailability } =
         usePlayerAvailability(playerId);
-    const guildId = players[0].guild_id;
+    const guildId = activePlayer.guild_id;
     const anyLoading =
         isLoading ||
         isLoadingPlayerAvailability ||
         !playerAvailability ||
         !players;
-
+    if (!guildId)
+        return <Typography>Join a guild to set your availability</Typography>;
     if (anyLoading) return <Loader />;
     const availability = buildEvents(playerAvailability);
 
@@ -41,6 +48,7 @@ export default function Availability() {
                     allDay: avail.is_all_day,
                     editable: true,
                     color: theme.palette.error.dark,
+                    daysOfWeek: avail.days_of_week,
                     start,
                     end,
                 };

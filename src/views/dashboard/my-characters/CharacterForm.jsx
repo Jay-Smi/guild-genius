@@ -8,20 +8,14 @@ import {
     FormControl,
     FormControlLabel,
     FormHelperText,
-    IconButton,
-    InputAdornment,
     InputLabel,
     MenuItem,
     OutlinedInput,
     Select,
     Stack,
-    Typography,
-    useMediaQuery,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-
 import { useState } from "react";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
 import AnimateButton from "../../../components/extended/AnimateButton";
 import { allClasses, allSpecs } from "../../../utils/wowHelpers";
 import { useStore } from "../../../store";
@@ -30,6 +24,7 @@ import useGuild from "../../../hooks/useGuild";
 import useCreateCharacter from "../../../hooks/character/useCreateCharacter";
 import { queryClient } from "../../../config";
 import { useNavigate } from "react-router-dom";
+import Loader from "../../../components/Loader";
 function CharacterForm({ ...others }) {
     const theme = useTheme();
     const scriptedRef = useScriptRef();
@@ -38,17 +33,23 @@ function CharacterForm({ ...others }) {
 
     const userId = user.id;
     const discordName = user.user_metadata.name;
-    const { profile, characters, players } = useUserInfo(userId, discordName);
+    const { profile, characters, players, isLoading } = useUserInfo(
+        userId,
+        discordName
+    );
     const somePlayerisInGuild =
         players?.some((player) => player.guild_id !== null) || false;
 
-    const { guild } = useGuild(players[0].guild_id, somePlayerisInGuild);
+    const { guild, isLoadingGuild } = useGuild(
+        players[0].guild_id,
+        somePlayerisInGuild
+    );
     const mainPlayer =
         players.find((player) => player.id === profile[0].main_player) ||
         players[0];
     const characterMutation = useCreateCharacter();
     const navigate = useNavigate();
-
+    const guildId = guild ? guild[0]?.id : null;
     async function handleSubmit(
         values,
         { setErrors, setStatus, setSubmitting }
@@ -70,6 +71,8 @@ function CharacterForm({ ...others }) {
             }
         }
     }
+
+    if (isLoading || isLoadingGuild) return <Loader />;
     return (
         <Formik
             initialValues={{
@@ -78,7 +81,7 @@ function CharacterForm({ ...others }) {
                 spec: "",
                 player_id: mainPlayer.id,
                 discord_name: discordName,
-                guild_id: guild[0].id,
+                guild_id: guildId || null,
                 guild_rank: "member",
                 submit: null,
             }}
