@@ -10,7 +10,14 @@ import { allClassesArray } from "../../../../utils/wowHelpers";
 import useCreateGuildCharacter from "../../../../hooks/character/useCreateGuildCharacter";
 import useUpdateGuildCharacter from "../../../../hooks/character/useUpdateGuildCharacter";
 import useDeleteGuildCharacter from "../../../../hooks/character/useDeleteGuildCharacter";
-import { Box, Button, IconButton, Tooltip, Typography } from "@mui/material";
+import {
+    Box,
+    Button,
+    IconButton,
+    Switch,
+    Tooltip,
+    Typography,
+} from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {
@@ -27,6 +34,8 @@ import {
     convertRankToInt,
     convertRankToString,
 } from "../../../../utils/helpers";
+import useUpdateOwnPlayer from "../../../../hooks/player/useUpdateOwnPlayer";
+import useUpdateGuildPlayer from "../../../../hooks/player/useUpdateGuildPlayer";
 
 function GuildRoster() {
     const user = useStore((state) => state.session.user);
@@ -36,7 +45,7 @@ function GuildRoster() {
         userId,
         discordName
     );
-    const activePlayer = players.find(
+    const activePlayer = players?.find(
         (player) => player.id === profile[0].active_player_id
     );
 
@@ -46,17 +55,17 @@ function GuildRoster() {
     const { guildPlayers, isLoadingPlayers } = useAllGuildsPlayers(mainGuildId);
     const { guildCharacterTags, isLoadingCharacterTags } =
         useAllGuildCharacterTags(mainGuildId);
-
-    const highestRank = characters.reduce((minCharacter, currentCharacter) => {
-        if (
-            minCharacter === null ||
-            currentCharacter.guild_rank < minCharacter.guild_rank
-        ) {
-            return currentCharacter;
-        } else {
-            return minCharacter;
-        }
-    }, null)?.guild_rank;
+    const userRank = activePlayer?.guild_rank;
+    // const highestRank = characters.reduce((minCharacter, currentCharacter) => {
+    //     if (
+    //         minCharacter === null ||
+    //         currentCharacter.guild_rank < minCharacter.guild_rank
+    //     ) {
+    //         return currentCharacter;
+    //     } else {
+    //         return minCharacter;
+    //     }
+    // }, null)?.guild_rank;
 
     const isLoadingAny =
         isLoadingCharacters ||
@@ -81,14 +90,14 @@ function GuildRoster() {
         const tagObjs = guildCharacterTags.filter(
             (tag) => tag.character_id === character.id
         );
-        const rank = convertRankToString(character.guild_rank);
+        const rank = convertRankToString(player.guild_rank);
         return {
             player_name: player.player_name,
             character_name: character.character_name,
             class: character.class,
             spec: character.spec,
             guild_rank: rank,
-            rank_int: character.guild_rank,
+            rank_int: player.guild_rank,
             discord_name: character.discord_name,
             tags: tagString,
             character_id: character.id,
@@ -99,11 +108,19 @@ function GuildRoster() {
         };
     });
 
+    const updatedPlayers = guildPlayers?.map((player) => ({
+        ...player,
+        guild_id: mainGuildId,
+        guild_rank: convertRankToString(player.guild_rank),
+        rank_int: player.guild_rank,
+    }));
+
     return (
         <CharacterTable
             initialCharacters={updatedCharacters}
             isLoadingAny={isLoadingAny}
-            userRank={highestRank}
+            userRank={userRank}
+            initialPlayers={updatedPlayers}
         />
     );
 }
@@ -116,18 +133,28 @@ const csvConfig = mkConfig({
     useKeysAsHeaders: true,
 });
 
-function CharacterTable({ initialCharacters, isLoadingAny, userRank }) {
+function CharacterTable({
+    initialCharacters,
+    initialPlayers,
+    isLoadingAny,
+    userRank,
+}) {
     const [validationErrors, setValidationErrors] = useState({});
+    const [isPlayers, setIsPlayers] = useState(false);
+
     const characters = useMemo(
         () => initialCharacters || [],
         [initialCharacters]
     );
+    const players = useMemo(() => initialPlayers || [], [initialPlayers]);
 
-    const columns = useMemo(
+    const characterColumns = useMemo(
         () => [
             {
                 accessorKey: "player_name",
                 header: "Player Name",
+                editVariant: "select",
+                editSelectOptions: players.map((player) => player.player_name),
                 muiEditTextFieldProps: {
                     required: true,
                     error: !!validationErrors?.playerName,
@@ -218,6 +245,128 @@ function CharacterTable({ initialCharacters, isLoadingAny, userRank }) {
                 header: "Guild Rank",
                 editVariant: "select",
 
+                // editSelectOptions: () => {
+                //     const possibleRanks = [
+                //         { string: "Trial", int: 15 },
+                //         { string: "Member", int: 10 },
+                //         { string: "Officer", int: 5 },
+                //         { string: "Guild Master", int: 0 },
+                //         { string: "Admin", int: -1 },
+                //     ];
+                //     const rankArray = [];
+
+                //     if (userRank === -1) {
+                //         for (let i = 0; i < possibleRanks.length; i++) {
+                //             rankArray.push(possibleRanks[i].string);
+                //         }
+                //     } else if (userRank === 0) {
+                //         for (let i = 0; i < possibleRanks.length; i++) {
+                //             if (
+                //                 possibleRanks[i].int === 0 ||
+                //                 possibleRanks[i].int === 5 ||
+                //                 possibleRanks[i].int === 10 ||
+                //                 possibleRanks[i].int === 15
+                //             ) {
+                //                 rankArray.push(possibleRanks[i].string);
+                //             }
+                //         }
+                //     } else if (userRank === 5) {
+                //         for (let i = 0; i < possibleRanks.length; i++) {
+                //             if (
+                //                 possibleRanks[i].int === 10 ||
+                //                 possibleRanks[i].int === 15
+                //             ) {
+                //                 rankArray.push(possibleRanks[i].string);
+                //             }
+                //         }
+                //     }
+
+                //     return rankArray;
+                // },
+                enableEditing: false,
+                // muiEditTextFieldProps: {
+                //     required: true,
+                //     error: !!validationErrors?.guild_rank,
+                //     helperText: validationErrors?.guild_rank,
+                //     onFocus: () =>
+                //         setValidationErrors({
+                //             ...validationErrors,
+                //             guild_rank: undefined,
+                //         }),
+                // },
+                size: 80,
+            },
+            {
+                accessorKey: "discord_name",
+                header: "Discord Name",
+                enableEditing: false,
+                // muiEditTextFieldProps: {
+                //     error: !!validationErrors?.discord_name,
+                //     helperText: validationErrors?.discord_name,
+                //     onFocus: () =>
+                //         setValidationErrors({
+                //             ...validationErrors,
+                //             discord_name: undefined,
+                //         }),
+                // },
+                size: 80,
+            },
+            {
+                accessorKey: "tags",
+                header: "Tags",
+                enableEditing: true,
+                muiEditTextFieldProps: {
+                    required: false,
+                    error: !!validationErrors?.discord_name,
+                    helperText: validationErrors?.discord_name,
+                    onFocus: () =>
+                        setValidationErrors({
+                            ...validationErrors,
+                            discord_name: undefined,
+                        }),
+                },
+                size: 80,
+            },
+        ],
+        [validationErrors, characters, userRank]
+    );
+
+    const playerColumns = useMemo(
+        () => [
+            {
+                accessorKey: "player_name",
+                header: "Player Name",
+                muiEditTextFieldProps: {
+                    required: true,
+                    error: !!validationErrors?.playerName,
+                    helperText: validationErrors?.playerName,
+                    onFocus: () =>
+                        setValidationErrors({
+                            ...validationErrors,
+                            playerName: undefined,
+                        }),
+                },
+            },
+            {
+                accessorKey: "discord_name",
+                header: "Discord Name",
+                enableEditing: true,
+                muiEditTextFieldProps: {
+                    error: !!validationErrors?.discord_name,
+                    helperText: validationErrors?.discord_name,
+                    onFocus: () =>
+                        setValidationErrors({
+                            ...validationErrors,
+                            discord_name: undefined,
+                        }),
+                },
+                size: 80,
+            },
+            {
+                accessorKey: "guild_rank",
+                header: "Guild Rank",
+                editVariant: "select",
+
                 editSelectOptions: () => {
                     const possibleRanks = [
                         { string: "Trial", int: 15 },
@@ -269,39 +418,8 @@ function CharacterTable({ initialCharacters, isLoadingAny, userRank }) {
                 },
                 size: 80,
             },
-            {
-                accessorKey: "discord_name",
-                header: "Discord Name",
-                enableEditing: true,
-                muiEditTextFieldProps: {
-                    error: !!validationErrors?.discord_name,
-                    helperText: validationErrors?.discord_name,
-                    onFocus: () =>
-                        setValidationErrors({
-                            ...validationErrors,
-                            discord_name: undefined,
-                        }),
-                },
-                size: 80,
-            },
-            {
-                accessorKey: "tags",
-                header: "Tags",
-                enableEditing: true,
-                muiEditTextFieldProps: {
-                    required: false,
-                    error: !!validationErrors?.discord_name,
-                    helperText: validationErrors?.discord_name,
-                    onFocus: () =>
-                        setValidationErrors({
-                            ...validationErrors,
-                            discord_name: undefined,
-                        }),
-                },
-                size: 80,
-            },
         ],
-        [validationErrors, characters, userRank]
+        [userRank, validationErrors]
     );
 
     //call CREATE hook
@@ -315,6 +433,8 @@ function CharacterTable({ initialCharacters, isLoadingAny, userRank }) {
     //call UPDATE hook
     const { mutateAsync: updateCharacter, isPending: isUpdatingCharacter } =
         useUpdateGuildCharacter();
+    const { mutateAsync: updatePlayer, isPending: isUpdatingPlayer } =
+        useUpdateGuildPlayer();
 
     //call DELETE hook
     const { mutateAsync: deleteCharacter, isPending: isDeletingCharacter } =
@@ -337,14 +457,13 @@ function CharacterTable({ initialCharacters, isLoadingAny, userRank }) {
             character_name,
             class: charClass,
             spec,
-            guild_rank,
-            discord_name,
+
             tags,
         } = values;
 
         function getMatchingPlayer(player_name) {
             return (
-                characters.find((char) => char.player_name === player_name) ||
+                players.find((player) => player.player_name === player_name) ||
                 null
             );
         }
@@ -354,7 +473,7 @@ function CharacterTable({ initialCharacters, isLoadingAny, userRank }) {
         const existingPlayer = getMatchingPlayer(player_name);
 
         const playerId = existingPlayer
-            ? existingPlayer.player_id
+            ? existingPlayer.id
             : crypto.randomUUID();
 
         const guildId = characters[0].guild_id;
@@ -364,23 +483,23 @@ function CharacterTable({ initialCharacters, isLoadingAny, userRank }) {
                 ? existingPlayer.profile_id
                 : null
             : null;
-        const rank = convertRankToInt(guild_rank);
+        const rank = convertRankToInt(existingPlayer.guild_rank);
+
         const character = {
             id: characterId,
             character_name,
-            discord_name,
+            discord_name: existingPlayer.discord_name,
             class: charClass,
             spec,
             player_id: playerId,
             guild_id: guildId,
-            guild_rank: rank,
         };
 
         const player = {
             id: playerId,
             player_name,
             profile_id: profileId,
-            discord_name,
+            discord_name: existingPlayer.discord_name,
             guild_id: guildId,
         };
 
@@ -395,21 +514,30 @@ function CharacterTable({ initialCharacters, isLoadingAny, userRank }) {
         }));
 
         setValidationErrors({});
-        existingPlayer
-            ? await createCharacter(character, {
-                  onSuccess: async () =>
-                      tagArray.length ? await createTags(newTags) : null,
-              })
-            : await createPlayer(player, {
-                  onSuccess: async () =>
-                      await createCharacter(character, {
-                          onSuccess: async () =>
-                              tagArray.length
-                                  ? await createTags(newTags)
-                                  : null,
-                      }),
-              });
+        await createCharacter(character, {
+            onSuccess: async () =>
+                tagArray.length ? await createTags(newTags) : null,
+        });
 
+        table.setCreatingRow(null);
+    };
+
+    const handleCreatePlayer = async ({ values, table }) => {
+        const newValiationErrors = validatePlayer(values);
+        if (Object.values(newValiationErrors).some((error) => error)) {
+            setValidationErrors(newValiationErrors);
+            return;
+        }
+        setValidationErrors({});
+
+        const guildId = characters[0].guild_id;
+
+        const newPlayer = {
+            ...values,
+            guild_rank: convertRankToInt(values.guild_rank),
+            guild_id: guildId,
+        };
+        await createPlayer(newPlayer);
         table.setCreatingRow(null);
     };
 
@@ -452,7 +580,6 @@ function CharacterTable({ initialCharacters, isLoadingAny, userRank }) {
             spec,
             player_id: player_id || newPlayerId,
             guild_id,
-            guild_rank: rank,
         };
 
         const player = {
@@ -508,6 +635,35 @@ function CharacterTable({ initialCharacters, isLoadingAny, userRank }) {
         table.setEditingRow(false);
     };
 
+    const handleSavePlayer = async ({ values, table, row }) => {
+        const newValiationErrors = validatePlayer(values);
+        if (Object.values(newValiationErrors).some((error) => error)) {
+            setValidationErrors(newValiationErrors);
+            return;
+        }
+        setValidationErrors({});
+
+        const matchingPlayer = players.find(
+            (player) => player.player_name === row.original.player_name
+        );
+
+        const { id, guild_id, profile_id } = matchingPlayer;
+
+        const { player_name, discord_name, guild_rank } = values;
+
+        const player = {
+            id,
+            player_name,
+            discord_name,
+            guild_rank: convertRankToInt(guild_rank),
+            guild_id,
+            profile_id,
+        };
+        console.log(player);
+        await updatePlayer(player);
+        table.setEditingRow(false);
+    };
+
     //DELETE action
     const handleDeleteCharacter = (row) => {
         const character = characters.find(
@@ -515,19 +671,19 @@ function CharacterTable({ initialCharacters, isLoadingAny, userRank }) {
                 char.player_name === row.original.player_name &&
                 char.character_name === row.original.character_name
         );
-        const player = characters.find(
-            (char) => char.player_name === row.original.player_name
-        );
-        const allPlayerCharacters = characters.filter(
-            (char) => char.player_id === player.player_id
-        );
 
         if (window.confirm("Are you sure you want to delete this character?")) {
-            if (allPlayerCharacters.length === 1) {
-                deletePlayer(player.player_id);
-            } else {
-                deleteCharacter(character.character_id);
-            }
+            deleteCharacter(character.character_id);
+        }
+    };
+
+    const handleDeletePlayer = (row) => {
+        const player = players.find(
+            (player) => player.player_name === row.original.player_name
+        );
+
+        if (window.confirm("Are you sure you want to delete this player?")) {
+            deletePlayer(player.id);
         }
     };
 
@@ -550,8 +706,8 @@ function CharacterTable({ initialCharacters, isLoadingAny, userRank }) {
     };
     // enableEditing: userRank < 6 ? true : false,
     const table = useMaterialReactTable({
-        columns,
-        data: characters,
+        columns: isPlayers ? playerColumns : characterColumns,
+        data: isPlayers ? players : characters,
         createDisplayMode: "row",
         editDisplayMode: "row",
         enableEditing:
@@ -607,29 +763,70 @@ function CharacterTable({ initialCharacters, isLoadingAny, userRank }) {
             },
         }),
         onCreatingRowCancel: () => setValidationErrors({}),
-        onCreatingRowSave: handleCreateCharacter,
+        onCreatingRowSave: isPlayers
+            ? handleCreatePlayer
+            : handleCreateCharacter,
         onEditingRowCancel: () => setValidationErrors({}),
-        onEditingRowSave: handleSaveCharacter,
-        renderRowActions: ({ row, table }) => (
-            <Box sx={{ display: "flex", gap: "1rem" }}>
-                <Tooltip title="Edit">
-                    <IconButton
-                        aria-label="edit"
-                        onClick={() => table.setEditingRow(row)}
-                    >
-                        <EditIcon />
-                    </IconButton>
-                </Tooltip>
-                <Tooltip title="Delete">
-                    <IconButton
-                        aria-label="delete"
-                        onClick={() => handleDeleteCharacter(row)}
-                    >
-                        <DeleteIcon />
-                    </IconButton>
-                </Tooltip>
-            </Box>
-        ),
+        onEditingRowSave: isPlayers ? handleSavePlayer : handleSaveCharacter,
+        renderRowActions: ({ row, table }) => {
+            const allCells = row.getAllCells();
+            const rankCell = allCells
+                .find((cell) => cell.column.id === "guild_rank")
+                .getValue();
+            const rankInt = convertRankToInt(rankCell);
+
+            let mayDelete = false;
+            switch (userRank) {
+                case -1:
+                    mayDelete = true;
+                    break;
+                case 0:
+                    mayDelete = rankInt >= 0;
+                    break;
+                case 5:
+                    mayDelete = rankInt >= 5;
+                    break;
+                case 10:
+                    mayDelete = false;
+                    break;
+                case 15:
+                    mayDelete = false;
+                    break;
+                default:
+                    mayDelete = false;
+            }
+
+            return (
+                <Box sx={{ display: "flex", gap: "1rem" }}>
+                    <Tooltip title="Edit">
+                        <span>
+                            <IconButton
+                                aria-label="edit"
+                                onClick={() => table.setEditingRow(row)}
+                                disabled={!mayDelete}
+                            >
+                                <EditIcon />
+                            </IconButton>
+                        </span>
+                    </Tooltip>
+                    <Tooltip title="Delete">
+                        <span>
+                            <IconButton
+                                aria-label="delete"
+                                onClick={() =>
+                                    isPlayers
+                                        ? handleDeletePlayer(row)
+                                        : handleDeleteCharacter(row)
+                                }
+                                disabled={!mayDelete}
+                            >
+                                <DeleteIcon />
+                            </IconButton>
+                        </span>
+                    </Tooltip>
+                </Box>
+            );
+        },
         renderTopToolbarCustomActions: ({ table }) =>
             userRank < 6 ? (
                 <Box
@@ -640,12 +837,15 @@ function CharacterTable({ initialCharacters, isLoadingAny, userRank }) {
                         flexWrap: "wrap",
                     }}
                 >
-                    <Button
-                        variant="contained"
-                        onClick={() => table.setCreatingRow(true)}
-                    >
-                        Create Character
-                    </Button>
+                    {
+                        <Button
+                            variant="contained"
+                            onClick={() => table.setCreatingRow(true)}
+                            sx={{ minWidth: "140px" }}
+                        >
+                            {isPlayers ? "Create Player" : "Create Character"}
+                        </Button>
+                    }
                     <Button
                         variant="outlined"
                         onClick={handleExportData}
@@ -653,6 +853,34 @@ function CharacterTable({ initialCharacters, isLoadingAny, userRank }) {
                     >
                         Export to CSV
                     </Button>
+                    <Box sx={{ display: "flex" }}>
+                        <Typography
+                            variant="caption"
+                            sx={{
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                color: isPlayers ? null : "primary.main",
+                            }}
+                        >
+                            Characters
+                        </Typography>
+                        <Switch
+                            checked={isPlayers}
+                            onChange={() => setIsPlayers((old) => !old)}
+                        />
+                        <Typography
+                            variant="caption"
+                            sx={{
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                color: !isPlayers ? null : "primary.main",
+                            }}
+                        >
+                            Players
+                        </Typography>
+                    </Box>
                 </Box>
             ) : null,
         state: {
@@ -694,11 +922,25 @@ function validateCharacter(character) {
             ? "Class is required"
             : "",
         spec: !validateRequired(character.spec) ? "Spec is required" : "",
-        guildRank: !validateRequired(character.guild_rank)
-            ? "Guild Rank is required"
+        // guildRank: !validateRequired(character.guild_rank)
+        //     ? "Guild Rank is required"
+        //     : "",
+        // discordName: !validateRequired(character.discord_name)
+        //     ? "Discord Name is required"
+        //     : "",
+    };
+}
+
+function validatePlayer(player) {
+    return {
+        playerName: !validateRequired(player.player_name)
+            ? "Player Name is required"
             : "",
-        discordName: !validateRequired(character.discord_name)
+        discordName: !validateRequired(player.discord_name)
             ? "Discord Name is required"
+            : "",
+        guildRank: !validateRequired(player.guild_rank)
+            ? "Guild Rank is required"
             : "",
     };
 }

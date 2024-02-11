@@ -42,7 +42,7 @@ const Login = () => {
                                     alignItems="center"
                                     justifyContent="center"
                                 >
-                                    <Grid item sx={{ mb: 3 }}>
+                                    <Grid item>
                                         <Link to="#">
                                             <Logo />
                                         </Link>
@@ -75,8 +75,12 @@ const Login = () => {
                                                                 ? "h3"
                                                                 : "h2"
                                                         }
+                                                        sx={{
+                                                            pb: 2,
+                                                        }}
                                                     >
-                                                        Hi, Welcome Back
+                                                        Hi, Welcome to Guild
+                                                        Genius
                                                     </Typography>
                                                     <Typography
                                                         variant="caption"
@@ -86,21 +90,30 @@ const Login = () => {
                                                                 ? "center"
                                                                 : "inherit"
                                                         }
+                                                        sx={{
+                                                            pb: 2,
+                                                        }}
                                                     >
-                                                        Enter your credentials
-                                                        to continue
+                                                        Please sign in with
+                                                        discord to use the app
                                                     </Typography>
                                                 </Stack>
                                             </Grid>
                                         </Grid>
                                     </Grid>
-                                    <Grid item xs={12}>
+                                    <Grid
+                                        item
+                                        xs={12}
+                                        sx={{
+                                            pb: 2,
+                                        }}
+                                    >
                                         <AuthLogin />
                                     </Grid>
                                     <Grid item xs={12}>
                                         <Divider />
                                     </Grid>
-                                    <Grid item xs={12}>
+                                    {/* <Grid item xs={12}>
                                         <Grid
                                             item
                                             container
@@ -117,7 +130,7 @@ const Login = () => {
                                                 Don&apos;t have an account?
                                             </Typography>
                                         </Grid>
-                                    </Grid>
+                                    </Grid> */}
                                 </Grid>
                             </AuthCardWrapper>
                         </Grid>

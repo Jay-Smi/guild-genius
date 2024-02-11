@@ -9,7 +9,7 @@ const MinimalLayout = () => {
     return (
         <>
             <Outlet />
-            <Customization />
+            {/* <Customization /> */}
         </>
     );
 };

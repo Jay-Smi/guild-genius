@@ -27,7 +27,6 @@ async function insertCharacter(formData) {
         player_id,
         guild_id,
         discord_name,
-        guild_rank,
     } = formData;
     const { data, error } = await supabase.from("characters").insert([
         {
@@ -38,7 +37,6 @@ async function insertCharacter(formData) {
             player_id,
             guild_id,
             discord_name,
-            guild_rank,
         },
     ]);
     return { data, error };

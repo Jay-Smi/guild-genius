@@ -3,11 +3,8 @@ import Calendar from "./calendar";
 import Loader from "../../../components/Loader";
 import { useStore } from "../../../store";
 import useUserInfo from "../../../hooks/useUserInfo";
-import useGuild from "../../../hooks/useGuild";
-import { useAllGuildInstanceLockouts } from "../../../hooks/useGuildInstanceLockout";
-import { useAllGuildsRaids } from "../../../hooks/useRaids";
+
 import usePlayerAvailability from "../../../hooks/player/availability/usePlayerAvailability";
-import { useMemo } from "react";
 
 export default function Availability() {
     const theme = useTheme();

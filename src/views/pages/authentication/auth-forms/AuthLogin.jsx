@@ -34,7 +34,7 @@ import { signInWithDiscord } from "../../../../services/auth/apiDiscord";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
-import Google from "../../../../assets/images/icons/social-google.svg";
+import Discord from "../../../../assets/images/icons/discord-icon.svg";
 
 // ============================|| FIREBASE - LOGIN ||============================ //
 
@@ -76,26 +76,46 @@ const FirebaseLogin = ({ ...others }) => {
                             variant="outlined"
                             sx={{
                                 color: "grey.700",
-                                backgroundColor: theme.palette.grey[50],
-                                borderColor: theme.palette.grey[100],
+                                backgroundColor: theme.palette.grey[500],
+                                borderColor: theme.palette.grey[400],
                             }}
                         >
-                            <Box sx={{ mr: { xs: 1, sm: 2, width: 20 } }}>
+                            <Box
+                                sx={{
+                                    mr: {
+                                        xs: 1,
+                                        sm: 2,
+                                        width: 28,
+                                        height: 28,
+                                        borderRadius: 5,
+                                    },
+
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    backgroundColor: theme.palette.grey[300],
+                                }}
+                            >
                                 <img
-                                    src={Google}
-                                    alt="google"
-                                    width={16}
-                                    height={16}
+                                    src={Discord}
+                                    alt="discord"
                                     style={{
-                                        marginRight: matchDownSM ? 8 : 16,
+                                        width: "24px",
+                                        height: "24px",
+                                        objectFit: "contain",
                                     }}
                                 />
                             </Box>
-                            Sign in with Discord
+                            <Typography
+                                variant="h4"
+                                color={theme.palette.grey[300]}
+                            >
+                                Sign in with Discord
+                            </Typography>
                         </Button>
                     </AnimateButton>
                 </Grid>
-                <Grid item xs={12}>
+                {/* <Grid item xs={12}>
                     <Box
                         sx={{
                             alignItems: "center",
@@ -143,10 +163,10 @@ const FirebaseLogin = ({ ...others }) => {
                             Sign in with Email address
                         </Typography>
                     </Box>
-                </Grid>
+                </Grid> */}
             </Grid>
 
-            <Formik
+            {/* <Formik
                 initialValues={{
                     email: "info@codedthemes.com",
                     password: "123456",
@@ -319,7 +339,7 @@ const FirebaseLogin = ({ ...others }) => {
                         </Box>
                     </form>
                 )}
-            </Formik>
+            </Formik> */}
         </>
     );
 };
