@@ -38,9 +38,9 @@ async function insertProfileByUserId(newProfile) {
 export function useInsertProfile() {
     const profileMutation = useMutation({
         mutationFn: (newProfile) => insertProfileByUserId(newProfile),
-        onMutate: (newProfile) => {
-            queryClient.setQueryData(["profile"], () => [newProfile]);
-        },
+        // onMutate: (newProfile) => {
+        //     queryClient.setQueryData(["profile"], () => [newProfile]);
+        // },
         onSettled: () => queryClient.invalidateQueries(["profile"]),
     });
     return profileMutation;

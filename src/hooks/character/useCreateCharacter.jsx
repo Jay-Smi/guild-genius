@@ -13,6 +13,7 @@ export default function useCreateCharacter() {
         },
         onSettled: () => {
             queryClient.invalidateQueries({ queryKey: ["user-characters"] });
+            queryClient.invalidateQueries({ queryKey: ["guild-characters"] });
         },
     });
 }

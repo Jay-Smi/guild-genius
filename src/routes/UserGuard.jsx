@@ -5,6 +5,7 @@ import { useInsertPlayer } from "../hooks/usePlayers";
 import useUserInfo from "../hooks/useUserInfo";
 import Loader from "../components/Loader";
 import useUpdateProfile from "../hooks/profile/useUpdateProfile";
+import useUpdateOwnPlayer from "../hooks/player/useUpdateOwnPlayer";
 
 export default function UserGuard({ children }) {
     const user = useStore((state) => state.session.user);
@@ -41,6 +42,11 @@ export default function UserGuard({ children }) {
                 profileId={profile[0].id}
             />
         );
+    if (players[0].profile_id === null) {
+        return (
+            <UpdateProfileAndPlayer profile={profile[0]} player={players[0]} />
+        );
+    }
 
     return children;
     // console.log("players", players);
@@ -90,6 +96,44 @@ export default function UserGuard({ children }) {
 
 //     return children;
 // }
+
+function UpdateProfileAndPlayer({ profile, player }) {
+    //assign profile active_player_id
+    //assign player profile_id
+    const { mutate: updateProfile } = useUpdateProfile();
+
+    const { mutate: updatePlayer } = useUpdateOwnPlayer();
+
+    const hasMutated = useRef(false);
+
+    console.log("profile", profile);
+    console.log("player", player);
+
+    const newProfile = {
+        ...profile,
+        active_player_id: player.id,
+    };
+
+    const newPlayer = {
+        ...player,
+        profile_id: profile.id,
+    };
+
+    useEffect(() => {
+        if (!hasMutated.current) {
+            hasMutated.current = true;
+            updateProfile(newProfile);
+            updatePlayer(newPlayer);
+        }
+    }, []);
+
+    return (
+        <>
+            <Loader />
+            <div>Updating Profile</div>
+        </>
+    );
+}
 
 function MakeProfile({ userId, displayName, discordName }) {
     const hasMutated = useRef(false);
