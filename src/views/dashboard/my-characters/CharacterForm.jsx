@@ -77,7 +77,6 @@ function CharacterForm({ ...others }) {
             player_id: activePlayer.id,
             guild_id: gId,
             discord_name: activePlayer.discord_name,
-            guild_rank: rank,
         };
 
         try {
