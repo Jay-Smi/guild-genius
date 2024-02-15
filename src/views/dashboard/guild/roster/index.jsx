@@ -4,7 +4,7 @@ import { useAllGuildsCharacters } from "../../../../hooks/character/useCharacter
 import useAllGuildsPlayers from "../../../../hooks/player/useAllGuildsPlayers";
 import useAllGuildCharacterTags from "../../../../hooks/character/useAllGuildCharacterTags";
 import Loader from "../../../../components/Loader";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 import { allClassesArray } from "../../../../utils/wowHelpers";
 import useCreateGuildCharacter from "../../../../hooks/character/useCreateGuildCharacter";
@@ -13,13 +13,16 @@ import useDeleteGuildCharacter from "../../../../hooks/character/useDeleteGuildC
 import {
     Box,
     Button,
+    Dialog,
     IconButton,
+    Input,
     Switch,
     Tooltip,
     Typography,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import FileUploadIcon from "@mui/icons-material/FileUpload";
 import {
     MaterialReactTable,
     useMaterialReactTable,
@@ -36,8 +39,14 @@ import {
 } from "../../../../utils/helpers";
 import useUpdateOwnPlayer from "../../../../hooks/player/useUpdateOwnPlayer";
 import useUpdateGuildPlayer from "../../../../hooks/player/useUpdateGuildPlayer";
+import Papa from "papaparse";
+import ImportDialog from "./import/ImportDialog";
+import { set } from "date-fns";
 
 function GuildRoster() {
+    const [importData, setImportData] = useState(null);
+    const [isPlayers, setIsPlayers] = useState(false);
+    const [dialogOpen, setDialogOpen] = useState(false);
     const user = useStore((state) => state.session.user);
     const userId = user.id;
     const discordName = user.user_metadata.name;
@@ -56,16 +65,15 @@ function GuildRoster() {
     const { guildCharacterTags, isLoadingCharacterTags } =
         useAllGuildCharacterTags(mainGuildId);
     const userRank = activePlayer?.guild_rank;
-    // const highestRank = characters.reduce((minCharacter, currentCharacter) => {
-    //     if (
-    //         minCharacter === null ||
-    //         currentCharacter.guild_rank < minCharacter.guild_rank
-    //     ) {
-    //         return currentCharacter;
-    //     } else {
-    //         return minCharacter;
-    //     }
-    // }, null)?.guild_rank;
+
+    const handleCloseDialog = () => {
+        setImportData(null);
+        setDialogOpen(false);
+    };
+
+    const handleOpenDialog = () => {
+        setDialogOpen(true);
+    };
 
     const isLoadingAny =
         isLoadingCharacters ||
@@ -116,12 +124,26 @@ function GuildRoster() {
     }));
 
     return (
-        <CharacterTable
-            initialCharacters={updatedCharacters}
-            isLoadingAny={isLoadingAny}
-            userRank={userRank}
-            initialPlayers={updatedPlayers}
-        />
+        <>
+            <CharacterTable
+                initialCharacters={updatedCharacters}
+                isLoadingAny={isLoadingAny}
+                userRank={userRank}
+                initialPlayers={updatedPlayers}
+                setImportData={setImportData}
+                isPlayers={isPlayers}
+                setIsPlayers={setIsPlayers}
+                handleOpenDialog={handleOpenDialog}
+            />
+            {dialogOpen && (
+                <ImportDialog
+                    importData={importData}
+                    isPlayers={isPlayers}
+                    open={dialogOpen}
+                    handleClose={handleCloseDialog}
+                />
+            )}
+        </>
     );
 }
 
@@ -138,9 +160,13 @@ function CharacterTable({
     initialPlayers,
     isLoadingAny,
     userRank,
+    setImportData,
+    isPlayers,
+    setIsPlayers,
+    handleOpenDialog,
 }) {
     const [validationErrors, setValidationErrors] = useState({});
-    const [isPlayers, setIsPlayers] = useState(false);
+    const fileInputRef = useRef(null);
 
     const characters = useMemo(
         () => initialCharacters || [],
@@ -169,37 +195,11 @@ function CharacterTable({
             {
                 accessorKey: "character_name",
                 header: "Character Name",
-                muiEditTextFieldProps: ({ table, row }) => ({
+                muiEditTextFieldProps: () => ({
                     required: true,
                     error: !!validationErrors?.characterName,
                     helperText: validationErrors?.characterName,
                     onFocus: () => {
-                        const playerName = row.getValue("player_name");
-                        const discordName = row.getValue("discord_name");
-                        if (!discordName && playerName) {
-                            const matchingPlayer = characters.find(
-                                (char) => char.player_name === playerName
-                            );
-                            if (matchingPlayer) {
-                                // const tableState = table.getState();
-                                console.log(table.getState());
-                                // table.setState((oldState) => {
-                                //     console.log(oldState);
-                                //     return {
-                                //         ...oldState,
-                                //         creatingRow: {
-                                //             ...oldState.creatingRow,
-                                //             _valuesCache: {
-                                //                 ...oldState.creatingRow
-                                //                     ._valuesCache,
-                                //                 discord_name:
-                                //                     matchingPlayer.discord_name,
-                                //             },
-                                //         },
-                                //     };
-                                // });
-                            }
-                        }
                         setValidationErrors({
                             ...validationErrors,
                             characterName: undefined,
@@ -245,44 +245,6 @@ function CharacterTable({
                 header: "Guild Rank",
                 editVariant: "select",
 
-                // editSelectOptions: () => {
-                //     const possibleRanks = [
-                //         { string: "Trial", int: 15 },
-                //         { string: "Member", int: 10 },
-                //         { string: "Officer", int: 5 },
-                //         { string: "Guild Master", int: 0 },
-                //         { string: "Admin", int: -1 },
-                //     ];
-                //     const rankArray = [];
-
-                //     if (userRank === -1) {
-                //         for (let i = 0; i < possibleRanks.length; i++) {
-                //             rankArray.push(possibleRanks[i].string);
-                //         }
-                //     } else if (userRank === 0) {
-                //         for (let i = 0; i < possibleRanks.length; i++) {
-                //             if (
-                //                 possibleRanks[i].int === 0 ||
-                //                 possibleRanks[i].int === 5 ||
-                //                 possibleRanks[i].int === 10 ||
-                //                 possibleRanks[i].int === 15
-                //             ) {
-                //                 rankArray.push(possibleRanks[i].string);
-                //             }
-                //         }
-                //     } else if (userRank === 5) {
-                //         for (let i = 0; i < possibleRanks.length; i++) {
-                //             if (
-                //                 possibleRanks[i].int === 10 ||
-                //                 possibleRanks[i].int === 15
-                //             ) {
-                //                 rankArray.push(possibleRanks[i].string);
-                //             }
-                //         }
-                //     }
-
-                //     return rankArray;
-                // },
                 enableEditing: false,
                 // muiEditTextFieldProps: {
                 //     required: true,
@@ -328,7 +290,7 @@ function CharacterTable({
                 size: 80,
             },
         ],
-        [validationErrors, characters, userRank]
+        [validationErrors, players]
     );
 
     const playerColumns = useMemo(
@@ -422,7 +384,7 @@ function CharacterTable({
         [userRank, validationErrors]
     );
 
-    //call CREATE hook
+    //CREATE hook
     const { mutateAsync: createCharacter, isPending: isCreatingCharacter } =
         useCreateGuildCharacter();
     const { mutateAsync: createPlayer, isPending: isCreatingPlayer } =
@@ -430,13 +392,13 @@ function CharacterTable({
     const { mutateAsync: createTags, isPending: isCreatingTags } =
         useCreateGuildCharacterTags();
 
-    //call UPDATE hook
+    //UPDATE hook
     const { mutateAsync: updateCharacter, isPending: isUpdatingCharacter } =
         useUpdateGuildCharacter();
     const { mutateAsync: updatePlayer, isPending: isUpdatingPlayer } =
         useUpdateGuildPlayer();
 
-    //call DELETE hook
+    //DELETE hook
     const { mutateAsync: deleteCharacter, isPending: isDeletingCharacter } =
         useDeleteGuildCharacter();
     const { mutateAsync: deletePlayer, isPending: isDeletingPlayer } =
@@ -614,20 +576,12 @@ function CharacterTable({
                 guild_id,
             }));
 
-        // console.log("tagArray", tagArray);
-        // console.log("charactersTags", charactersTags);
-        // console.log("newTags", newTags);
-
-        // console.log("charactersTags", charactersTags);
-        // console.log("charactersTagObjs", charactersTagObjs);
         await updateCharacter(character, {
             onSuccess: async () => {
                 if (tagsToDelete.length) {
-                    console.log("tagsToDelete", tagsToDelete);
                     await deleteTags(tagsToDelete);
                 }
                 if (newTags.length) {
-                    console.log("newTags", newTags);
                     await createTags(newTags);
                 }
             },
@@ -659,7 +613,7 @@ function CharacterTable({
             guild_id,
             profile_id,
         };
-        console.log(player);
+
         await updatePlayer(player);
         table.setEditingRow(false);
     };
@@ -704,7 +658,62 @@ function CharacterTable({
         const csv = generateCsv(csvConfig)(strippedCharacters);
         download(csvConfig)(csv);
     };
-    // enableEditing: userRank < 6 ? true : false,
+
+    //IMPORT action
+
+    const handleImportCharacters = (e) => {
+        console.log("importing characters");
+    };
+
+    const handleImportPlayers = (e) => {
+        Papa.parse(e.target.files[0], {
+            header: true,
+            skipEmptyLines: true,
+            complete: (results) => {
+                const newPlayers = [];
+                results.data.forEach((player) => {
+                    const {
+                        id: discordId,
+                        username,
+                        discriminator,
+                        nickname,
+                        roles,
+                    } = player;
+
+                    const rolesArray = roles
+                        .split(",")
+                        .map((role) => role.trim());
+
+                    if (
+                        rolesArray.includes("Bot") ||
+                        rolesArray.includes("bot")
+                    ) {
+                        return;
+                    }
+                    if (!rolesArray[0]) {
+                        return;
+                    }
+
+                    const discord_name = username + "#" + discriminator;
+
+                    if (players.find((p) => p.discord_name === discord_name)) {
+                        return;
+                    }
+
+                    const newPlayer = {
+                        discord_name,
+                        guild_id: players[0].guild_id,
+                        player_name: nickname || username,
+                        roles: rolesArray,
+                    };
+                    newPlayers.push(newPlayer);
+                });
+                setImportData(newPlayers);
+                handleOpenDialog();
+            },
+        });
+    };
+
     const table = useMaterialReactTable({
         columns: isPlayers ? playerColumns : characterColumns,
         data: isPlayers ? players : characters,
@@ -852,6 +861,28 @@ function CharacterTable({
                         startIcon={<FileDownloadIcon />}
                     >
                         Export to CSV
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        component="label"
+                        startIcon={<FileUploadIcon />}
+                    >
+                        Import from CSV
+                        <input
+                            type="file"
+                            name="file"
+                            hidden
+                            ref={fileInputRef}
+                            onChange={
+                                isPlayers
+                                    ? handleImportPlayers
+                                    : handleImportCharacters
+                            }
+                            onClick={() => {
+                                fileInputRef.current.value = "";
+                            }}
+                            accept=".csv"
+                        />
                     </Button>
                     <Box sx={{ display: "flex" }}>
                         <Typography
