@@ -124,3 +124,89 @@ export default function themePalette(theme) {
         },
     };
 }
+
+function autoFillRaid(rosters, characters, raids) {
+    for (let raid of raids) {
+        if (raidHasExclusiveTags(raid)) {
+            fillRaidWithExclusiveTags(rosters, characters, raid);
+        } else {
+            fillRaidRoundRobin(rosters, characters, raid);
+        }
+    }
+}
+
+function raidHasExclusiveTags(raid) {
+    return raid.tags.some((tag) => tag.value === 0);
+}
+
+function fillRaidWithExclusiveTags(rosters, characters, raid) {
+    const exclusiveTag = raid.tags.find((tag) => tag.value === 0);
+    if (exclusiveTag) {
+        const charactersWithExclusiveTag = getCharactersWithTag(
+            characters,
+            exclusiveTag
+        );
+        for (let group of raid.groups) {
+            assignCharactersWithExclusiveTagToGroup(
+                group,
+                charactersWithExclusiveTag
+            );
+            removeAssignedCharactersFromPool(charactersWithExclusiveTag);
+        }
+    }
+}
+
+function fillRaidRoundRobin(rosters, characters, raid) {
+    const charactersPool = filterAvailableCharacters(characters, raid.time);
+    for (let group of raid.groups) {
+        assignCharactersRoundRobin(group, charactersPool);
+        removeAssignedCharactersFromPool(charactersPool);
+    }
+}
+
+function filterAvailableCharacters(characters, raidTime) {
+    return characters.filter((character) =>
+        characterIsAvailable(character, raidTime)
+    );
+}
+
+function characterIsAvailable(character, raidTime) {
+    return !character.player.unavailabilities.some(
+        (unavailability) =>
+            unavailability.start <= raidTime && raidTime <= unavailability.end
+    );
+}
+
+function assignCharactersRoundRobin(group, charactersPool) {
+    for (let character of charactersPool) {
+        if (isValidCharacterForGroup(character, group)) {
+            group.addCharacter(character);
+            break;
+        }
+    }
+}
+
+function isValidCharacterForGroup(character, group) {
+    // Check if character fits the required role for the group (tank, healer, dps)
+    // Check if the group already has enough characters of the same role
+    // Check if the character has any conflicting tags with the group
+    // Add any other relevant checks based on your specific requirements
+    return true;
+}
+
+function assignCharactersWithExclusiveTagToGroup(
+    group,
+    charactersWithExclusiveTag
+) {
+    for (let character of charactersWithExclusiveTag) {
+        if (isValidCharacterForGroup(character, group)) {
+            group.addCharacter(character);
+            break;
+        }
+    }
+}
+
+function removeAssignedCharactersFromPool(charactersPool) {
+    // Remove assigned characters from the characters pool
+    // so they cannot be assigned to another raid/group
+}

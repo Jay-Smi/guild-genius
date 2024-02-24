@@ -128,10 +128,7 @@ const MainLayout = () => {
                 <Box
                     id="main-content-container"
                     sx={{
-                        backgroundColor:
-                            theme.palette.mode === "dark"
-                                ? theme.palette.background.dark3
-                                : theme.palette.grey[100],
+                        backgroundColor: "transparent",
                     }}
                 >
                     <Outlet />
@@ -143,3 +140,7 @@ const MainLayout = () => {
 };
 
 export default MainLayout;
+
+// theme.palette.mode === "dark"
+//                                 ? theme.palette.background.dark3
+//                                 : theme.palette.grey[100],

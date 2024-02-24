@@ -1,40 +1,73 @@
-import { Box, Grid, Paper, useTheme } from "@mui/material";
+import {
+    Box,
+    Button,
+    Grid,
+    Paper,
+    useMediaQuery,
+    useTheme,
+} from "@mui/material";
 import Calendar from "./Calendar";
 import { useStore } from "../../../../store";
+import { gridSpacing } from "../../../../store/constant";
 
 function CalendarIndex() {
     const theme = useTheme();
     const borderRadius = useStore((state) => state.borderRadius);
+    const matchUpMd = useMediaQuery(theme.breakpoints.up("lg"));
+
+    const CalendarComponent = (
+        <Box
+            sx={{
+                width: "100%",
+                maxWidth: "950px",
+                backgroundColor: "transparent",
+            }}
+        >
+            <Calendar />
+        </Box>
+    );
+
+    //guild events / guild availability
+    //filters
+
+    const FilterSortComponent = (
+        <Box
+            sx={{
+                width: "100%",
+                height: matchUpMd ? "100%" : "50px",
+                borderRadius: borderRadius / 2,
+                backgroundColor: theme.palette.background.paper,
+                padding: "24px",
+            }}
+        >
+            <Button variant="contained" sx={{ width: "100%" }}>
+                Swap
+            </Button>
+            <Button></Button>
+        </Box>
+    );
+
     return (
-        <Grid container sx={{ position: "relative" }}>
+        <Grid container spacing={gridSpacing}>
             <Grid
                 item
-                xs={9}
-                sx={{ display: "flex", justifyContent: "center" }}
+                xs={12}
+                lg={10}
+                sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                }}
             >
-                <Box
-                    sx={{
-                        width: "100%",
-                        maxWidth: "1000px",
-                    }}
-                >
-                    <Calendar />
-                </Box>
+                {matchUpMd ? CalendarComponent : FilterSortComponent}
             </Grid>
 
             <Grid
                 item
-                xs={3}
+                xs={12}
+                lg={2}
                 sx={{ display: "flex", justifyContent: "center" }}
             >
-                <Box
-                    sx={{
-                        width: "100%",
-                        height: "100%",
-                        borderRadius: borderRadius / 2,
-                        backgroundColor: theme.palette.background.paper,
-                    }}
-                ></Box>
+                {matchUpMd ? FilterSortComponent : CalendarComponent}
             </Grid>
         </Grid>
     );
