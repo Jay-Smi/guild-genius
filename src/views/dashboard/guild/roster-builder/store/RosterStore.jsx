@@ -171,6 +171,7 @@ const createRosterStore = ({
             },
             {
                 name: "roster-builder",
+                storage: createJSONStorage(() => sessionStorage),
             }
         )
     );
