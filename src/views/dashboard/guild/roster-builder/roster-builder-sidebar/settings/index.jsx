@@ -13,6 +13,8 @@ import useCreateGroupCharacters from "../../../../../../hooks/postLockout/useCre
 import useCreateRaidTags from "../../../../../../hooks/postLockout/useCreateRaidTags";
 import { queryClient } from "../../../../../../config";
 import toast from "react-hot-toast";
+import { useAllGuildInstanceLockouts } from "../../../../../../hooks/useGuildInstanceLockout";
+import useDeleteGuildInstanceLockouts from "../../../../../../hooks/lockout/useDeleteGuildInstanceLockouts";
 
 const StyledAlphaBox = styled(Box)(({ theme }) => ({
     maxWidth: "300px",
@@ -91,22 +93,16 @@ export default function RosterSettings() {
     const somePlayerisInGuild =
         players?.some((player) => player.guild_id !== null) || false;
 
-    const { guild } = useGuild(players[0].guild_id, somePlayerisInGuild);
-    const guildId = guild[0].id;
-    // const highestRank =
-    //     characters.reduce((minCharacter, currentCharacter) => {
-    //         if (
-    //             minCharacter === null ||
-    //             currentCharacter.guild_rank < minCharacter.guild_rank
-    //         ) {
-    //             return currentCharacter;
-    //         } else {
-    //             return minCharacter;
-    //         }
-    //     }, null)?.guild_rank || 15;
-    const activePlayer = players?.find(
+    const activePlayer = players.find(
         (player) => player.id === profile[0].active_player_id
     );
+
+    const guildId = activePlayer?.guild_id;
+    const { lockouts, lockoutsError, isLoadingLockouts } =
+        useAllGuildInstanceLockouts(guildId);
+
+    const { mutate: deleteLockout } = useDeleteGuildInstanceLockouts();
+
     const userRank = activePlayer?.guild_rank;
     const mutateGuildInstanceLockouts = useCreateGuildInstanceLockouts();
     const mutateRaids = useCreateRaids();
@@ -155,6 +151,27 @@ export default function RosterSettings() {
         let groupsPromise = null;
         let groupCharactersPromise = null;
         let raidTagsPromise = null;
+        console.log(readyToMutate.guild_instance_lockout);
+
+        const lockoutAlreadyExists = readyToMutate.guild_instance_lockout.some(
+            (lockout) =>
+                lockouts.some(
+                    (existingLockout) =>
+                        existingLockout.start_date === lockout.start_date
+                )
+        );
+
+        if (lockoutAlreadyExists) {
+            const newLockoutStartDates =
+                readyToMutate.guild_instance_lockout.map(
+                    (lockout) => lockout.start_date
+                );
+            const existingLockoutId = lockouts.find((existingLockout) =>
+                newLockoutStartDates.includes(existingLockout.start_date)
+            ).id;
+
+            deleteLockout(existingLockoutId);
+        }
 
         guildInstanceLockoutPromise = mutateGuildInstanceLockouts.mutate(
             readyToMutate.guild_instance_lockout,

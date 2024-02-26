@@ -172,7 +172,9 @@ export function isRanged(character) {
         character.spec === "Balance" ||
         character.spec === "Marksman" ||
         character.spec === "Beastmaster" ||
-        character.spec === "Survival"
+        character.spec === "Survival" ||
+        character.spec === "Shadow" ||
+        character.spec === "Elemental"
     ) {
         return true;
     } else {

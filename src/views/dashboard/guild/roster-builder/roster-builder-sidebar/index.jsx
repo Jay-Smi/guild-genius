@@ -17,12 +17,20 @@ import PerfectScrollbar from "react-perfect-scrollbar";
 import "react-perfect-scrollbar/dist/css/styles.css";
 import { useContext, useState } from "react";
 import SidebarItems from "./sidebar-items";
-import { isEqual, parseISO } from "date-fns";
+import { format, isEqual, parse, parseISO } from "date-fns";
 import { getLockoutStartAndEndDates } from "../../../../../utils/wowHelpers";
 import dayjs from "dayjs";
 import { useStore } from "zustand";
 import { RosterContext } from "../store/RosterContextProvider";
 import toast from "react-hot-toast";
+import { useAllGuildInstanceLockouts } from "../../../../../hooks/useGuildInstanceLockout";
+import { useAllGuildsRaids } from "../../../../../hooks/useRaids";
+import {
+    useAllGuildsGroupCharacters,
+    useAllGuildsGroups,
+} from "../../../../../hooks/useGroups";
+import { useAllGuildsRaidsTags } from "../../../../../hooks/useGuildsRaidsTags";
+import Loader from "../../../../../components/Loader";
 
 const StyledStack = styled(Stack, {
     shouldForwardProp: (prop) => prop !== "matchUpLg",
@@ -96,11 +104,42 @@ const StyledMobileDrawer = styled(Drawer)(({ theme }) => ({
     },
 }));
 
-const RosterBuilderSidebar = () => {
+const RosterBuilderSidebar = ({ guildId }) => {
     const theme = useTheme();
     const matchUpLg = useMediaQuery(theme.breakpoints.up("lg"));
     const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
     const rosterStore = useContext(RosterContext);
+    const categories = useStore(rosterStore, (state) => state.categories);
+    const characters = useStore(rosterStore, (state) => state.characters);
+
+    const { lockouts, lockoutsError, isLoadingLockouts } =
+        useAllGuildInstanceLockouts(guildId);
+    const { raids, raidsError, isLoadingRaids } = useAllGuildsRaids(guildId);
+    const { groups, groupsError, isLoadingGroups } =
+        useAllGuildsGroups(guildId);
+    const {
+        guildGroupCharacters,
+        groupCharactersError,
+        isLoadingGroupCharacters,
+    } = useAllGuildsGroupCharacters(guildId);
+    const { raidsTags, raidsTagsError, isLoadingRaidsTags } =
+        useAllGuildsRaidsTags(guildId);
+
+    const isLoadingAny =
+        isLoadingLockouts ||
+        isLoadingRaids ||
+        isLoadingGroups ||
+        isLoadingGroupCharacters ||
+        isLoadingRaidsTags ||
+        raids === undefined ||
+        groups === undefined ||
+        guildGroupCharacters === undefined ||
+        raidsTags === undefined;
+
+    const createExistingTabsContainer = useStore(
+        rosterStore,
+        (state) => state.createExistingTabsContainer
+    );
     const chosenLockouts = useStore(
         rosterStore,
         (state) => state.chosenLockouts
@@ -160,6 +199,12 @@ const RosterBuilderSidebar = () => {
         setChosenLockouts(newLockouts);
     }
 
+    function selectedLockoutAlreadySaved(startDate) {
+        return lockouts.some((lockout) => {
+            return lockout.start_date === startDate;
+        });
+    }
+
     function handleAddLockout() {
         if (selectedLockout === null) {
             return;
@@ -186,9 +231,121 @@ const RosterBuilderSidebar = () => {
             },
         ];
 
-        createTabsContainer(newLockoutId);
+        if (selectedLockoutAlreadySaved(startDate)) {
+            const selectedGuildInstanceLockout = lockouts.find(
+                (lockout) => lockout.start_date === startDate
+            );
+
+            const containers = buildExistingLockoutContainers(
+                selectedGuildInstanceLockout
+            );
+            console.log("containers", containers);
+
+            createExistingTabsContainer(newLockoutId, containers);
+        } else {
+            createTabsContainer(newLockoutId);
+        }
+
         setChosenLockouts(newLockouts);
     }
+    //lockouts
+    //raids
+    //groups
+    //guildGroupCharacters
+    //raidsTags
+
+    function buildExistingLockoutContainers(selectedGuildInstanceLockout) {
+        const newRaids = raids.filter(
+            (raid) =>
+                raid.guild_instance_lockout_id ===
+                selectedGuildInstanceLockout.id
+        );
+        const newGroups = groups.filter(
+            (group) =>
+                group.guild_instance_lockout_id ===
+                selectedGuildInstanceLockout.id
+        );
+        const newGuildGroupCharacters = guildGroupCharacters.filter(
+            (guildGroupCharacter) =>
+                guildGroupCharacter.guild_instance_lockout_id ===
+                selectedGuildInstanceLockout.id
+        );
+        const newRaidsTags = raidsTags.filter(
+            (raidTag) =>
+                raidTag.guild_instance_lockout_id ===
+                selectedGuildInstanceLockout.id
+        );
+
+        const newCategories = Object.values(categories).map((category) => {
+            //remove any rostered characters from category
+            const newCategoryData = category.data.filter((characterId) => {
+                return !newGuildGroupCharacters.some(
+                    (guildGroupCharacter) =>
+                        guildGroupCharacter.character_id === characterId
+                );
+            });
+            return {
+                ...category,
+                data: newCategoryData,
+            };
+        });
+
+        const updatedRaids = newRaids.map((raid) => {
+            const raidTags = newRaidsTags
+                .filter((raidTag) => raidTag.raid_id === raid.id)
+                .map((raidTag) => {
+                    return {
+                        ...raidTag,
+                        tag: raidTag.tag_name,
+                    };
+                });
+            const raidsGroups = newGroups
+                .filter((group) => group.raid_id === raid.id)
+                .map((group) => group.id);
+            const formattedTime = parse(raid.time, "HH:mm:ss", new Date());
+            return {
+                ...raid,
+                time: format(formattedTime, "h:mm a"),
+                tags: raidTags,
+                data: raidsGroups,
+            };
+        });
+        const updatedGroups = newGroups.map((group) => {
+            const groupCharacters = newGuildGroupCharacters
+                .filter(
+                    (guildGroupCharacter) =>
+                        guildGroupCharacter.group_id === group.id
+                )
+                .map((guildGroupCharacter) => guildGroupCharacter.character_id);
+            return {
+                ...group,
+                data: groupCharacters,
+            };
+        });
+
+        const containersObject = [
+            ...newCategories,
+            ...updatedRaids,
+            ...updatedGroups,
+            ...Object.values(characters),
+            {
+                id: "categoriesContainer",
+                type: "container",
+                data: newCategories.map((category) => category.id),
+            },
+            {
+                id: "raidsContainer",
+                type: "container",
+                data: updatedRaids.map((raid) => raid.id),
+            },
+        ].reduce((acc, container) => {
+            acc[container.id] = container;
+            return acc;
+        }, {});
+
+        return containersObject;
+    }
+
     function handleInstanceSelectChange(event) {
         setSelectedInstance(event.target.value);
     }
@@ -250,6 +407,7 @@ const RosterBuilderSidebar = () => {
 
     return (
         <Box component="nav" aria-label="roster-builder-options">
+            {isLoadingAny && <Loader />}
             {/* DESKTOP VIEW */}
             {matchUpLg && (
                 <StyledDesktopDrawer

@@ -71,9 +71,8 @@ const createRosterStore = ({
                     activeId: null,
                     selectedTab: 0,
                     selectedInstance: "",
-                    categories,
-                    characters,
-
+                    categories: categoriesObject,
+                    characters: charactersObject,
                     characterTags,
                     tags: [
                         ...new Set(characterTags.map((tag) => tag.tag_name)),
@@ -114,6 +113,14 @@ const createRosterStore = ({
                             tabsContainers: {
                                 ...state.tabsContainers,
                                 [tab]: get().containers,
+                            },
+                        })),
+                    createExistingTabsContainer: (tab, container) =>
+                        set((state) => ({
+                            ...state,
+                            tabsContainers: {
+                                ...state.tabsContainers,
+                                [tab]: container,
                             },
                         })),
                     setTabContainer: (tab, container) => {

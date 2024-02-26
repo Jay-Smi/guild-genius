@@ -7,7 +7,7 @@ export function useAllGuildsGroups(guildId) {
         error: groupsError,
         isLoading: isLoadingGroups,
     } = useQuery({
-        queryKey: ["guilds-groups", guildId],
+        queryKey: ["guilds-groups"],
         queryFn: () => getAllGuildsGroups(guildId),
         enabled: !!guildId,
     });
@@ -34,7 +34,7 @@ export function useAllGuildsGroupCharacters(guildId) {
         error: groupCharactersError,
         isLoading: isLoadingGroupCharacters,
     } = useQuery({
-        queryKey: ["guilds-groups-characters", guildId],
+        queryKey: ["guilds-groups-characters"],
         queryFn: () => getAllGuildsGroupCharacters(guildId),
         enabled: !!guildId,
     });

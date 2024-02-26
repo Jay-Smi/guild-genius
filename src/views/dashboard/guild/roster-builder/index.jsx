@@ -1,5 +1,8 @@
-import { useGuildInstanceLockout } from "../../../../hooks/useGuildInstanceLockout";
-import { useState } from "react";
+import {
+    useAllGuildInstanceLockouts,
+    useGuildInstanceLockout,
+} from "../../../../hooks/useGuildInstanceLockout";
+import { useMemo, useState } from "react";
 import {
     getLockoutStartAndEndDates,
     isHealer,
@@ -79,6 +82,7 @@ export default function RosterBuilder() {
 
     let categories = [];
     let modifiedCharacters = null;
+
     if (!mainGuildId)
         return <Typography>Join a guild to use the roster builder</Typography>;
     if (!isLoadingAny) {
@@ -204,7 +208,7 @@ export default function RosterBuilder() {
                     <DndProvider />
                 </Box>
 
-                <RosterBuilderSidebar />
+                <RosterBuilderSidebar guildId={mainGuildId} />
                 <AlteredTabAlert />
             </LocalizationProvider>
         </RosterContextProvider>

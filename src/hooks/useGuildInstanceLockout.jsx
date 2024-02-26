@@ -35,7 +35,7 @@ export function useAllGuildInstanceLockouts(guildId) {
         error: lockoutsError,
         isLoading: isLoadingLockouts,
     } = useQuery({
-        queryKey: ["guild-instance-lockouts", guildId],
+        queryKey: ["guild-instance-lockouts"],
         queryFn: () => getAllLockouts(guildId),
         enabled: !!guildId,
     });
