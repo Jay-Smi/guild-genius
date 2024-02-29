@@ -6,6 +6,7 @@ import { StyledActions, StyledItem, StyledWrapper } from "./Item.styles.jsx";
 import { RosterContext } from "../../store/RosterContextProvider.jsx";
 import { useStore } from "zustand";
 import { Typography, styled, useTheme } from "@mui/material";
+import isUnavailable from "../../utils/isUnavailable.jsx";
 
 const StyledTypography = styled(Typography)(({ theme }) => ({
     fontWeight: "800",
@@ -37,7 +38,7 @@ export const Item = memo(
                 wrapperStyle,
                 characterId,
                 activeCharacterId,
-
+                raidId,
                 ...props
             },
             ref
@@ -70,6 +71,11 @@ export const Item = memo(
 
             const character = getActualContainer(characterId);
             const activeCharacter = getActualContainer(activeCharacterId);
+            const raid = raidId ? getActualContainer(raidId) : null;
+            const charIsUnavailable = raidId
+                ? isUnavailable(character, raid)
+                : null;
+
             const isActivePlayer =
                 activeCharacter &&
                 character.player_id === activeCharacter.player_id;
@@ -146,6 +152,16 @@ export const Item = memo(
                         </StyledTypography>
                         <StyledActions>
                             {onRemove ? <Remove onClick={onRemove} /> : null}
+                            {charIsUnavailable && (
+                                <Typography
+                                    sx={{
+                                        mr: "10px",
+                                        color: theme.palette.background.dark3,
+                                    }}
+                                >
+                                    Unavailable
+                                </Typography>
+                            )}
                         </StyledActions>
                     </StyledItem>
                 </StyledWrapper>

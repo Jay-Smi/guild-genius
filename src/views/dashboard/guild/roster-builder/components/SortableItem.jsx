@@ -16,7 +16,7 @@ import { Sort } from "@mui/icons-material";
 // }
 
 const SortableItem = memo(
-    ({ id, index, renderItem, characterId, activeCharacterId }) => {
+    ({ id, index, renderItem, characterId, activeCharacterId, raidId }) => {
         const {
             setNodeRef,
             setActivatorNodeRef,
@@ -49,6 +49,7 @@ const SortableItem = memo(
                 renderItem={renderItem}
                 characterId={characterId}
                 activeCharacterId={activeCharacterId}
+                raidId={raidId}
             />
         );
     }

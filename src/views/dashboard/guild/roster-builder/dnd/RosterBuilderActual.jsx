@@ -235,6 +235,9 @@ const RosterBuilderActual = memo(({ handleRemove, containers }) => {
                                                                                     activeCharacterId={
                                                                                         activeId
                                                                                     }
+                                                                                    raidId={
+                                                                                        currentRaid.id
+                                                                                    }
                                                                                 />
                                                                             );
                                                                         }
