@@ -40,6 +40,7 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { DndContext } from "@dnd-kit/core";
 import DndProvider from "./dnd/DndProvider";
 import usePlayerAvailability from "../../../../hooks/player/availability/usePlayerAvailability";
+import useGuildAvailability from "../../../../hooks/player/availability/useGuildAvailability";
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
 
@@ -65,7 +66,7 @@ export default function RosterBuilder() {
     const { guildCharacterTags, isLoadingCharacterTags, errorCharacterTags } =
         useAllGuildCharacterTags(mainGuildId);
     const { data: playerAvailability, isLoading: isLoadingPlayerAvailability } =
-        usePlayerAvailability(activePlayer?.id);
+        useGuildAvailability(mainGuildId);
 
     const isLoadingAny =
         isLoadingCharacters ||
