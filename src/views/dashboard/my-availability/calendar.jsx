@@ -107,7 +107,7 @@ export default function Calendar({ availability, playerId, userId, guildId }) {
             user_id: userId,
             guild_id: guildId,
         };
-        console.log("event", event);
+
         createAvailability(event);
         setNewAvailability({});
         setDialogOpen(false);

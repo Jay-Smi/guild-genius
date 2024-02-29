@@ -57,6 +57,7 @@ function GuildRoster() {
     const activePlayer = players?.find(
         (player) => player.id === profile[0].active_player_id
     );
+    const userRank = activePlayer?.guild_rank;
 
     const mainGuildId = activePlayer?.guild_id;
     const { guildCharacters, isLoadingCharacters } =
@@ -64,7 +65,6 @@ function GuildRoster() {
     const { guildPlayers, isLoadingPlayers } = useAllGuildsPlayers(mainGuildId);
     const { guildCharacterTags, isLoadingCharacterTags } =
         useAllGuildCharacterTags(mainGuildId);
-    const userRank = activePlayer?.guild_rank;
 
     const handleCloseDialog = () => {
         setImportData(null);
