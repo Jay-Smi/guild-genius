@@ -1,82 +1,80 @@
-import styled from "@emotion/styled";
-import { useTheme } from "@mui/material";
+import { useTheme, styled, Box } from "@mui/material";
+import emotionStyled from "@emotion/styled";
 
-export const StyledRaid = styled.div`
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    box-sizing: border-box;
-    appearance: none;
-    outline: none;
-    resize: horizontal;
-    min-width: 330px;
-    max-width: 1140px;
-    height: "auto";
-    min-height: ${(props) => (props.isopen ? "100px" : 0)};
-    border-radius: 12px;
-    background-color: ${(props) => {
-        return props.theme.palette.mode === "dark"
-            ? props.theme.palette.background.dark2
-            : props.theme.palette.grey[100];
-    }};
+export const StyledRaid = styled(Box, {
+    shouldForwardProp: (prop) => prop !== "isopen" && prop !== "unavailable",
+})(({ theme, isopen, unavailable }) => ({
+    display: "flex",
+    flexDirection: "column",
+    overflow: "hidden",
+    boxsizing: "border-box",
+    appearance: "none",
+    outline: "none",
+    resize: "horizontal",
+    minWidth: "330px",
+    maxWidth: "1140px",
+    height: "auto",
+    minHeight: isopen ? "100px" : "0",
+    borderRadius: "12px",
+    backgroundColor:
+        theme.palette.mode === "dark"
+            ? theme.palette.background.dark2
+            : theme.palette.grey[100],
     /* border: 1px solid
         ${(props) => {
         return props.theme.palette.mode === "dark"
             ? props.theme.palette.grey[600]
             : props.theme.palette.grey[300];
     }}; */
-    box-shadow: ${(props) => {
-        return props.theme.palette.mode === "dark"
-            ? "4px 5px 5px 2px rgba(0, 0, 0, 0.459)"
-            : " 2px 3px 10px 1px rgba(0, 0, 0, 0.155)";
-    }};
-    font-size: 1em;
+    boxShadow: unavailable
+        ? `4px 5px 5px 2px ${theme.palette.error.dark}`
+        : theme.palette.mode === "dark"
+        ? "4px 5px 5px 2px rgba(0, 0, 0, 0.459)"
+        : " 2px 3px 10px 1px rgba(0, 0, 0, 0.155)",
+    fontSize: "1em",
 
-    & > .containerHeader {
-        display: flex;
+    "& > .containerHeader": {
+        display: "flex",
 
-        padding: 5px 20px;
-        padding-right: 8px;
-        justify-content: space-between;
-        align-items: center;
-        background-color: ${(props) => {
-            return props.theme.palette.background.paper;
-        }};
-        border-top-left-radius: 12px;
-        border-top-right-radius: 12px;
-        border-bottom: 1px solid
-            ${(props) => {
-                return props.theme.palette.mode === "dark"
-                    ? props.theme.palette.grey[600]
-                    : props.theme.palette.grey[300];
-            }};
-    }
+        padding: "5px 20px",
+        paddingRight: "8px",
+        justifyContent: "space-between",
+        alignItems: "center",
+        backgroundColor: theme.palette.background.paper,
+        borderTopLeftRadius: "12px",
+        borderTopRightRadius: "12px",
+        borderBottom: `1px solid
+            ${
+                theme.palette.mode === "dark"
+                    ? theme.palette.grey[600]
+                    : theme.palette.grey[300]
+            }`,
+    },
 
-    & > ul {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        justify-items: center;
-        list-style: none;
+    "& > ul": {
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
+        justifyItems: "center",
+        listStyle: "none",
 
-        gap: 20px 20px;
-        padding: 20px;
-        margin: 0;
-        background-color: ${(props) => {
-            return props.theme.palette.mode === "dark"
-                ? props.theme.palette.background.dark2
-                : props.theme.palette.grey[100];
-        }};
-        border-bottom-left-radius: 12px;
-        border-bottom-right-radius: 12px;
+        gap: "20px 20px",
+        padding: "20px",
+        margin: "0",
+        backgroundColor:
+            theme.palette.mode === "dark"
+                ? theme.palette.background.dark2
+                : theme.palette.grey[100],
+        borderBottomLeftRadius: "12px",
+        borderBottomRightRadius: "12px",
         /* box-shadow: inset 0 0 10px 4px rgba(0, 0, 0, 0.05); */
-    }
+    },
 
-    &.shadow {
-        box-shadow: 0 1px 10px 0 rgba(34, 33, 81, 0.1);
-    }
-`;
+    "&.shadow": {
+        boxShadow: "0 1px 10px 0 rgba(34, 33, 81, 0.1)",
+    },
+}));
 
-export const StyledGroup = styled.div`
+export const StyledGroup = emotionStyled.div`
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -147,7 +145,7 @@ export const StyledGroup = styled.div`
     }
 `;
 
-export const StyledCategory = styled.div`
+export const StyledCategory = emotionStyled.div`
     display: flex;
     flex-direction: column;
     grid-auto-rows: max-content;
@@ -166,10 +164,10 @@ export const StyledCategory = styled.div`
     }};
     /* border: 1px solid
         ${(props) => {
-        return props.theme.palette.mode === "dark"
-            ? props.theme.palette.grey[600]
-            : props.theme.palette.grey[300];
-    }}; */
+            return props.theme.palette.mode === "dark"
+                ? props.theme.palette.grey[600]
+                : props.theme.palette.grey[300];
+        }}; */
     box-shadow: ${(props) => {
         return props.theme.palette.mode === "dark"
             ? "4px 5px 5px 2px rgba(0, 0, 0, 0.459)"
@@ -231,6 +229,6 @@ export const StyledCategory = styled.div`
 //     border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 // `;
 
-export const StyledDragHandle = styled.div`
+export const StyledDragHandle = emotionStyled.div`
     cursor: grabbing;
 `;

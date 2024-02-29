@@ -39,6 +39,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { DndContext } from "@dnd-kit/core";
 import DndProvider from "./dnd/DndProvider";
+import usePlayerAvailability from "../../../../hooks/player/availability/usePlayerAvailability";
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
 
@@ -63,14 +64,18 @@ export default function RosterBuilder() {
         useAllGuildsPlayers(mainGuildId);
     const { guildCharacterTags, isLoadingCharacterTags, errorCharacterTags } =
         useAllGuildCharacterTags(mainGuildId);
+    const { data: playerAvailability, isLoading: isLoadingPlayerAvailability } =
+        usePlayerAvailability(activePlayer?.id);
 
     const isLoadingAny =
         isLoadingCharacters ||
         isLoadingPlayers ||
         isLoadingCharacterTags ||
+        isLoadingPlayerAvailability ||
         guildCharacters === undefined ||
         guildCharacterTags === undefined ||
-        guildPlayers === undefined;
+        guildPlayers === undefined ||
+        playerAvailability === undefined;
 
     const tagCategories = [];
     const roleCategories = [
@@ -159,11 +164,19 @@ export default function RosterBuilder() {
 
         modifiedCharacters = guildCharacters?.map((character) => {
             const charPlayer = guildPlayers.find((player) => {
-                return character.player_name === player.name;
+                return character.player_id === player.id;
             });
+
+            const playerAvailabilities = playerAvailability?.filter(
+                (availObj) => {
+                    return availObj.player_id === charPlayer.id;
+                }
+            );
+
             return {
                 ...character,
                 player: charPlayer,
+                availability: playerAvailabilities,
             };
         });
     }

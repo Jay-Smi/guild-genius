@@ -93,6 +93,7 @@ const RosterBuilderActual = memo(({ handleRemove, containers }) => {
                                             label={currentContainer.name}
                                             items={currentContainer.data}
                                             type={currentContainer.type}
+                                            activeId={activeId}
                                         >
                                             <SortableContext
                                                 items={currentContainer.data}
@@ -164,6 +165,7 @@ const RosterBuilderActual = memo(({ handleRemove, containers }) => {
                                                 handleRemove(currentRaid.id)
                                             }
                                             type={currentRaid.type}
+                                            activeId={activeId}
                                         >
                                             <SortableContext
                                                 items={currentRaid.data}
@@ -195,6 +197,9 @@ const RosterBuilderActual = memo(({ handleRemove, containers }) => {
                                                                 }
                                                                 type={
                                                                     currentGroup.type
+                                                                }
+                                                                activeId={
+                                                                    activeId
                                                                 }
                                                             >
                                                                 <SortableContext

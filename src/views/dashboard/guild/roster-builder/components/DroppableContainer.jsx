@@ -7,7 +7,7 @@ const animateLayoutChanges = (args) =>
     defaultAnimateLayoutChanges({ ...args, wasDragging: true });
 
 const DroppableContainer = memo(
-    ({ children, id, items, style, type, ...props }) => {
+    ({ children, id, items, style, type, activeId, ...props }) => {
         const {
             attributes,
             isDragging,
@@ -39,6 +39,7 @@ const DroppableContainer = memo(
                 }}
                 type={type}
                 id={id}
+                activeId={activeId}
                 {...props}
             >
                 {children}
